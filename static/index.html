@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Кликер</title>
+<title>Sundered Star</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
     * {
@@ -16,151 +16,502 @@
 
     body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(180deg, #0a0a15 0%, #16162e 100%);
         color: white;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
         min-height: 100vh;
-        overflow: hidden;
+        padding: 16px;
+        overflow-x: hidden;
     }
 
-    .balance {
-        font-size: 48px;
-        font-weight: bold;
-        margin-bottom: 8px;
-        text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    .object-name {
+        font-size: 16px;
+        font-weight: 600;
+        opacity: 0.85;
+        margin-top: 8px;
+        letter-spacing: 1px;
     }
 
     .balance-label {
-        font-size: 14px;
-        opacity: 0.6;
-        margin-bottom: 40px;
+        font-size: 11px;
+        opacity: 0.5;
         text-transform: uppercase;
         letter-spacing: 2px;
+        margin-top: 10px;
     }
 
-    .coin {
+    .balance {
+        font-size: 40px;
+        font-weight: bold;
+        text-shadow: 0 0 20px rgba(255, 180, 80, 0.5);
+    }
+
+    .object-wrap {
+        position: relative;
         width: 220px;
         height: 220px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 35% 35%, #ffd700, #b8860b);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 90px;
+        margin: 16px 0;
         cursor: pointer;
-        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4), inset 0 -8px 15px rgba(0,0,0,0.2);
-        transition: transform 0.08s ease;
-        border: 4px solid #fff8dc;
     }
 
-    .coin:active {
-        transform: scale(0.92);
+    .object-glow {
+        position: absolute;
+        top: -20px; left: -20px;
+        width: 260px; height: 260px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,180,80,0.35) 0%, transparent 70%);
+        pointer-events: none;
+        transition: filter 0.4s ease;
+    }
+
+    .object-img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 220px;
+        height: 220px;
+        object-fit: contain;
+        transition: transform 0.08s ease, filter 0.4s ease;
+        -webkit-user-drag: none;
+    }
+
+    .cracks-overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 220px;
+        height: 220px;
+        object-fit: contain;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+        mix-blend-mode: multiply;
+    }
+
+    .object-wrap:active .object-img {
+        transform: scale(0.94);
     }
 
     .float-text {
         position: fixed;
-        font-size: 28px;
+        font-size: 22px;
         font-weight: bold;
-        color: #ffd700;
+        color: #ffb347;
         pointer-events: none;
         animation: floatUp 0.8s ease-out forwards;
         text-shadow: 0 0 8px rgba(0,0,0,0.5);
+        z-index: 10;
     }
 
     @keyframes floatUp {
         0% { transform: translateY(0); opacity: 1; }
-        100% { transform: translateY(-80px); opacity: 0; }
+        100% { transform: translateY(-70px); opacity: 0; }
+    }
+
+    .progress-block {
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 6px;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        opacity: 0.7;
+        margin-bottom: 4px;
+    }
+
+    .progress-bar-bg {
+        width: 100%;
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #a855f7, #d946ef);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .stamina-block {
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 12px;
+    }
+
+    .stamina-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        opacity: 0.7;
+        margin-bottom: 4px;
+    }
+
+    .stamina-bar-bg {
+        width: 100%;
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .stamina-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4a90e2, #6ab7ff);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .prestige-btn {
+        width: 100%;
+        max-width: 320px;
+        background: linear-gradient(135deg, #a855f7, #d946ef);
+        border: none;
+        border-radius: 14px;
+        padding: 14px;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 14px;
+        box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+    }
+
+    .prestige-btn:disabled {
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.3);
+        box-shadow: none;
+    }
+
+    .upgrades {
+        width: 100%;
+        max-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .upgrade-card {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 14px;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .upgrade-info { text-align: left; }
+    .upgrade-title { font-size: 13px; font-weight: 600; }
+    .upgrade-sub { font-size: 10px; opacity: 0.6; margin-top: 2px; }
+
+    .upgrade-btn {
+        background: linear-gradient(135deg, #ffb347, #ff8c00);
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        color: #1a1a1a;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .upgrade-btn:disabled {
+        background: rgba(255,255,255,0.1);
+        color: rgba(255,255,255,0.3);
     }
 
     .status {
-        margin-top: 30px;
-        font-size: 13px;
-        opacity: 0.5;
+        margin-top: 14px;
+        font-size: 11px;
+        opacity: 0.4;
     }
 </style>
 </head>
 <body>
 
+<div class="object-name" id="object-name">Загрузка...</div>
 <div class="balance-label">Твой баланс</div>
 <div class="balance" id="balance">0</div>
 
-<div class="coin" id="coin">🪙</div>
+<div class="object-wrap" id="object-wrap">
+    <div class="object-glow" id="object-glow"></div>
+    <img class="object-img" id="object-img" src="" alt="объект">
+    <img class="cracks-overlay" id="cracks-overlay" src="/images/cracks.png" alt="">
+</div>
+
+<div class="progress-block">
+    <div class="progress-label">
+        <span>🌌 Прогресс</span>
+        <span id="progress-text">0/0</span>
+    </div>
+    <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+</div>
+
+<div class="stamina-block">
+    <div class="stamina-label">
+        <span>⚡ Стамина</span>
+        <span id="stamina-text">0/0</span>
+    </div>
+    <div class="stamina-bar-bg">
+        <div class="stamina-bar-fill" id="stamina-fill" style="width: 0%"></div>
+    </div>
+</div>
+
+<button class="prestige-btn" id="prestige-btn" disabled>Набери прогресс для перелёта</button>
+
+<div class="upgrades">
+    <div class="upgrade-card">
+        <div class="upgrade-info">
+            <div class="upgrade-title">👆 Сила клика</div>
+            <div class="upgrade-sub" id="click-level-text">Уровень 1 · +1 монета</div>
+        </div>
+        <button class="upgrade-btn" id="upgrade-click-btn">...</button>
+    </div>
+    <div class="upgrade-card">
+        <div class="upgrade-info">
+            <div class="upgrade-title">⚡ Запас стамины</div>
+            <div class="upgrade-sub" id="stamina-level-text">Уровень 1</div>
+        </div>
+        <button class="upgrade-btn" id="upgrade-stamina-btn">...</button>
+    </div>
+</div>
 
 <div class="status" id="status">Загрузка...</div>
 
 <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.ready();
-        tg.expand();
-    }
+    if (tg) { tg.ready(); tg.expand(); }
 
     const userId = tg?.initDataUnsafe?.user?.id || 12345;
-
     const API_URL = window.location.origin;
 
+    const objectNameEl = document.getElementById('object-name');
     const balanceEl = document.getElementById('balance');
-    const coinEl = document.getElementById('coin');
+    const objectWrapEl = document.getElementById('object-wrap');
+    const objectImgEl = document.getElementById('object-img');
+    const objectGlowEl = document.getElementById('object-glow');
+    const cracksOverlayEl = document.getElementById('cracks-overlay');
     const statusEl = document.getElementById('status');
+    const progressTextEl = document.getElementById('progress-text');
+    const progressFillEl = document.getElementById('progress-fill');
+    const staminaTextEl = document.getElementById('stamina-text');
+    const staminaFillEl = document.getElementById('stamina-fill');
+    const clickLevelTextEl = document.getElementById('click-level-text');
+    const staminaLevelTextEl = document.getElementById('stamina-level-text');
+    const upgradeClickBtn = document.getElementById('upgrade-click-btn');
+    const upgradeStaminaBtn = document.getElementById('upgrade-stamina-btn');
+    const prestigeBtn = document.getElementById('prestige-btn');
 
-    let localBalance = 0;
-    let pendingClicks = 0;
+    let state = null;
+    let objectsList = [];
+    let pendingTaps = 0;
     let sendTimeout = null;
+    let localStamina = 0;
+    let currentObjectIndex = -1;
 
-    async function loadBalance() {
-        try {
-            const res = await fetch(`${API_URL}/api/balance/${userId}`);
-            const data = await res.json();
-            localBalance = data.balance;
-            balanceEl.textContent = localBalance;
-            statusEl.textContent = `ID: ${userId}`;
-        } catch (e) {
-            statusEl.textContent = 'Ошибка загрузки. Проверь подключение к серверу.';
+    async function loadObjectsList() {
+        const res = await fetch(`${API_URL}/api/objects`);
+        objectsList = await res.json();
+    }
+
+    function updateObjectVisual() {
+        if (!state) return;
+
+        if (currentObjectIndex !== state.object_index) {
+            currentObjectIndex = state.object_index;
+            const obj = objectsList[state.object_index];
+            objectImgEl.src = `/images/${obj.image}`;
+            cracksOverlayEl.style.display = state.object_category === 'planet' ? 'block' : 'none';
+        }
+
+        let progressPct = 0;
+        if (state.object_threshold) {
+            progressPct = Math.min(100, (state.object_progress / state.object_threshold) * 100);
+        } else {
+            progressPct = 100;
+        }
+
+        if (state.object_category === 'planet') {
+            cracksOverlayEl.style.opacity = 1 - (progressPct / 100) * 0.9;
+        }
+
+        if (state.object_category === 'star' || state.object_category === 'blackhole') {
+            const brightness = 0.5 + (progressPct / 100) * 0.9;
+            objectImgEl.style.filter = `brightness(${brightness})`;
+            objectGlowEl.style.filter = `brightness(${brightness})`;
+        } else {
+            objectImgEl.style.filter = 'none';
         }
     }
+
+    function renderState() {
+        if (!state) return;
+        objectNameEl.textContent = state.object_name;
+        balanceEl.textContent = state.balance;
+
+        const staminaPct = Math.max(0, Math.min(100, (localStamina / state.stamina_max) * 100));
+        staminaFillEl.style.width = staminaPct + '%';
+        staminaTextEl.textContent = `${Math.floor(localStamina)}/${state.stamina_max}`;
+
+        if (state.object_threshold) {
+            const progressPct = Math.min(100, (state.object_progress / state.object_threshold) * 100);
+            progressFillEl.style.width = progressPct + '%';
+            progressTextEl.textContent = `${state.object_progress}/${state.object_threshold}`;
+        } else {
+            progressFillEl.style.width = '100%';
+            progressTextEl.textContent = 'Финал';
+        }
+
+        clickLevelTextEl.textContent = `Уровень ${state.click_level} · +${state.click_power} монета`;
+        if (state.click_upgrade_cost === -1) {
+            upgradeClickBtn.textContent = 'MAX';
+            upgradeClickBtn.disabled = true;
+        } else {
+            upgradeClickBtn.textContent = state.click_upgrade_cost;
+            upgradeClickBtn.disabled = state.balance < state.click_upgrade_cost;
+        }
+
+        staminaLevelTextEl.textContent = `Уровень ${state.stamina_level} · макс ${state.stamina_max}`;
+        if (state.stamina_upgrade_cost === -1) {
+            upgradeStaminaBtn.textContent = 'MAX';
+            upgradeStaminaBtn.disabled = true;
+        } else {
+            upgradeStaminaBtn.textContent = state.stamina_upgrade_cost;
+            upgradeStaminaBtn.disabled = state.balance < state.stamina_upgrade_cost;
+        }
+
+        if (state.is_final_object) {
+            prestigeBtn.textContent = '🌟 Это финальный объект!';
+            prestigeBtn.disabled = true;
+        } else if (state.can_prestige) {
+            prestigeBtn.textContent = `🚀 Лететь дальше (+60% навсегда)`;
+            prestigeBtn.disabled = false;
+        } else {
+            prestigeBtn.textContent = 'Набери прогресс для перелёта';
+            prestigeBtn.disabled = true;
+        }
+
+        updateObjectVisual();
+    }
+
+    async function loadState() {
+        try {
+            const res = await fetch(`${API_URL}/api/state/${userId}`);
+            state = await res.json();
+            localStamina = state.stamina;
+            statusEl.textContent = `ID: ${userId} · Перелётов: ${state.prestige_count}`;
+            renderState();
+        } catch (e) {
+            statusEl.textContent = 'Ошибка загрузки сервера';
+        }
+    }
+
+    setInterval(() => {
+        if (state && localStamina < state.stamina_max) {
+            localStamina = Math.min(state.stamina_max, localStamina + 2 * 0.2);
+            renderState();
+        }
+    }, 200);
 
     function scheduleSend() {
         clearTimeout(sendTimeout);
         sendTimeout = setTimeout(async () => {
-            const amount = pendingClicks;
-            pendingClicks = 0;
-            if (amount === 0) return;
+            const taps = pendingTaps;
+            pendingTaps = 0;
+            if (taps === 0) return;
             try {
-                await fetch(`${API_URL}/api/click`, {
+                const res = await fetch(`${API_URL}/api/click`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, amount })
+                    body: JSON.stringify({ user_id: userId, taps })
                 });
+                if (res.ok) {
+                    state = await res.json();
+                    localStamina = state.stamina;
+                    renderState();
+                }
             } catch (e) {
                 statusEl.textContent = 'Ошибка синхронизации';
             }
-        }, 500);
+        }, 400);
     }
 
-    function showFloatText(x, y) {
+    function showFloatText(x, y, amount) {
         const el = document.createElement('div');
         el.className = 'float-text';
-        el.textContent = '+1';
+        el.textContent = '+' + amount;
         el.style.left = x + 'px';
         el.style.top = y + 'px';
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 800);
     }
 
-    coinEl.addEventListener('click', (e) => {
-        localBalance += 1;
-        pendingClicks += 1;
-        balanceEl.textContent = localBalance;
-        showFloatText(e.clientX - 15, e.clientY - 20);
+    objectWrapEl.addEventListener('click', (e) => {
+        if (!state || localStamina < 1) return;
+        localStamina -= 1;
+        pendingTaps += 1;
+        const prestigeMult = state.prestige_multiplier || 1;
+        const earnedThisClick = Math.round(state.click_power * prestigeMult);
+        balanceEl.textContent = (state.balance + Math.round(pendingTaps * state.click_power * prestigeMult));
+        showFloatText(e.clientX - 10, e.clientY - 20, earnedThisClick);
+        renderState();
         scheduleSend();
         tg?.HapticFeedback?.impactOccurred('light');
     });
 
-    loadBalance();
+    upgradeClickBtn.addEventListener('click', async () => {
+        const res = await fetch(`${API_URL}/api/upgrade/click`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
+        if (res.ok) {
+            state = await res.json();
+            localStamina = state.stamina;
+            renderState();
+        }
+    });
+
+    upgradeStaminaBtn.addEventListener('click', async () => {
+        const res = await fetch(`${API_URL}/api/upgrade/stamina`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
+        if (res.ok) {
+            state = await res.json();
+            localStamina = state.stamina;
+            renderState();
+        }
+    });
+
+    prestigeBtn.addEventListener('click', async () => {
+        const res = await fetch(`${API_URL}/api/prestige`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
+        if (res.ok) {
+            state = await res.json();
+            localStamina = state.stamina;
+            statusEl.textContent = `ID: ${userId} · Перелётов: ${state.prestige_count}`;
+            renderState();
+            tg?.HapticFeedback?.notificationOccurred('success');
+        }
+    });
+
+    async function init() {
+        await loadObjectsList();
+        await loadState();
+    }
+
+    init();
 </script>
 
 </body>
 </html>
+    
