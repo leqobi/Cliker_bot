@@ -165,6 +165,38 @@
         transition: width 0.3s ease;
     }
 
+    .daily-card {
+        width: 100%;
+        max-width: 320px;
+        background: linear-gradient(135deg, rgba(255,180,50,0.15), rgba(255,100,50,0.1));
+        border: 1px solid rgba(255,180,50,0.3);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .daily-info { text-align: left; }
+    .daily-title { font-size: 13px; font-weight: 600; }
+    .daily-sub { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+
+    .daily-btn {
+        background: linear-gradient(135deg, #ffb347, #ff8c00);
+        border: none;
+        border-radius: 10px;
+        padding: 8px 14px;
+        color: #1a1a1a;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .daily-btn:disabled {
+        background: rgba(255,255,255,0.1);
+        color: rgba(255,255,255,0.4);
+    }
+
     .prestige-btn {
         width: 100%;
         max-width: 320px;
@@ -261,6 +293,14 @@
     </div>
 </div>
 
+<div class="daily-card">
+    <div class="daily-info">
+        <div class="daily-title">🎁 Ежедневный бонус</div>
+        <div class="daily-sub" id="daily-sub">Загрузка...</div>
+    </div>
+    <button class="daily-btn" id="daily-btn">...</button>
+</div>
+
 <button class="prestige-btn" id="prestige-btn" disabled>Набери прогресс для перелёта</button>
 
 <div class="upgrades">
@@ -305,6 +345,8 @@
     const upgradeClickBtn = document.getElementById('upgrade-click-btn');
     const upgradeStaminaBtn = document.getElementById('upgrade-stamina-btn');
     const prestigeBtn = document.getElementById('prestige-btn');
+    const dailySubEl = document.getElementById('daily-sub');
+    const dailyBtn = document.getElementById('daily-btn');
 
     let state = null;
     let objectsList = [];
@@ -388,11 +430,21 @@
             prestigeBtn.textContent = '🌟 Это финальный объект!';
             prestigeBtn.disabled = true;
         } else if (state.can_prestige) {
-            prestigeBtn.textContent = `🚀 Лететь дальше (+60% навсегда)`;
+            prestigeBtn.textContent = `🚀 Лететь дальше (+${Math.round(60)}% навсегда)`;
             prestigeBtn.disabled = false;
         } else {
             prestigeBtn.textContent = 'Набери прогресс для перелёта';
             prestigeBtn.disabled = true;
+        }
+
+        const daily = state.daily_status;
+        dailySubEl.textContent = `Стрик: ${state.daily_streak} дн. · +${state.daily_next_amount} монет`;
+        if (daily.can_claim) {
+            dailyBtn.textContent = 'Забрать';
+            dailyBtn.disabled = false;
+        } else {
+            dailyBtn.textContent = `${daily.hours_until_next}ч`;
+            dailyBtn.disabled = true;
         }
 
         updateObjectVisual();
@@ -499,6 +551,20 @@
             state = await res.json();
             localStamina = state.stamina;
             statusEl.textContent = `ID: ${userId} · Перелётов: ${state.prestige_count}`;
+            renderState();
+            tg?.HapticFeedback?.notificationOccurred('success');
+        }
+    });
+
+    dailyBtn.addEventListener('click', async () => {
+        const res = await fetch(`${API_URL}/api/daily/claim`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
+        if (res.ok) {
+            state = await res.json();
+            localStamina = state.stamina;
             renderState();
             tg?.HapticFeedback?.notificationOccurred('success');
         }
