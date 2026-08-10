@@ -32,6 +32,11 @@ STAMINA_MAX_PER_LEVEL = 300
 
 PRESTIGE_BOOST_PER_LEVEL = 0.6
 
+DAILY_BONUS_BASE = 100
+DAILY_BONUS_PER_DAY = 50
+DAILY_BONUS_MAX_STREAK_DAY = 7
+SECONDS_IN_DAY = 86400
+
 CELESTIAL_OBJECTS = [
     {"id": 0, "name": "Меркурий", "category": "planet", "threshold": 2000, "image": "mercury.png"},
     {"id": 1, "name": "Венера", "category": "planet", "threshold": 3000, "image": "venus.png"},
@@ -75,7 +80,9 @@ def init_db():
                 last_stamina_update REAL NOT NULL DEFAULT 0,
                 object_index INTEGER NOT NULL DEFAULT 0,
                 object_progress INTEGER NOT NULL DEFAULT 0,
-                prestige_count INTEGER NOT NULL DEFAULT 0
+                prestige_count INTEGER NOT NULL DEFAULT 0,
+                daily_streak INTEGER NOT NULL DEFAULT 0,
+                last_daily_claim REAL NOT NULL DEFAULT 0
             )
         """)
         conn.commit()
@@ -116,14 +123,34 @@ def get_prestige_multiplier(prestige_count: int) -> float:
     return 1 + prestige_count * PRESTIGE_BOOST_PER_LEVEL
 
 
+def get_daily_bonus_amount(streak: int) -> int:
+    effective_day = min(streak, DAILY_BONUS_MAX_STREAK_DAY)
+    return DAILY_BONUS_BASE + (effective_day - 1) * DAILY_BONUS_PER_DAY
+
+
+def get_daily_status(last_claim: float, streak: int) -> dict:
+    now = time.time()
+    if last_claim == 0:
+        return {"can_claim": True, "next_streak": 1, "hours_until_next": 0}
+
+    elapsed = now - last_claim
+    if elapsed < SECONDS_IN_DAY:
+        hours_left = math.ceil((SECONDS_IN_DAY - elapsed) / 3600)
+        return {"can_claim": False, "next_streak": streak, "hours_until_next": hours_left}
+    elif elapsed < SECONDS_IN_DAY * 2:
+        return {"can_claim": True, "next_streak": streak + 1, "hours_until_next": 0}
+    else:
+        return {"can_claim": True, "next_streak": 1, "hours_until_next": 0}
+
+
 def get_or_create_user(conn, user_id: int):
     row = conn.execute("SELECT * FROM users WHERE user_id = ?", (user_id,)).fetchone()
     if row is None:
         stamina_max = get_stamina_max(1)
         conn.execute(
             """INSERT INTO users
-               (user_id, balance, click_level, stamina_level, stamina, last_stamina_update, object_index, object_progress, prestige_count)
-               VALUES (?, 0, 1, 1, ?, ?, 0, 0, 0)""",
+               (user_id, balance, click_level, stamina_level, stamina, last_stamina_update, object_index, object_progress, prestige_count, daily_streak, last_daily_claim)
+               VALUES (?, 0, 1, 1, ?, ?, 0, 0, 0, 0, 0)""",
             (user_id, stamina_max, time.time()),
         )
         conn.commit()
@@ -156,6 +183,11 @@ def user_to_dict(row) -> dict:
         "prestige_multiplier": get_prestige_multiplier(row["prestige_count"]),
         "can_prestige": current_object["threshold"] is not None and row["object_progress"] >= current_object["threshold"],
         "is_final_object": current_object["threshold"] is None,
+        "daily_streak": row["daily_streak"],
+        "daily_status": get_daily_status(row["last_daily_claim"], row["daily_streak"]),
+        "daily_next_amount": get_daily_bonus_amount(
+            get_daily_status(row["last_daily_claim"], row["daily_streak"])["next_streak"]
+        ),
     }
 
 
@@ -283,6 +315,33 @@ def prestige(data: UpgradeRequest):
         return user_to_dict(row)
 
 
+@app.post("/api/daily/claim")
+def claim_daily(data: UpgradeRequest):
+    with get_db() as conn:
+        row = get_or_create_user(conn, data.user_id)
+        status = get_daily_status(row["last_daily_claim"], row["daily_streak"])
+
+        if not status["can_claim"]:
+            raise HTTPException(status_code=400, detail="Бонус уже забран сегодня, приходи позже")
+
+        new_streak = status["next_streak"]
+        amount = get_daily_bonus_amount(new_streak)
+
+        conn.execute(
+            """
+            UPDATE users
+            SET balance = balance + ?, daily_streak = ?, last_daily_claim = ?
+            WHERE user_id = ?
+            """,
+            (amount, new_streak, time.time(), data.user_id),
+        )
+        conn.commit()
+        row = conn.execute("SELECT * FROM users WHERE user_id = ?", (data.user_id,)).fetchone()
+        result = user_to_dict(row)
+        result["claimed_amount"] = amount
+        return result
+
+
 @app.get("/api/objects")
 def get_objects_list():
     return CELESTIAL_OBJECTS
@@ -297,4 +356,4 @@ def leaderboard():
     return [{"user_id": r["user_id"], "balance": r["balance"]} for r in rows]
 
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory="static", html=True), name="static") 
