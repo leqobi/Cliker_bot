@@ -2,875 +2,992 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Sundered Star</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-}
-
-:root {
-    --bg: #050711;
-    --panel: rgba(15, 19, 38, .78);
-    --panel-border: rgba(255,255,255,.09);
-
-    --text: #f5f7ff;
-    --muted: rgba(230,235,255,.55);
-
-    --gold: #ffc76b;
-    --gold2: #ff8b38;
-
-    --blue: #65b9ff;
-    --purple: #9d70ff;
-    --pink: #ed69ff;
-
-    --green: #63e6a8;
-}
-
-html,
-body {
-    min-height: 100%;
-    background: var(--bg);
-}
-
-body {
-    min-height: 100vh;
-    overflow-x: hidden;
-    color: var(--text);
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        sans-serif;
-
-    background:
-        radial-gradient(
-            circle at 50% 22%,
-            rgba(91, 62, 170, .22),
-            transparent 34%
-        ),
-        radial-gradient(
-            circle at 10% 90%,
-            rgba(36, 105, 180, .12),
-            transparent 35%
-        ),
-        linear-gradient(
-            180deg,
-            #04050c 0%,
-            #080a17 45%,
-            #101326 100%
-        );
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: .32;
-
-    background-image:
-        radial-gradient(circle, rgba(255,255,255,.75) 1px, transparent 1px),
-        radial-gradient(circle, rgba(255,255,255,.45) 1px, transparent 1px);
-
-    background-size: 83px 83px, 137px 137px;
-    background-position: 12px 20px, 40px 70px;
-}
-
-.app {
-    position: relative;
-    z-index: 1;
-
-    width: 100%;
-    max-width: 430px;
-
-    margin: 0 auto;
-    padding: 18px 15px 28px;
-}
-
-/* ================= HEADER ================= */
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 12px;
-}
-
-.logo {
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 2.5px;
-}
-
-.logo span {
-    color: var(--gold);
-}
-
-.expedition {
-    padding: 7px 10px;
-
-    border-radius: 999px;
-
-    background: rgba(255,255,255,.055);
-    border: 1px solid rgba(255,255,255,.08);
-
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--muted);
-}
-
-/* ================= MISSION ================= */
-
-.mission {
-    text-align: center;
-    margin-top: 4px;
-}
-
-.mission-kicker {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 2.5px;
-    color: var(--muted);
-}
-
-.object-name {
-    margin-top: 5px;
-
-    font-size: 25px;
-    font-weight: 800;
-
-    letter-spacing: .5px;
-
-    text-shadow:
-        0 0 24px rgba(255,255,255,.12);
-}
-
-.object-name::before {
-    content: "✦ ";
-    color: var(--gold);
-}
-
-/* ================= BALANCE ================= */
-
-.balance-card {
-    text-align: center;
-    margin-top: 13px;
-}
-
-.balance-label {
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-.balance {
-    margin-top: 2px;
-
-    font-size: 38px;
-    line-height: 1;
-
-    font-weight: 900;
-
-    background:
-        linear-gradient(
-            180deg,
-            #fff8e7,
-            #ffc76b 65%,
-            #ff8b38
-        );
-
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-
-    filter:
-        drop-shadow(0 0 14px rgba(255,170,65,.18));
-}
-
-/* ================= OBJECT ================= */
-
-.object-zone {
-    position: relative;
-
-    width: 290px;
-    height: 290px;
-
-    margin: 3px auto 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.object-zone::before {
-    content: "";
-
-    position: absolute;
-
-    width: 245px;
-    height: 245px;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,190,90,.18),
-            rgba(130,85,255,.08) 42%,
-            transparent 70%
-        );
-
-    filter: blur(9px);
-
-    transition:
-        transform .5s ease,
-        opacity .5s ease;
-}
-
-.object-zone::after {
-    content: "";
-
-    position: absolute;
-
-    width: 215px;
-    height: 215px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid rgba(255,255,255,.055);
-
-    box-shadow:
-        0 0 45px rgba(119,92,255,.08),
-        inset 0 0 35px rgba(255,255,255,.025);
-
-    pointer-events: none;
-}
-
-.object-wrap {
-    position: relative;
-
-    width: 230px;
-    height: 230px;
-
-    cursor: pointer;
-
-    z-index: 2;
-}
-
-.object-img {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    transition:
-        transform .08s ease,
-        filter .45s ease;
-
-    -webkit-user-drag: none;
-
-    filter:
-        drop-shadow(
-            0 0 25px rgba(255,180,80,.12)
-        );
-}
-
-.cracks-overlay {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    pointer-events: none;
-
-    mix-blend-mode: multiply;
-
-    transition:
-        opacity .7s ease;
-}
-
-.object-wrap:active .object-img {
-    transform: scale(.91);
-}
-
-/* ================= CLICK EFFECT ================= */
-
-.click-ring {
-    position: fixed;
-
-    width: 25px;
-    height: 25px;
-
-    margin-left: -12px;
-    margin-top: -12px;
-
-    border-radius: 50%;
-
-    border: 2px solid rgba(255,195,105,.9);
-
-    pointer-events: none;
-
-    animation: clickRing .55s ease-out forwards;
-
-    z-index: 20;
-}
-
-@keyframes clickRing {
-    0% {
-        transform: scale(.5);
-        opacity: 1;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
     }
 
-    100% {
-        transform: scale(3);
-        opacity: 0;
-    }
-}
+    :root {
+        --bg-main: #070812;
+        --bg-second: #101225;
+        --panel: rgba(20, 23, 45, 0.82);
+        --panel-border: rgba(255,255,255,0.10);
 
-.float-text {
-    position: fixed;
+        --purple: #9d6cff;
+        --purple-light: #c08cff;
 
-    color: var(--gold);
+        --gold: #ffb347;
+        --gold-light: #ffd27a;
 
-    font-size: 20px;
-    font-weight: 900;
+        --blue: #4fa3ff;
+        --blue-light: #78c2ff;
 
-    pointer-events: none;
-
-    text-shadow:
-        0 0 12px rgba(255,160,50,.7),
-        0 2px 4px rgba(0,0,0,.6);
-
-    animation:
-        floatUp .8s ease-out forwards;
-
-    z-index: 30;
-}
-
-@keyframes floatUp {
-    0% {
-        transform:
-            translateY(0)
-            scale(.85);
-
-        opacity: 0;
+        --text: #ffffff;
+        --muted: rgba(255,255,255,0.55);
     }
 
-    15% {
-        opacity: 1;
+    html {
+        min-height: 100%;
+        background: var(--bg-main);
     }
 
-    100% {
-        transform:
-            translateY(-75px)
-            scale(1.1);
+    body {
+        min-height: 100vh;
+        padding: 12px 14px 24px;
 
-        opacity: 0;
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            Arial,
+            sans-serif;
+
+        color: var(--text);
+
+        background:
+            radial-gradient(
+                circle at 50% 18%,
+                rgba(110, 70, 180, 0.18),
+                transparent 35%
+            ),
+            radial-gradient(
+                circle at 20% 80%,
+                rgba(40, 80, 180, 0.10),
+                transparent 35%
+            ),
+            linear-gradient(
+                180deg,
+                #060710 0%,
+                #0a0b19 45%,
+                #101225 100%
+            );
+
+        overflow-x: hidden;
     }
-}
 
-/* ================= PROGRESS ================= */
+    /* =========================
+       BACKGROUND STARS
+    ========================= */
+
+    .space {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.7);
+        animation: twinkle 3s ease-in-out infinite;
+    }
+
+    .star:nth-child(1) { left: 8%; top: 13%; animation-delay: .3s; }
+    .star:nth-child(2) { left: 21%; top: 30%; animation-delay: 1.2s; }
+    .star:nth-child(3) { left: 34%; top: 8%; animation-delay: 2s; }
+    .star:nth-child(4) { left: 47%; top: 22%; animation-delay: .8s; }
+    .star:nth-child(5) { left: 63%; top: 11%; animation-delay: 1.7s; }
+    .star:nth-child(6) { left: 76%; top: 28%; animation-delay: .4s; }
+    .star:nth-child(7) { left: 90%; top: 17%; animation-delay: 2.3s; }
+    .star:nth-child(8) { left: 14%; top: 55%; animation-delay: 1.1s; }
+    .star:nth-child(9) { left: 29%; top: 69%; animation-delay: 2.1s; }
+    .star:nth-child(10) { left: 51%; top: 59%; animation-delay: .5s; }
+    .star:nth-child(11) { left: 71%; top: 71%; animation-delay: 1.4s; }
+    .star:nth-child(12) { left: 88%; top: 62%; animation-delay: 2.4s; }
+    .star:nth-child(13) { left: 5%; top: 86%; animation-delay: .7s; }
+    .star:nth-child(14) { left: 40%; top: 91%; animation-delay: 1.9s; }
+    .star:nth-child(15) { left: 81%; top: 91%; animation-delay: .9s; }
+
+    @keyframes twinkle {
+        0%, 100% {
+            opacity: .25;
+            transform: scale(.7);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.5);
+        }
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
 
-.panel {
-    width: 100%;
-
-    background: var(--panel);
-
-    border:
-        1px solid var(--panel-border);
-
-    border-radius: 17px;
-
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-
-    box-shadow:
-        0 10px 35px rgba(0,0,0,.22);
-
-    padding: 13px 14px;
-}
-
-.progress-head,
-.stamina-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    font-size: 10px;
-}
-
-.progress-title,
-.stamina-title {
-    color: var(--muted);
-}
-
-.progress-value,
-.stamina-value {
-    font-weight: 700;
-}
-
-.bar {
-    width: 100%;
-    height: 9px;
-
-    margin-top: 7px;
-
-    background: rgba(255,255,255,.07);
-
-    border-radius: 999px;
-
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-
-    width: 0%;
-
-    border-radius: inherit;
-
-    transition: width .3s ease;
-}
-
-.progress-fill {
-    background:
-        linear-gradient(
-            90deg,
-            var(--purple),
-            var(--pink)
-        );
-
-    box-shadow:
-        0 0 12px rgba(170,95,255,.45);
-}
-
-.stamina-fill {
-    background:
-        linear-gradient(
-            90deg,
-            #4b9df5,
-            #70d4ff
-        );
-
-    box-shadow:
-        0 0 12px rgba(80,180,255,.35);
-}
-
-.stamina-section {
-    margin-top: 13px;
-}
-
-/* ================= DAILY ================= */
-
-.daily {
-    margin-top: 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,180,70,.13),
-            rgba(255,90,60,.05)
-        );
-
-    border:
-        1px solid rgba(255,185,80,.18);
-
-    border-radius: 17px;
-
-    padding: 13px 14px;
-}
-
-.daily-icon {
-    width: 38px;
-    height: 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    border-radius: 12px;
-
-    background:
-        rgba(255,180,70,.13);
-
-    font-size: 19px;
-}
-
-.daily-info {
-    flex: 1;
-    text-align: left;
-}
-
-.daily-title {
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.daily-sub {
-    margin-top: 3px;
-
-    font-size: 9px;
-
-    color: var(--muted);
-}
-
-.daily-btn {
-    border: 0;
-
-    padding: 9px 13px;
-
-    border-radius: 11px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--gold),
-            var(--gold2)
-        );
-
-    color: #211307;
-
-    font-size: 10px;
-    font-weight: 900;
-}
-
-.daily-btn:disabled {
-    background: rgba(255,255,255,.07);
-    color: rgba(255,255,255,.3);
-}
-
-/* ================= PRESTIGE ================= */
-
-.prestige-btn {
-    width: 100%;
-
-    margin-top: 10px;
-
-    border: 0;
-
-    border-radius: 17px;
-
-    padding: 14px;
-
-    color: white;
-
-    font-size: 12px;
-    font-weight: 900;
-
-    background:
-        linear-gradient(
-            135deg,
-            #7651e8,
-            #d84df2
-        );
-
-    box-shadow:
-        0 8px 28px rgba(155,70,240,.22);
-
-    transition:
-        transform .12s ease,
-        opacity .2s ease;
-}
-
-.prestige-btn:not(:disabled):active {
-    transform: scale(.97);
-}
-
-.prestige-btn:disabled {
-    background: rgba(255,255,255,.055);
-    color: rgba(255,255,255,.28);
-    box-shadow: none;
-}
-
-/* ================= UPGRADES ================= */
-
-.section-title {
-    margin: 18px 2px 8px;
-
-    font-size: 9px;
-
-    color: var(--muted);
-
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.upgrades {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-
-    gap: 9px;
-}
-
-.upgrade-card {
-    min-width: 0;
-
-    padding: 13px;
-
-    background:
-        rgba(255,255,255,.045);
-
-    border:
-        1px solid rgba(255,255,255,.08);
-
-    border-radius: 16px;
-}
-
-.upgrade-icon {
-    font-size: 18px;
-}
-
-.upgrade-title {
-    margin-top: 7px;
-
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.upgrade-sub {
-    margin-top: 3px;
-
-    min-height: 25px;
-
-    font-size: 8px;
-
-    line-height: 1.4;
-
-    color: var(--muted);
-}
-
-.upgrade-btn {
-    width: 100%;
-
-    margin-top: 10px;
-
-    border: 0;
-
-    border-radius: 10px;
-
-    padding: 9px 5px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ffbd5b,
-            #ff8c32
-        );
-
-    color: #211307;
-
-    font-size: 10px;
-    font-weight: 900;
-}
-
-.upgrade-btn:disabled {
-    background: rgba(255,255,255,.07);
-    color: rgba(255,255,255,.3);
-}
-
-/* ================= STATUS ================= */
-
-.status {
-    margin-top: 16px;
-
-    text-align: center;
-
-    font-size: 8px;
-
-    color: rgba(255,255,255,.28);
-
-    letter-spacing: .5px;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-height: 700px) {
     .app {
-        padding-top: 10px;
+        position: relative;
+        z-index: 2;
+
+        width: 100%;
+        max-width: 430px;
+
+        margin: 0 auto;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .object-zone {
-        width: 250px;
-        height: 250px;
+    /* =========================
+       OBJECT NAME
+    ========================= */
+
+    .object-name {
+        margin-top: 2px;
+
+        font-size: 22px;
+        font-weight: 700;
+
+        letter-spacing: 1px;
+
+        text-align: center;
+
+        text-shadow:
+            0 0 15px rgba(255,255,255,.15);
     }
 
-    .object-wrap {
-        width: 200px;
-        height: 200px;
+    .object-type {
+        margin-top: 3px;
+
+        font-size: 9px;
+        letter-spacing: 3px;
+
+        text-transform: uppercase;
+
+        color: rgba(255,255,255,.35);
     }
 
-    .object-zone::before {
-        width: 215px;
-        height: 215px;
-    }
+    /* =========================
+       BALANCE
+    ========================= */
 
-    .object-zone::after {
-        width: 190px;
-        height: 190px;
+    .balance-label {
+        margin-top: 15px;
+
+        font-size: 10px;
+        font-weight: 600;
+
+        letter-spacing: 3px;
+
+        color: rgba(255,255,255,.43);
+
+        text-transform: uppercase;
     }
 
     .balance {
-        font-size: 32px;
+        margin-top: 1px;
+
+        font-size: 48px;
+        line-height: 1;
+
+        font-weight: 800;
+
+        letter-spacing: -2px;
+
+        color: #fff;
+
+        text-shadow:
+            0 0 12px rgba(255,179,71,.18),
+            0 0 35px rgba(255,179,71,.15);
+
+        transition: transform .12s ease;
     }
-}
+
+    .balance.bump {
+        transform: scale(1.08);
+    }
+
+    /* =========================
+       OBJECT
+    ========================= */
+
+    .object-wrap {
+        position: relative;
+
+        width: min(300px, 82vw);
+        height: min(300px, 82vw);
+
+        margin: 8px 0 10px;
+
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        touch-action: manipulation;
+    }
+
+    .object-aura {
+        position: absolute;
+
+        width: 90%;
+        height: 90%;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(255,190,100,.22) 0%,
+                rgba(255,150,70,.12) 30%,
+                transparent 70%
+            );
+
+        filter: blur(8px);
+
+        transition:
+            transform .3s ease,
+            opacity .3s ease,
+            filter .3s ease;
+    }
+
+    .object-ring {
+        position: absolute;
+
+        width: 82%;
+        height: 82%;
+
+        border-radius: 50%;
+
+        border: 1px solid rgba(255,255,255,.06);
+
+        box-shadow:
+            0 0 50px rgba(150,100,255,.08),
+            inset 0 0 40px rgba(255,255,255,.025);
+    }
+
+    .object-img {
+        position: absolute;
+
+        width: 82%;
+        height: 82%;
+
+        object-fit: contain;
+
+        z-index: 3;
+
+        transition:
+            transform .08s ease,
+            filter .35s ease;
+
+        -webkit-user-drag: none;
+
+        /*
+         * У PNG прозрачный фон должен остаться прозрачным.
+         */
+        mix-blend-mode: normal;
+    }
+
+    .cracks-overlay {
+        position: absolute;
+
+        width: 82%;
+        height: 82%;
+
+        object-fit: contain;
+
+        z-index: 4;
+
+        pointer-events: none;
+
+        transition:
+            opacity .5s ease,
+            transform .2s ease;
+
+        mix-blend-mode: normal;
+    }
+
+    .object-wrap:active .object-img {
+        transform: scale(.94);
+    }
+
+    .object-wrap.hit .object-img {
+        animation: objectHit .18s ease;
+    }
+
+    .object-wrap.hit .object-aura {
+        animation: auraHit .25s ease;
+    }
+
+    @keyframes objectHit {
+        0% {
+            transform: scale(1);
+        }
+
+        45% {
+            transform: scale(.91);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes auraHit {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.15);
+            opacity: .75;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* =========================
+       FLOAT TEXT
+    ========================= */
+
+    .float-text {
+        position: fixed;
+
+        z-index: 100;
+
+        pointer-events: none;
+
+        font-size: 21px;
+        font-weight: 800;
+
+        color: var(--gold-light);
+
+        text-shadow:
+            0 0 8px rgba(255,179,71,.5),
+            0 2px 8px rgba(0,0,0,.7);
+
+        animation:
+            floatUp .75s cubic-bezier(.2,.8,.3,1) forwards;
+    }
+
+    @keyframes floatUp {
+        0% {
+            transform:
+                translateY(0)
+                scale(.8);
+
+            opacity: 0;
+        }
+
+        15% {
+            opacity: 1;
+        }
+
+        100% {
+            transform:
+                translateY(-75px)
+                scale(1.1);
+
+            opacity: 0;
+        }
+    }
+
+    /* =========================
+       PROGRESS
+    ========================= */
+
+    .progress-block,
+    .stamina-block {
+        width: 100%;
+        max-width: 370px;
+    }
+
+    .progress-block {
+        margin-top: 2px;
+    }
+
+    .stamina-block {
+        margin-top: 10px;
+    }
+
+    .bar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 5px;
+
+        font-size: 11px;
+    }
+
+    .bar-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        color: rgba(255,255,255,.65);
+    }
+
+    .bar-value {
+        color: rgba(255,255,255,.72);
+
+        font-variant-numeric: tabular-nums;
+    }
+
+    .bar-bg {
+        width: 100%;
+        height: 8px;
+
+        padding: 1px;
+
+        border-radius: 99px;
+
+        background: rgba(255,255,255,.08);
+
+        box-shadow:
+            inset 0 1px 2px rgba(0,0,0,.5);
+    }
+
+    .bar-fill {
+        height: 100%;
+
+        width: 0%;
+
+        border-radius: 99px;
+
+        transition: width .3s ease;
+    }
+
+    .progress-bar-fill {
+        background:
+            linear-gradient(
+                90deg,
+                #8251e9,
+                #bd68f5
+            );
+
+        box-shadow:
+            0 0 12px rgba(168,85,247,.55);
+    }
+
+    .stamina-bar-fill {
+        background:
+            linear-gradient(
+                90deg,
+                #3988ed,
+                #72c0ff
+            );
+
+        box-shadow:
+            0 0 12px rgba(79,163,255,.45);
+    }
+
+    /* =========================
+       DAILY
+    ========================= */
+
+    .daily-card {
+        width: 100%;
+        max-width: 370px;
+
+        margin-top: 17px;
+
+        padding: 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+
+        border-radius: 17px;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,179,71,.13),
+                rgba(255,100,50,.07)
+            );
+
+        border: 1px solid rgba(255,179,71,.25);
+
+        box-shadow:
+            0 8px 30px rgba(0,0,0,.18);
+    }
+
+    .daily-info {
+        min-width: 0;
+    }
+
+    .daily-title {
+        font-size: 14px;
+        font-weight: 750;
+    }
+
+    .daily-sub {
+        margin-top: 3px;
+
+        font-size: 10px;
+
+        color: rgba(255,255,255,.55);
+    }
+
+    button {
+        font-family: inherit;
+
+        border: none;
+
+        cursor: pointer;
+
+        touch-action: manipulation;
+    }
+
+    .daily-btn {
+        flex-shrink: 0;
+
+        padding: 9px 15px;
+
+        border-radius: 11px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffc15b,
+                #ff9017
+            );
+
+        color: #18120b;
+
+        font-size: 12px;
+        font-weight: 800;
+
+        box-shadow:
+            0 4px 15px rgba(255,143,24,.25);
+
+        transition:
+            transform .1s ease,
+            filter .2s ease;
+    }
+
+    .daily-btn:active {
+        transform: scale(.95);
+    }
+
+    .daily-btn:disabled {
+        background: rgba(255,255,255,.08);
+        color: rgba(255,255,255,.32);
+        box-shadow: none;
+    }
+
+    /* =========================
+       PRESTIGE
+    ========================= */
+
+    .prestige-btn {
+        width: 100%;
+        max-width: 370px;
+
+        margin-top: 12px;
+
+        padding: 14px;
+
+        border-radius: 16px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #9959ee,
+                #d24ee9
+            );
+
+        color: white;
+
+        font-size: 14px;
+        font-weight: 800;
+
+        box-shadow:
+            0 6px 25px rgba(168,85,247,.25);
+
+        transition:
+            transform .1s ease,
+            filter .2s ease;
+    }
+
+    .prestige-btn:active:not(:disabled) {
+        transform: scale(.98);
+    }
+
+    .prestige-btn:disabled {
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,255,255,.08),
+                rgba(255,255,255,.06)
+            );
+
+        color: rgba(255,255,255,.28);
+
+        box-shadow: none;
+
+        cursor: default;
+    }
+
+    /* =========================
+       UPGRADES
+    ========================= */
+
+    .upgrades {
+        width: 100%;
+        max-width: 370px;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 9px;
+
+        margin-top: 11px;
+    }
+
+    .upgrade-card {
+        width: 100%;
+
+        padding: 13px 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        border-radius: 16px;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,255,255,.075),
+                rgba(255,255,255,.035)
+            );
+
+        border: 1px solid rgba(255,255,255,.09);
+
+        box-shadow:
+            0 5px 20px rgba(0,0,0,.12);
+    }
+
+    .upgrade-info {
+        min-width: 0;
+    }
+
+    .upgrade-title {
+        font-size: 14px;
+        font-weight: 750;
+    }
+
+    .upgrade-sub {
+        margin-top: 3px;
+
+        font-size: 10px;
+
+        color: rgba(255,255,255,.48);
+    }
+
+    .upgrade-btn {
+        min-width: 64px;
+
+        padding: 10px 13px;
+
+        border-radius: 12px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffbd50,
+                #ff8e18
+            );
+
+        color: #18120b;
+
+        font-size: 12px;
+        font-weight: 850;
+
+        box-shadow:
+            0 3px 12px rgba(255,150,30,.15);
+
+        transition:
+            transform .1s ease,
+            filter .2s ease;
+    }
+
+    .upgrade-btn:active:not(:disabled) {
+        transform: scale(.94);
+    }
+
+    .upgrade-btn:disabled {
+        background: rgba(255,255,255,.10);
+        color: rgba(255,255,255,.3);
+
+        box-shadow: none;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+        margin-top: 15px;
+
+        font-size: 10px;
+
+        color: rgba(255,255,255,.3);
+
+        text-align: center;
+    }
+
+    /* =========================
+       PARTICLE
+    ========================= */
+
+    .click-particle {
+        position: fixed;
+
+        width: 5px;
+        height: 5px;
+
+        border-radius: 50%;
+
+        background: #ffd27a;
+
+        pointer-events: none;
+
+        z-index: 90;
+
+        animation: particle .45s ease-out forwards;
+    }
+
+    @keyframes particle {
+        from {
+            opacity: 1;
+            transform: translate(0,0) scale(1);
+        }
+
+        to {
+            opacity: 0;
+            transform:
+                translate(
+                    var(--x),
+                    var(--y)
+                )
+                scale(.2);
+        }
+    }
+
+    /* =========================
+       SMALL SCREENS
+    ========================= */
+
+    @media (max-height: 700px) {
+        body {
+            padding-top: 5px;
+        }
+
+        .balance-label {
+            margin-top: 8px;
+        }
+
+        .object-wrap {
+            width: 250px;
+            height: 250px;
+
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .daily-card {
+            margin-top: 11px;
+        }
+
+        .upgrade-card {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+
+    @media (max-width: 350px) {
+        body {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .balance {
+            font-size: 42px;
+        }
+
+        .object-wrap {
+            width: 250px;
+            height: 250px;
+        }
+
+        .daily-title,
+        .upgrade-title {
+            font-size: 13px;
+        }
+    }
 </style>
 </head>
 
 <body>
 
+<!-- =========================
+     SPACE BACKGROUND
+========================= -->
+
+<div class="space">
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+</div>
+
+
 <div class="app">
 
-    <header class="header">
-        <div class="logo">
-            SUNDERED <span>STAR</span>
-        </div>
+    <!-- OBJECT NAME -->
 
-        <div class="expedition">
-            EXPEDITION
-        </div>
-    </header>
+    <div class="object-name" id="object-name">
+        Загрузка...
+    </div>
 
-
-    <section class="mission">
-
-        <div class="mission-kicker">
-            Объект восстановления
-        </div>
-
-        <div class="object-name" id="object-name">
-            Загрузка...
-        </div>
-
-    </section>
+    <div class="object-type" id="object-type">
+        CELESTIAL OBJECT
+    </div>
 
 
-    <section class="balance-card">
+    <!-- BALANCE -->
 
-        <div class="balance-label">
-            Ресурс экспедиции
-        </div>
+    <div class="balance-label">
+        Твой баланс
+    </div>
 
-        <div class="balance" id="balance">
-            0
-        </div>
-
-    </section>
+    <div class="balance" id="balance">
+        0
+    </div>
 
 
-    <section class="object-zone">
+    <!-- OBJECT -->
 
-        <div class="object-wrap" id="object-wrap">
+    <div class="object-wrap" id="object-wrap">
 
-            <img
-                class="object-img"
-                id="object-img"
-                src=""
-                alt="celestial object"
-            >
+        <div class="object-aura" id="object-aura"></div>
 
-            <img
-                class="cracks-overlay"
-                id="cracks-overlay"
-                src="/images/cracks.png"
-                alt=""
-            >
+        <div class="object-ring"></div>
 
-        </div>
+        <img
+            class="object-img"
+            id="object-img"
+            src=""
+            alt="Космический объект"
+        >
 
-    </section>
+        <img
+            class="cracks-overlay"
+            id="cracks-overlay"
+            src="/images/cracks.png"
+            alt=""
+        >
+
+    </div>
 
 
-    <section class="panel">
+    <!-- PROGRESS -->
 
-        <div class="progress-head">
-            <span class="progress-title">
-                🌌 Восстановление
-            </span>
+    <div class="progress-block">
 
-            <span
-                class="progress-value"
+        <div class="bar-header">
+
+            <div class="bar-title">
+                <span>🌌</span>
+                <span>Прогресс</span>
+            </div>
+
+            <div
+                class="bar-value"
                 id="progress-text"
             >
                 0/0
-            </span>
+            </div>
+
         </div>
 
-        <div class="bar">
+        <div class="bar-bg">
+
             <div
-                class="bar-fill progress-fill"
+                class="bar-fill progress-bar-fill"
                 id="progress-fill"
             ></div>
+
         </div>
 
+    </div>
 
-        <div class="stamina-section">
 
-            <div class="stamina-head">
+    <!-- STAMINA -->
 
-                <span class="stamina-title">
-                    ⚡ Энергия костюма
-                </span>
+    <div class="stamina-block">
 
-                <span
-                    class="stamina-value"
-                    id="stamina-text"
-                >
-                    0/0
-                </span>
+        <div class="bar-header">
 
+            <div class="bar-title">
+                <span>⚡</span>
+                <span>Стамина</span>
             </div>
 
-            <div class="bar">
-                <div
-                    class="bar-fill stamina-fill"
-                    id="stamina-fill"
-                ></div>
+            <div
+                class="bar-value"
+                id="stamina-text"
+            >
+                0/0
             </div>
 
         </div>
 
-    </section>
+        <div class="bar-bg">
 
+            <div
+                class="bar-fill stamina-bar-fill"
+                id="stamina-fill"
+            ></div>
 
-    <section class="daily">
-
-        <div class="daily-icon">
-            🎁
         </div>
+
+    </div>
+
+
+    <!-- DAILY BONUS -->
+
+    <div class="daily-card">
 
         <div class="daily-info">
 
             <div class="daily-title">
-                Ежедневное снабжение
+                🎁 Ежедневный бонус
             </div>
 
             <div
@@ -889,40 +1006,39 @@ body::before {
             ...
         </button>
 
-    </section>
+    </div>
 
+
+    <!-- PRESTIGE -->
 
     <button
         class="prestige-btn"
         id="prestige-btn"
         disabled
     >
-        Завершите восстановление объекта
+        Набери прогресс для перелёта
     </button>
 
 
-    <div class="section-title">
-        Модули экспедиции
-    </div>
+    <!-- UPGRADES -->
 
-
-    <section class="upgrades">
+    <div class="upgrades">
 
         <div class="upgrade-card">
 
-            <div class="upgrade-icon">
-                👆
-            </div>
+            <div class="upgrade-info">
 
-            <div class="upgrade-title">
-                Усилитель
-            </div>
+                <div class="upgrade-title">
+                    👆 Сила клика
+                </div>
 
-            <div
-                class="upgrade-sub"
-                id="click-level-text"
-            >
-                Уровень 1
+                <div
+                    class="upgrade-sub"
+                    id="click-level-text"
+                >
+                    Уровень 1 · +1 монета
+                </div>
+
             </div>
 
             <button
@@ -937,19 +1053,19 @@ body::before {
 
         <div class="upgrade-card">
 
-            <div class="upgrade-icon">
-                ⚡
-            </div>
+            <div class="upgrade-info">
 
-            <div class="upgrade-title">
-                Батарея
-            </div>
+                <div class="upgrade-title">
+                    ⚡ Запас стамины
+                </div>
 
-            <div
-                class="upgrade-sub"
-                id="stamina-level-text"
-            >
-                Уровень 1
+                <div
+                    class="upgrade-sub"
+                    id="stamina-level-text"
+                >
+                    Уровень 1
+                </div>
+
             </div>
 
             <button
@@ -961,439 +1077,581 @@ body::before {
 
         </div>
 
-    </section>
+    </div>
 
+
+    <!-- STATUS -->
 
     <div
         class="status"
         id="status"
     >
-        Подключение к экспедиционному центру...
+        Загрузка...
     </div>
 
 </div>
 
 
 <script>
+    /* =========================================================
+       TELEGRAM
+    ========================================================= */
 
-const tg = window.Telegram?.WebApp;
+    const tg = window.Telegram?.WebApp;
 
-if (tg) {
-    tg.ready();
-    tg.expand();
+    if (tg) {
+        tg.ready();
+        tg.expand();
 
-    try {
-        tg.setHeaderColor("#050711");
-        tg.setBackgroundColor("#050711");
-    } catch (e) {}
-}
-
-
-const userId =
-    tg?.initDataUnsafe?.user?.id || 12345;
-
-const API_URL =
-    window.location.origin;
-
-
-const objectNameEl =
-    document.getElementById("object-name");
-
-const balanceEl =
-    document.getElementById("balance");
-
-const objectWrapEl =
-    document.getElementById("object-wrap");
-
-const objectImgEl =
-    document.getElementById("object-img");
-
-const cracksOverlayEl =
-    document.getElementById("cracks-overlay");
-
-const statusEl =
-    document.getElementById("status");
-
-const progressTextEl =
-    document.getElementById("progress-text");
-
-const progressFillEl =
-    document.getElementById("progress-fill");
-
-const staminaTextEl =
-    document.getElementById("stamina-text");
-
-const staminaFillEl =
-    document.getElementById("stamina-fill");
-
-const clickLevelTextEl =
-    document.getElementById("click-level-text");
-
-const staminaLevelTextEl =
-    document.getElementById("stamina-level-text");
-
-const upgradeClickBtn =
-    document.getElementById("upgrade-click-btn");
-
-const upgradeStaminaBtn =
-    document.getElementById("upgrade-stamina-btn");
-
-const prestigeBtn =
-    document.getElementById("prestige-btn");
-
-const dailySubEl =
-    document.getElementById("daily-sub");
-
-const dailyBtn =
-    document.getElementById("daily-btn");
-
-
-let state = null;
-
-let objectsList = [];
-
-let pendingTaps = 0;
-
-let sendTimeout = null;
-
-let localStamina = 0;
-
-let currentObjectIndex = -1;
-
-
-/* ================= OBJECTS ================= */
-
-async function loadObjectsList() {
-
-    const res =
-        await fetch(`${API_URL}/api/objects`);
-
-    if (!res.ok) {
-        throw new Error("Objects loading failed");
+        try {
+            tg.setHeaderColor('#070812');
+            tg.setBackgroundColor('#070812');
+        } catch (e) {}
     }
 
-    objectsList =
-        await res.json();
-}
+
+    /* =========================================================
+       USER / API
+    ========================================================= */
+
+    const userId =
+        tg?.initDataUnsafe?.user?.id || 12345;
+
+    const API_URL =
+        window.location.origin;
 
 
-/* ================= VISUAL ================= */
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
 
-function updateObjectVisual() {
+    const objectNameEl =
+        document.getElementById('object-name');
 
-    if (!state) return;
+    const objectTypeEl =
+        document.getElementById('object-type');
 
-    if (
-        currentObjectIndex !==
-        state.object_index
-    ) {
+    const balanceEl =
+        document.getElementById('balance');
 
-        currentObjectIndex =
-            state.object_index;
+    const objectWrapEl =
+        document.getElementById('object-wrap');
 
-        const obj =
-            objectsList[state.object_index];
+    const objectImgEl =
+        document.getElementById('object-img');
 
-        if (obj) {
+    const objectAuraEl =
+        document.getElementById('object-aura');
 
-            objectImgEl.src =
-                `/images/${obj.image}`;
+    const cracksOverlayEl =
+        document.getElementById('cracks-overlay');
+
+    const statusEl =
+        document.getElementById('status');
+
+    const progressTextEl =
+        document.getElementById('progress-text');
+
+    const progressFillEl =
+        document.getElementById('progress-fill');
+
+    const staminaTextEl =
+        document.getElementById('stamina-text');
+
+    const staminaFillEl =
+        document.getElementById('stamina-fill');
+
+    const clickLevelTextEl =
+        document.getElementById('click-level-text');
+
+    const staminaLevelTextEl =
+        document.getElementById('stamina-level-text');
+
+    const upgradeClickBtn =
+        document.getElementById('upgrade-click-btn');
+
+    const upgradeStaminaBtn =
+        document.getElementById('upgrade-stamina-btn');
+
+    const prestigeBtn =
+        document.getElementById('prestige-btn');
+
+    const dailySubEl =
+        document.getElementById('daily-sub');
+
+    const dailyBtn =
+        document.getElementById('daily-btn');
+
+
+    /* =========================================================
+       STATE
+    ========================================================= */
+
+    let state = null;
+
+    let objectsList = [];
+
+    let pendingTaps = 0;
+
+    let sendTimeout = null;
+
+    let localStamina = 0;
+
+    let currentObjectIndex = -1;
+
+
+    /* =========================================================
+       OBJECTS
+    ========================================================= */
+
+    async function loadObjectsList() {
+
+        try {
+
+            const res =
+                await fetch(`${API_URL}/api/objects`);
+
+            if (!res.ok) {
+                throw new Error('Objects request failed');
+            }
+
+            objectsList =
+                await res.json();
+
+        } catch (error) {
+
+            console.error(error);
+
+            statusEl.textContent =
+                'Ошибка загрузки объектов';
+
+        }
+    }
+
+
+    /* =========================================================
+       OBJECT VISUAL
+    ========================================================= */
+
+    function updateObjectVisual() {
+
+        if (!state) {
+            return;
+        }
+
+
+        if (
+            currentObjectIndex !==
+            state.object_index
+        ) {
+
+            currentObjectIndex =
+                state.object_index;
+
+            const obj =
+                objectsList[state.object_index];
+
+
+            if (obj) {
+
+                objectImgEl.src =
+                    `/images/${obj.image}`;
+
+            }
+
+
+            const category =
+                state.object_category || 'planet';
+
+
+            if (category === 'planet') {
+
+                cracksOverlayEl.style.display =
+                    'block';
+
+            } else {
+
+                cracksOverlayEl.style.display =
+                    'none';
+
+            }
+
+
+            objectTypeEl.textContent =
+                getObjectTypeName(category);
+        }
+
+
+        let progressPct = 0;
+
+
+        if (state.object_threshold) {
+
+            progressPct =
+                Math.min(
+                    100,
+                    (
+                        state.object_progress /
+                        state.object_threshold
+                    ) * 100
+                );
+
+        } else {
+
+            progressPct = 100;
 
         }
 
-        cracksOverlayEl.style.display =
-            state.object_category === "planet"
-                ? "block"
-                : "none";
-    }
 
+        /* CRACKS */
 
-    let progressPct = 0;
+        if (
+            state.object_category ===
+            'planet'
+        ) {
 
-    if (state.object_threshold) {
+            cracksOverlayEl.style.opacity =
+                Math.max(
+                    0.05,
+                    1 - (progressPct / 100) * 0.9
+                );
 
-        progressPct =
-            Math.min(
-                100,
-                (
-                    state.object_progress /
-                    state.object_threshold
-                ) * 100
-            );
-
-    } else {
-
-        progressPct = 100;
-    }
-
-
-    if (state.object_category === "planet") {
-
-        cracksOverlayEl.style.opacity =
-            1 - (progressPct / 100) * .9;
-    }
-
-
-    if (
-        state.object_category === "star" ||
-        state.object_category === "blackhole"
-    ) {
-
-        const brightness =
-            .5 + (progressPct / 100) * .9;
-
-        objectImgEl.style.filter =
-            `brightness(${brightness}) drop-shadow(0 0 30px rgba(180,120,255,.22))`;
-
-    } else {
-
-        objectImgEl.style.filter =
-            "drop-shadow(0 0 25px rgba(255,180,80,.12))";
-    }
-}
-
-
-/* ================= RENDER ================= */
-
-function renderState() {
-
-    if (!state) return;
-
-
-    objectNameEl.textContent =
-        state.object_name;
-
-    balanceEl.textContent =
-        Number(state.balance).toLocaleString("ru-RU");
-
-
-    const staminaPct =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                (
-                    localStamina /
-                    state.stamina_max
-                ) * 100
-            )
-        );
-
-
-    staminaFillEl.style.width =
-        `${staminaPct}%`;
-
-    staminaTextEl.textContent =
-        `${Math.floor(localStamina)}/${state.stamina_max}`;
-
-
-    if (state.object_threshold) {
-
-        const progressPct =
-            Math.min(
-                100,
-                (
-                    state.object_progress /
-                    state.object_threshold
-                ) * 100
-            );
-
-        progressFillEl.style.width =
-            `${progressPct}%`;
-
-        progressTextEl.textContent =
-            `${state.object_progress}/${state.object_threshold}`;
-
-    } else {
-
-        progressFillEl.style.width =
-            "100%";
-
-        progressTextEl.textContent =
-            "ФИНАЛ";
-    }
-
-
-    clickLevelTextEl.textContent =
-        `Уровень ${state.click_level} · +${state.click_power} ресурс`;
-
-
-    if (state.click_upgrade_cost === -1) {
-
-        upgradeClickBtn.textContent =
-            "MAX";
-
-        upgradeClickBtn.disabled =
-            true;
-
-    } else {
-
-        upgradeClickBtn.textContent =
-            `⚡ ${state.click_upgrade_cost}`;
-
-        upgradeClickBtn.disabled =
-            state.balance <
-            state.click_upgrade_cost;
-    }
-
-
-    staminaLevelTextEl.textContent =
-        `Уровень ${state.stamina_level} · ${state.stamina_max} энергии`;
-
-
-    if (state.stamina_upgrade_cost === -1) {
-
-        upgradeStaminaBtn.textContent =
-            "MAX";
-
-        upgradeStaminaBtn.disabled =
-            true;
-
-    } else {
-
-        upgradeStaminaBtn.textContent =
-            `⚡ ${state.stamina_upgrade_cost}`;
-
-        upgradeStaminaBtn.disabled =
-            state.balance <
-            state.stamina_upgrade_cost;
-    }
-
-
-    if (state.is_final_object) {
-
-        prestigeBtn.textContent =
-            "✦ Квазар — финальный объект";
-
-        prestigeBtn.disabled =
-            true;
-
-    } else if (state.can_prestige) {
-
-        prestigeBtn.textContent =
-            `🚀 Перейти к следующему объекту · +60%`;
-
-        prestigeBtn.disabled =
-            false;
-
-    } else {
-
-        prestigeBtn.textContent =
-            "Завершите восстановление объекта";
-
-        prestigeBtn.disabled =
-            true;
-    }
-
-
-    const daily =
-        state.daily_status;
-
-
-    dailySubEl.textContent =
-        `Серия: ${state.daily_streak} дн. · награда +${state.daily_next_amount}`;
-
-
-    if (daily.can_claim) {
-
-        dailyBtn.textContent =
-            "ЗАБРАТЬ";
-
-        dailyBtn.disabled =
-            false;
-
-    } else {
-
-        dailyBtn.textContent =
-            `${daily.hours_until_next}ч`;
-
-        dailyBtn.disabled =
-            true;
-    }
-
-
-    statusEl.textContent =
-        `Экспедиция #${state.prestige_count + 1} · ID ${userId}`;
-
-
-    updateObjectVisual();
-}
-
-
-/* ================= LOAD ================= */
-
-async function loadState() {
-
-    try {
-
-        const res =
-            await fetch(
-                `${API_URL}/api/state/${userId}`
-            );
-
-        if (!res.ok) {
-            throw new Error("State loading failed");
         }
 
-        state =
-            await res.json();
 
-        localStamina =
-            state.stamina;
+        /* BRIGHTNESS */
 
-        renderState();
+        if (
+            state.object_category === 'star' ||
+            state.object_category === 'blackhole'
+        ) {
 
-    } catch (e) {
+            const brightness =
+                0.65 +
+                (progressPct / 100) * 0.75;
 
-        console.error(e);
+            objectImgEl.style.filter =
+                `brightness(${brightness})`;
 
-        statusEl.textContent =
-            "Ошибка связи с экспедиционным центром";
+            objectAuraEl.style.filter =
+                `brightness(${brightness})`;
+
+        } else {
+
+            objectImgEl.style.filter =
+                'none';
+
+            objectAuraEl.style.filter =
+                'none';
+
+        }
+
+
+        /* AURA */
+
+        const auraScale =
+            0.9 +
+            (progressPct / 100) * 0.15;
+
+        objectAuraEl.style.transform =
+            `scale(${auraScale})`;
     }
-}
 
 
-/* ================= STAMINA ================= */
+    function getObjectTypeName(category) {
 
-setInterval(() => {
+        switch (category) {
 
-    if (
-        state &&
-        localStamina <
-        state.stamina_max
-    ) {
+            case 'planet':
+                return 'PLANET';
 
-        localStamina =
-            Math.min(
-                state.stamina_max,
-                localStamina +
-                (2 * .2)
+            case 'star':
+                return 'STAR';
+
+            case 'blackhole':
+                return 'BLACK HOLE';
+
+            default:
+                return 'CELESTIAL OBJECT';
+        }
+    }
+
+
+    /* =========================================================
+       RENDER STATE
+    ========================================================= */
+
+    function renderState() {
+
+        if (!state) {
+            return;
+        }
+
+
+        objectNameEl.textContent =
+            state.object_name;
+
+
+        balanceEl.textContent =
+            state.balance;
+
+
+        /* STAMINA */
+
+        const staminaPct =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    (
+                        localStamina /
+                        state.stamina_max
+                    ) * 100
+                )
             );
 
-        renderState();
+
+        staminaFillEl.style.width =
+            staminaPct + '%';
+
+
+        staminaTextEl.textContent =
+            `${Math.floor(localStamina)}/${state.stamina_max}`;
+
+
+        /* PROGRESS */
+
+        if (state.object_threshold) {
+
+            const progressPct =
+                Math.min(
+                    100,
+                    (
+                        state.object_progress /
+                        state.object_threshold
+                    ) * 100
+                );
+
+
+            progressFillEl.style.width =
+                progressPct + '%';
+
+
+            progressTextEl.textContent =
+                `${state.object_progress}/${state.object_threshold}`;
+
+        } else {
+
+            progressFillEl.style.width =
+                '100%';
+
+            progressTextEl.textContent =
+                'Финал';
+
+        }
+
+
+        /* CLICK UPGRADE */
+
+        clickLevelTextEl.textContent =
+            `Уровень ${state.click_level} · +${state.click_power} монета`;
+
+
+        if (
+            state.click_upgrade_cost === -1
+        ) {
+
+            upgradeClickBtn.textContent =
+                'MAX';
+
+            upgradeClickBtn.disabled =
+                true;
+
+        } else {
+
+            upgradeClickBtn.textContent =
+                state.click_upgrade_cost;
+
+            upgradeClickBtn.disabled =
+                state.balance <
+                state.click_upgrade_cost;
+        }
+
+
+        /* STAMINA UPGRADE */
+
+        staminaLevelTextEl.textContent =
+            `Уровень ${state.stamina_level} · макс ${state.stamina_max}`;
+
+
+        if (
+            state.stamina_upgrade_cost === -1
+        ) {
+
+            upgradeStaminaBtn.textContent =
+                'MAX';
+
+            upgradeStaminaBtn.disabled =
+                true;
+
+        } else {
+
+            upgradeStaminaBtn.textContent =
+                state.stamina_upgrade_cost;
+
+            upgradeStaminaBtn.disabled =
+                state.balance <
+                state.stamina_upgrade_cost;
+        }
+
+
+        /* PRESTIGE */
+
+        if (state.is_final_object) {
+
+            prestigeBtn.textContent =
+                '🌟 Это финальный объект!';
+
+            prestigeBtn.disabled =
+                true;
+
+        } else if (state.can_prestige) {
+
+            prestigeBtn.textContent =
+                '🚀 Лететь дальше (+60% навсегда)';
+
+            prestigeBtn.disabled =
+                false;
+
+        } else {
+
+            prestigeBtn.textContent =
+                'Набери прогресс для перелёта';
+
+            prestigeBtn.disabled =
+                true;
+        }
+
+
+        /* DAILY */
+
+        const daily =
+            state.daily_status;
+
+
+        dailySubEl.textContent =
+            `Стрик: ${state.daily_streak} дн. · +${state.daily_next_amount} монет`;
+
+
+        if (daily.can_claim) {
+
+            dailyBtn.textContent =
+                'Забрать';
+
+            dailyBtn.disabled =
+                false;
+
+        } else {
+
+            dailyBtn.textContent =
+                `${daily.hours_until_next}ч`;
+
+            dailyBtn.disabled =
+                true;
+        }
+
+
+        updateObjectVisual();
     }
 
-}, 200);
+
+    /* =========================================================
+       LOAD STATE
+    ========================================================= */
+
+    async function loadState() {
+
+        try {
+
+            const res =
+                await fetch(
+                    `${API_URL}/api/state/${userId}`
+                );
 
 
-/* ================= SYNC ================= */
-
-function scheduleSend() {
-
-    clearTimeout(sendTimeout);
+            if (!res.ok) {
+                throw new Error('State request failed');
+            }
 
 
-    sendTimeout =
-        setTimeout(
-            async () => {
+            state =
+                await res.json();
+
+
+            localStamina =
+                state.stamina;
+
+
+            statusEl.textContent =
+                `ID: ${userId} · Перелётов: ${state.prestige_count}`;
+
+
+            renderState();
+
+        } catch (error) {
+
+            console.error(error);
+
+            statusEl.textContent =
+                'Ошибка загрузки сервера';
+        }
+    }
+
+
+    /* =========================================================
+       STAMINA REGEN
+    ========================================================= */
+
+    setInterval(() => {
+
+        if (
+            state &&
+            localStamina <
+            state.stamina_max
+        ) {
+
+            localStamina =
+                Math.min(
+                    state.stamina_max,
+                    localStamina + 2 * 0.2
+                );
+
+            renderState();
+        }
+
+    }, 200);
+
+
+    /* =========================================================
+       SEND CLICKS
+    ========================================================= */
+
+    function scheduleSend() {
+
+        clearTimeout(sendTimeout);
+
+
+        sendTimeout =
+            setTimeout(async () => {
 
                 const taps =
                     pendingTaps;
 
+
                 pendingTaps = 0;
 
 
-                if (taps <= 0) {
+                if (taps === 0) {
                     return;
                 }
 
@@ -1404,445 +1662,591 @@ function scheduleSend() {
                         await fetch(
                             `${API_URL}/api/click`,
                             {
-                                method: "POST",
+                                method: 'POST',
 
                                 headers: {
-                                    "Content-Type":
-                                        "application/json"
+                                    'Content-Type':
+                                        'application/json'
                                 },
 
-                                body: JSON.stringify({
-                                    user_id: userId,
-                                    taps: taps
-                                })
+                                body:
+                                    JSON.stringify({
+                                        user_id: userId,
+                                        taps: taps
+                                    })
                             }
                         );
 
 
-                    if (!res.ok) {
-                        throw new Error("Click sync failed");
+                    if (res.ok) {
+
+                        state =
+                            await res.json();
+
+
+                        localStamina =
+                            state.stamina;
+
+
+                        renderState();
+
+                    } else {
+
+                        statusEl.textContent =
+                            'Ошибка клика';
+
                     }
 
+                } catch (error) {
 
-                    state =
-                        await res.json();
-
-                    localStamina =
-                        state.stamina;
-
-                    renderState();
-
-
-                } catch (e) {
-
-                    console.error(e);
+                    console.error(error);
 
                     statusEl.textContent =
-                        "Ошибка синхронизации";
+                        'Ошибка синхронизации';
                 }
 
-            },
-            300
-        );
-}
+            }, 400);
+    }
 
 
-/* ================= EFFECTS ================= */
+    /* =========================================================
+       FLOAT TEXT
+    ========================================================= */
 
-function showFloatText(
-    x,
-    y,
-    amount
-) {
+    function showFloatText(
+        x,
+        y,
+        amount
+    ) {
 
-    const el =
-        document.createElement("div");
-
-    el.className =
-        "float-text";
-
-    el.textContent =
-        `+${amount}`;
-
-    el.style.left =
-        `${x}px`;
-
-    el.style.top =
-        `${y}px`;
-
-    document.body.appendChild(el);
+        const el =
+            document.createElement('div');
 
 
-    setTimeout(
-        () => el.remove(),
-        800
-    );
-}
+        el.className =
+            'float-text';
 
 
-function showClickRing(
-    x,
-    y
-) {
-
-    const ring =
-        document.createElement("div");
-
-    ring.className =
-        "click-ring";
-
-    ring.style.left =
-        `${x}px`;
-
-    ring.style.top =
-        `${y}px`;
-
-    document.body.appendChild(ring);
+        el.textContent =
+            '+' + amount;
 
 
-    setTimeout(
-        () => ring.remove(),
-        600
-    );
-}
+        el.style.left =
+            x + 'px';
 
 
-/* ================= CLICK ================= */
+        el.style.top =
+            y + 'px';
 
-objectWrapEl.addEventListener(
-    "click",
-    (e) => {
 
-        if (
-            !state ||
-            localStamina < 1
+        document.body.appendChild(el);
+
+
+        setTimeout(() => {
+
+            el.remove();
+
+        }, 800);
+    }
+
+
+    /* =========================================================
+       PARTICLES
+    ========================================================= */
+
+    function createParticles(
+        x,
+        y
+    ) {
+
+        for (
+            let i = 0;
+            i < 5;
+            i++
         ) {
-            return;
-        }
+
+            const particle =
+                document.createElement('div');
 
 
-        localStamina -= 1;
-
-        pendingTaps += 1;
-
-
-        const prestigeMult =
-            state.prestige_multiplier || 1;
+            particle.className =
+                'click-particle';
 
 
-        const earnedThisClick =
-            Math.round(
-                state.click_power *
-                prestigeMult
+            particle.style.left =
+                x + 'px';
+
+
+            particle.style.top =
+                y + 'px';
+
+
+            const angle =
+                Math.random() *
+                Math.PI *
+                2;
+
+
+            const distance =
+                20 +
+                Math.random() * 35;
+
+
+            particle.style.setProperty(
+                '--x',
+                `${Math.cos(angle) * distance}px`
             );
 
 
-        balanceEl.textContent =
-            (
+            particle.style.setProperty(
+                '--y',
+                `${Math.sin(angle) * distance}px`
+            );
+
+
+            document.body.appendChild(
+                particle
+            );
+
+
+            setTimeout(() => {
+
+                particle.remove();
+
+            }, 500);
+        }
+    }
+
+
+    /* =========================================================
+       CLICK OBJECT
+    ========================================================= */
+
+    objectWrapEl.addEventListener(
+        'click',
+        (e) => {
+
+            if (
+                !state ||
+                localStamina < 1
+            ) {
+                return;
+            }
+
+
+            localStamina -= 1;
+
+
+            pendingTaps += 1;
+
+
+            const prestigeMult =
+                state.prestige_multiplier ||
+                1;
+
+
+            const earnedThisClick =
+                Math.round(
+                    state.click_power *
+                    prestigeMult
+                );
+
+
+            /*
+             * Локально показываем ожидаемый баланс.
+             * Сервер всё равно остаётся главным источником данных.
+             */
+
+            const temporaryBalance =
                 state.balance +
                 Math.round(
                     pendingTaps *
                     state.click_power *
                     prestigeMult
-                )
-            ).toLocaleString("ru-RU");
-
-
-        showFloatText(
-            e.clientX - 10,
-            e.clientY - 20,
-            earnedThisClick
-        );
-
-
-        showClickRing(
-            e.clientX,
-            e.clientY
-        );
-
-
-        renderState();
-
-        scheduleSend();
-
-
-        try {
-
-            tg?.HapticFeedback
-                ?.impactOccurred("light");
-
-        } catch (e) {}
-    }
-);
-
-
-/* ================= UPGRADE CLICK ================= */
-
-upgradeClickBtn.addEventListener(
-    "click",
-    async () => {
-
-        try {
-
-            const res =
-                await fetch(
-                    `${API_URL}/api/upgrade/click`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            user_id: userId
-                        })
-                    }
                 );
 
 
-            if (!res.ok) {
-                return;
-            }
+            balanceEl.textContent =
+                temporaryBalance;
 
 
-            state =
-                await res.json();
+            /* ANIMATION */
 
-            localStamina =
-                state.stamina;
+            objectWrapEl.classList.remove(
+                'hit'
+            );
+
+
+            void objectWrapEl.offsetWidth;
+
+
+            objectWrapEl.classList.add(
+                'hit'
+            );
+
+
+            balanceEl.classList.remove(
+                'bump'
+            );
+
+
+            void balanceEl.offsetWidth;
+
+
+            balanceEl.classList.add(
+                'bump'
+            );
+
+
+            setTimeout(() => {
+
+                balanceEl.classList.remove(
+                    'bump'
+                );
+
+            }, 130);
+
+
+            /* FLOAT TEXT */
+
+            showFloatText(
+                e.clientX - 10,
+                e.clientY - 20,
+                earnedThisClick
+            );
+
+
+            /* PARTICLES */
+
+            createParticles(
+                e.clientX,
+                e.clientY
+            );
+
 
             renderState();
 
 
-            tg?.HapticFeedback
-                ?.notificationOccurred("success");
-
-        } catch (e) {
-
-            console.error(e);
-        }
-    }
-);
+            scheduleSend();
 
 
-/* ================= UPGRADE STAMINA ================= */
+            /* TELEGRAM HAPTIC */
 
-upgradeStaminaBtn.addEventListener(
-    "click",
-    async () => {
+            try {
 
-        try {
-
-            const res =
-                await fetch(
-                    `${API_URL}/api/upgrade/stamina`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            user_id: userId
-                        })
-                    }
+                tg?.HapticFeedback?.impactOccurred(
+                    'light'
                 );
 
-
-            if (!res.ok) {
-                return;
-            }
-
-
-            state =
-                await res.json();
-
-            localStamina =
-                state.stamina;
-
-            renderState();
-
-
-            tg?.HapticFeedback
-                ?.notificationOccurred("success");
-
-        } catch (e) {
-
-            console.error(e);
+            } catch (error) {}
         }
-    }
-);
+    );
 
 
-/* ================= PRESTIGE ================= */
+    /* =========================================================
+       CLICK UPGRADE
+    ========================================================= */
 
-prestigeBtn.addEventListener(
-    "click",
-    async () => {
+    upgradeClickBtn.addEventListener(
+        'click',
+        async () => {
 
-        if (
-            !state ||
-            !state.can_prestige
-        ) {
-            return;
-        }
+            try {
 
-
-        try {
-
-            prestigeBtn.disabled =
-                true;
+                upgradeClickBtn.disabled =
+                    true;
 
 
-            const res =
-                await fetch(
-                    `${API_URL}/api/prestige`,
-                    {
-                        method: "POST",
+                const res =
+                    await fetch(
+                        `${API_URL}/api/upgrade/click`,
+                        {
+                            method: 'POST',
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
 
-                        body: JSON.stringify({
-                            user_id: userId
-                        })
-                    }
-                );
+                            body:
+                                JSON.stringify({
+                                    user_id: userId
+                                })
+                        }
+                    );
 
 
-            if (!res.ok) {
+                if (res.ok) {
+
+                    state =
+                        await res.json();
+
+
+                    localStamina =
+                        state.stamina;
+
+
+                    renderState();
+
+
+                    tg?.HapticFeedback?.notificationOccurred(
+                        'success'
+                    );
+
+                } else {
+
+                    renderState();
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                statusEl.textContent =
+                    'Ошибка улучшения';
 
                 renderState();
-
-                return;
             }
-
-
-            state =
-                await res.json();
-
-            localStamina =
-                state.stamina;
-
-            currentObjectIndex =
-                -1;
-
-            renderState();
-
-
-            tg?.HapticFeedback
-                ?.notificationOccurred("success");
-
-        } catch (e) {
-
-            console.error(e);
-
-            renderState();
         }
-    }
-);
+    );
 
 
-/* ================= DAILY ================= */
+    /* =========================================================
+       STAMINA UPGRADE
+    ========================================================= */
 
-dailyBtn.addEventListener(
-    "click",
-    async () => {
+    upgradeStaminaBtn.addEventListener(
+        'click',
+        async () => {
 
-        if (
-            !state ||
-            !state.daily_status.can_claim
-        ) {
-            return;
-        }
+            try {
 
-
-        try {
-
-            dailyBtn.disabled =
-                true;
+                upgradeStaminaBtn.disabled =
+                    true;
 
 
-            const res =
-                await fetch(
-                    `${API_URL}/api/daily/claim`,
-                    {
-                        method: "POST",
+                const res =
+                    await fetch(
+                        `${API_URL}/api/upgrade/stamina`,
+                        {
+                            method: 'POST',
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
 
-                        body: JSON.stringify({
-                            user_id: userId
-                        })
-                    }
-                );
+                            body:
+                                JSON.stringify({
+                                    user_id: userId
+                                })
+                        }
+                    );
 
 
-            if (!res.ok) {
+                if (res.ok) {
+
+                    state =
+                        await res.json();
+
+
+                    localStamina =
+                        state.stamina;
+
+
+                    renderState();
+
+
+                    tg?.HapticFeedback?.notificationOccurred(
+                        'success'
+                    );
+
+                } else {
+
+                    renderState();
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                statusEl.textContent =
+                    'Ошибка улучшения';
 
                 renderState();
+            }
+        }
+    );
 
+
+    /* =========================================================
+       PRESTIGE
+    ========================================================= */
+
+    prestigeBtn.addEventListener(
+        'click',
+        async () => {
+
+            if (
+                !state ||
+                !state.can_prestige
+            ) {
                 return;
             }
 
 
-            state =
-                await res.json();
+            try {
 
-            localStamina =
-                state.stamina;
-
-            renderState();
+                prestigeBtn.disabled =
+                    true;
 
 
-            tg?.HapticFeedback
-                ?.notificationOccurred("success");
+                const res =
+                    await fetch(
+                        `${API_URL}/api/prestige`,
+                        {
+                            method: 'POST',
 
-        } catch (e) {
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
 
-            console.error(e);
+                            body:
+                                JSON.stringify({
+                                    user_id: userId
+                                })
+                        }
+                    );
 
-            renderState();
+
+                if (res.ok) {
+
+                    state =
+                        await res.json();
+
+
+                    localStamina =
+                        state.stamina;
+
+
+                    statusEl.textContent =
+                        `ID: ${userId} · Перелётов: ${state.prestige_count}`;
+
+
+                    renderState();
+
+
+                    tg?.HapticFeedback?.notificationOccurred(
+                        'success'
+                    );
+
+                } else {
+
+                    renderState();
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                statusEl.textContent =
+                    'Ошибка перелёта';
+
+                renderState();
+            }
         }
-    }
-);
+    );
 
 
-/* ================= INIT ================= */
+    /* =========================================================
+       DAILY BONUS
+    ========================================================= */
 
-async function init() {
+    dailyBtn.addEventListener(
+        'click',
+        async () => {
 
-    try {
+            try {
+
+                dailyBtn.disabled =
+                    true;
+
+
+                const res =
+                    await fetch(
+                        `${API_URL}/api/daily/claim`,
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    user_id: userId
+                                })
+                        }
+                    );
+
+
+                if (res.ok) {
+
+                    state =
+                        await res.json();
+
+
+                    localStamina =
+                        state.stamina;
+
+
+                    renderState();
+
+
+                    tg?.HapticFeedback?.notificationOccurred(
+                        'success'
+                    );
+
+                } else {
+
+                    renderState();
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                statusEl.textContent =
+                    'Ошибка получения бонуса';
+
+                renderState();
+            }
+        }
+    );
+
+
+    /* =========================================================
+       INIT
+    ========================================================= */
+
+    async function init() {
 
         statusEl.textContent =
-            "Загрузка экспедиции...";
+            'Подключение к Sundered Star...';
+
 
         await loadObjectsList();
 
         await loadState();
 
-    } catch (e) {
-
-        console.error(e);
-
-        statusEl.textContent =
-            "Не удалось загрузить экспедицию";
     }
-}
 
 
-init();
+    init();
 
 </script>
 
 </body>
-    </html>
+</html>
