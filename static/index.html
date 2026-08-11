@@ -456,9 +456,31 @@
             height: 43px;
             border: 0;
             border-radius: 13px;
-            background: #302e43;
-            color: #fff;
+            background: #29273b;
+            color: #77758a;
             font-weight: 850;
+            transition:
+                background .15s ease,
+                color .15s ease,
+                transform .12s ease,
+                box-shadow .15s ease;
+        }
+
+        .upgrade-button.can-buy {
+            color: #fff;
+            background:
+                linear-gradient(
+                    135deg,
+                    #7654ff,
+                    #ad38ff
+                );
+            box-shadow:
+                0 7px 20px rgba(120, 70, 255, .25);
+        }
+
+        .upgrade-button:disabled {
+            opacity: 1;
+            cursor: default;
         }
 
         /* =====================================================
@@ -717,7 +739,7 @@
 
         .nav-inner {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 5px;
         }
 
@@ -767,6 +789,14 @@
             .upgrade-button {
                 min-width: 65px;
             }
+
+            .nav-button {
+                font-size: 9px;
+            }
+
+            .nav-icon {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -776,7 +806,7 @@
 <div class="app">
 
     <!-- =====================================================
-         TOP BAR
+         TOP
     ====================================================== -->
 
     <div class="topbar">
@@ -792,7 +822,10 @@
                     Sundered Star
                 </div>
 
-                <div class="brand-subtitle" id="user-name">
+                <div
+                    class="brand-subtitle"
+                    id="user-name"
+                >
                     Исследователь
                 </div>
             </div>
@@ -805,7 +838,10 @@
                 Баланс
             </div>
 
-            <div class="balance" id="balance">
+            <div
+                class="balance"
+                id="balance"
+            >
                 0
             </div>
 
@@ -966,9 +1002,11 @@
         </div>
 
         <div id="leaderboard-list">
+
             <div class="loading">
                 Загрузка...
             </div>
+
         </div>
 
     </section>
@@ -1026,6 +1064,17 @@
 
         </div>
 
+    </section>
+
+
+    <!-- =====================================================
+         PAGE: UPGRADES
+    ====================================================== -->
+
+    <section
+        class="page"
+        id="page-upgrades"
+    >
 
         <div class="section-title">
             ⚙️ Улучшения
@@ -1048,7 +1097,7 @@
                     class="upgrade-desc"
                     id="click-upgrade-desc"
                 >
-                    Уровень 1 · +1 монета
+                    Уровень 1 · +1 монета за клик
                 </div>
 
             </div>
@@ -1233,9 +1282,11 @@
         </div>
 
         <div id="referral-list">
+
             <div class="empty">
                 Пока никто не приглашён
             </div>
+
         </div>
 
     </section>
@@ -1301,6 +1352,22 @@
 
         <button
             class="nav-button"
+            data-page="upgrades"
+        >
+
+            <span class="nav-icon">
+                ⚙️
+            </span>
+
+            <span>
+                Улучшения
+            </span>
+
+        </button>
+
+
+        <button
+            class="nav-button"
             data-page="referrals"
         >
 
@@ -1332,6 +1399,7 @@
 
 
 <script>
+
 /* ============================================================
    TELEGRAM
 ============================================================ */
@@ -1343,13 +1411,17 @@ const tg =
         : null;
 
 if (tg) {
+
     tg.ready();
     tg.expand();
 
     try {
+
         tg.setHeaderColor("#0b0a16");
         tg.setBackgroundColor("#090812");
+
     } catch (e) {}
+
 }
 
 
@@ -1372,33 +1444,35 @@ function getUserId() {
         tg.initDataUnsafe.user &&
         tg.initDataUnsafe.user.id
     ) {
+
         return Number(
             tg.initDataUnsafe.user.id
         );
+
     }
+
 
     const params =
         new URLSearchParams(
             window.location.search
         );
 
+
     const urlId =
         Number(
             params.get("user_id")
         );
 
+
     if (
         Number.isInteger(urlId) &&
         urlId > 0
     ) {
+
         return urlId;
+
     }
 
-    /*
-     * Для тестирования вне Telegram.
-     * В настоящем Mini App будет использоваться
-     * настоящий Telegram user.id.
-     */
 
     let localId =
         Number(
@@ -1407,23 +1481,29 @@ function getUserId() {
             )
         );
 
+
     if (
         !Number.isInteger(localId) ||
         localId <= 0
     ) {
+
         localId =
             Math.floor(
                 100000000 +
                 Math.random() * 800000000
             );
 
+
         localStorage.setItem(
             "sundered_star_test_user",
             String(localId)
         );
+
     }
 
+
     return localId;
+
 }
 
 
@@ -1452,6 +1532,7 @@ function formatNumber(value) {
     return Number(
         value || 0
     ).toLocaleString("ru-RU");
+
 }
 
 
@@ -1463,28 +1544,44 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+
 }
 
 
 function showToast(message) {
 
     const toast =
-        document.getElementById("toast");
+        document.getElementById(
+            "toast"
+        );
 
-    toast.textContent = message;
 
-    toast.classList.add("show");
+    toast.textContent =
+        message;
+
+
+    toast.classList.add(
+        "show"
+    );
+
 
     clearTimeout(
         showToast.timer
     );
 
+
     showToast.timer =
-        setTimeout(() => {
-            toast.classList.remove(
-                "show"
-            );
-        }, 1800);
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            1800
+        );
+
 }
 
 
@@ -1506,14 +1603,21 @@ async function api(
             }
         );
 
+
     let data = null;
 
+
     try {
+
         data =
             await response.json();
+
     } catch (e) {
+
         data = null;
+
     }
+
 
     if (!response.ok) {
 
@@ -1523,10 +1627,16 @@ async function api(
                 ? data.detail
                 : "Произошла ошибка";
 
-        throw new Error(message);
+
+        throw new Error(
+            message
+        );
+
     }
 
+
     return data;
+
 }
 
 
@@ -1543,17 +1653,23 @@ async function loadState() {
                 `/api/state/${USER_ID}`
             );
 
+
         renderState();
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         showToast(
             error.message ||
             "Не удалось загрузить игру"
         );
+
     }
+
 }
 
 
@@ -1568,11 +1684,15 @@ async function syncTelegramProfile() {
         !tg.initDataUnsafe ||
         !tg.initDataUnsafe.user
     ) {
+
         return;
+
     }
+
 
     const user =
         tg.initDataUnsafe.user;
+
 
     try {
 
@@ -1582,16 +1702,23 @@ async function syncTelegramProfile() {
                 {
                     method: "POST",
                     body: JSON.stringify({
-                        user_id: USER_ID,
+
+                        user_id:
+                            USER_ID,
+
                         username:
                             user.username || null,
+
                         first_name:
                             user.first_name || null,
+
                         last_name:
                             user.last_name || null
+
                     })
                 }
             );
+
 
         renderState();
 
@@ -1601,7 +1728,9 @@ async function syncTelegramProfile() {
             "Profile sync:",
             error
         );
+
     }
+
 }
 
 
@@ -1674,6 +1803,7 @@ function renderState() {
             "/" +
             state.object_image;
 
+
         image.onerror =
             function () {
 
@@ -1683,7 +1813,9 @@ function renderState() {
                     createFallbackSvg(
                         state.object_category
                     );
+
             };
+
     }
 
 
@@ -1693,6 +1825,7 @@ function renderState() {
 
     const threshold =
         state.object_threshold;
+
 
     const progress =
         Number(
@@ -1737,6 +1870,7 @@ function renderState() {
             "progress-fill"
         ).style.width =
             "100%";
+
     }
 
 
@@ -1748,6 +1882,7 @@ function renderState() {
         Number(
             state.stamina || 0
         );
+
 
     const staminaMax =
         Number(
@@ -1787,6 +1922,7 @@ function renderState() {
         prestigeButton.disabled =
             false;
 
+
         prestigeButton.textContent =
             "🚀 Исследовать следующий объект";
 
@@ -1797,6 +1933,7 @@ function renderState() {
         prestigeButton.disabled =
             true;
 
+
         prestigeButton.textContent =
             "🌌 Финальный объект";
 
@@ -1805,10 +1942,12 @@ function renderState() {
         prestigeButton.disabled =
             true;
 
+
         prestigeButton.textContent =
             `Набери ${formatNumber(
                 state.object_threshold
             )} прогресса`;
+
     }
 
 
@@ -1850,6 +1989,7 @@ function renderState() {
         dailyButton.disabled =
             false;
 
+
         dailyButton.textContent =
             "Забрать";
 
@@ -1858,13 +1998,15 @@ function renderState() {
         dailyButton.disabled =
             true;
 
+
         dailyButton.textContent =
             `Через ${daily.hours_until_next} ч.`;
+
     }
 
 
     /* ---------------------------------------------
-       UPGRADES
+       CLICK UPGRADE
     --------------------------------------------- */
 
     document.getElementById(
@@ -1874,7 +2016,9 @@ function renderState() {
 
 
     const clickCost =
-        state.click_upgrade_cost;
+        Number(
+            state.click_upgrade_cost
+        );
 
 
     const clickButton =
@@ -1888,8 +2032,14 @@ function renderState() {
         clickButton.textContent =
             "MAX";
 
+
         clickButton.disabled =
             true;
+
+
+        clickButton.classList.remove(
+            "can-buy"
+        );
 
     } else {
 
@@ -1898,11 +2048,27 @@ function renderState() {
                 clickCost
             );
 
-        clickButton.disabled =
-            state.balance <
+
+        const canBuy =
+            Number(state.balance) >=
             clickCost;
+
+
+        clickButton.disabled =
+            !canBuy;
+
+
+        clickButton.classList.toggle(
+            "can-buy",
+            canBuy
+        );
+
     }
 
+
+    /* ---------------------------------------------
+       STAMINA UPGRADE
+    --------------------------------------------- */
 
     document.getElementById(
         "stamina-upgrade-desc"
@@ -1911,7 +2077,9 @@ function renderState() {
 
 
     const staminaCost =
-        state.stamina_upgrade_cost;
+        Number(
+            state.stamina_upgrade_cost
+        );
 
 
     const staminaButton =
@@ -1925,8 +2093,14 @@ function renderState() {
         staminaButton.textContent =
             "MAX";
 
+
         staminaButton.disabled =
             true;
+
+
+        staminaButton.classList.remove(
+            "can-buy"
+        );
 
     } else {
 
@@ -1935,9 +2109,21 @@ function renderState() {
                 staminaCost
             );
 
-        staminaButton.disabled =
-            state.balance <
+
+        const canBuy =
+            Number(state.balance) >=
             staminaCost;
+
+
+        staminaButton.disabled =
+            !canBuy;
+
+
+        staminaButton.classList.toggle(
+            "can-buy",
+            canBuy
+        );
+
     }
 
 
@@ -1983,37 +2169,51 @@ function renderState() {
     ).textContent =
         state.referral_percent +
         "%";
+
 }
 
 
 function pluralDays(number) {
 
-    number = Math.abs(
-        Number(number)
-    ) % 100;
+    number =
+        Math.abs(
+            Number(number)
+        ) % 100;
+
 
     const last =
         number % 10;
+
 
     if (
         number > 10 &&
         number < 20
     ) {
+
         return "дней";
+
     }
 
+
     if (last === 1) {
+
         return "день";
+
     }
+
 
     if (
         last >= 2 &&
         last <= 4
     ) {
+
         return "дня";
+
     }
 
+
     return "дней";
+
 }
 
 
@@ -2027,41 +2227,51 @@ function createFallbackSvg(
 
     let symbol = "✦";
 
+
     if (category === "planet") {
         symbol = "◉";
     }
+
 
     if (category === "star") {
         symbol = "★";
     }
 
+
     if (category === "blackhole") {
         symbol = "●";
     }
+
 
     const svg = `
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 400 400"
         >
+
             <defs>
-                <radialGradient
-                    id="g"
-                >
+
+                <radialGradient id="g">
+
                     <stop
                         offset="0"
                         stop-color="#8b72ff"
                     />
+
                     <stop
                         offset=".7"
                         stop-color="#35235c"
                     />
+
                     <stop
                         offset="1"
                         stop-color="#11101d"
                     />
+
                 </radialGradient>
+
             </defs>
+
 
             <circle
                 cx="200"
@@ -2069,6 +2279,7 @@ function createFallbackSvg(
                 r="145"
                 fill="url(#g)"
             />
+
 
             <text
                 x="200"
@@ -2079,29 +2290,22 @@ function createFallbackSvg(
             >
                 ${symbol}
             </text>
+
         </svg>
     `;
+
 
     return (
         "data:image/svg+xml;charset=utf-8," +
         encodeURIComponent(svg)
     );
+
 }
 
 
 /* ============================================================
-   CLICK SYSTEM — 50 MS
+   CLICK SYSTEM — EXACTLY 50 MS
 ============================================================ */
-
-/*
- * Не отправляем отдельный HTTP-запрос на каждый тап.
- *
- * Тапы складываются в очередь.
- * Каждые 50 мс очередь отправляется одним запросом.
- *
- * Это значительно лучше, чем делать fetch()
- * на каждый клик.
- */
 
 let pendingTaps = 0;
 
@@ -2110,11 +2314,58 @@ let clickTimer = null;
 let clickRequestRunning = false;
 
 
+/*
+ * Каждый тап сначала проверяет,
+ * есть ли доступная стамина.
+ *
+ * pendingTaps тоже учитывается,
+ * поэтому нельзя визуально сделать
+ * больше тапов, чем есть стамины.
+ */
+
 function queueTap() {
+
+    if (!state) {
+        return;
+    }
+
+
+    const stamina =
+        Number(
+            state.stamina || 0
+        );
+
+
+    /*
+     * Сколько стамины реально осталось
+     * с учётом уже поставленных в очередь тапов.
+     */
+
+    const available =
+        stamina -
+        pendingTaps;
+
+
+    /*
+     * Стамина закончилась.
+     * Никакого +6 и никакого запроса.
+     */
+
+    if (available <= 0) {
+        return;
+    }
+
 
     pendingTaps += 1;
 
+
     animateTap();
+
+
+    /*
+     * ВАЖНО:
+     * задержка РОВНО 50 мс.
+     */
 
     if (!clickTimer) {
 
@@ -2123,7 +2374,9 @@ function queueTap() {
                 flushClicks,
                 50
             );
+
     }
+
 }
 
 
@@ -2131,17 +2384,19 @@ async function flushClicks() {
 
     clickTimer = null;
 
+
     if (
         pendingTaps <= 0 ||
         clickRequestRunning
     ) {
+
         return;
+
     }
 
 
     /*
-     * За один запрос отправляем максимум 1000,
-     * потому что именно такой лимит есть в main.py.
+     * Максимум 1000 тапов за запрос.
      */
 
     const taps =
@@ -2150,7 +2405,9 @@ async function flushClicks() {
             1000
         );
 
+
     pendingTaps -= taps;
+
 
     clickRequestRunning =
         true;
@@ -2163,12 +2420,18 @@ async function flushClicks() {
                 "/api/click",
                 {
                     method: "POST",
-                    body: JSON.stringify({
-                        user_id:
-                            USER_ID,
-                        taps:
-                            taps
-                    })
+
+                    body:
+                        JSON.stringify({
+
+                            user_id:
+                                USER_ID,
+
+                            taps:
+                                taps
+
+                        })
+
                 }
             );
 
@@ -2176,19 +2439,9 @@ async function flushClicks() {
         state =
             result;
 
+
         renderState();
 
-
-        if (
-            result.earned > 0 &&
-            result.accepted_taps
-        ) {
-
-            /*
-             * Можно при желании показывать
-             * число заработанных монет.
-             */
-        }
 
     } catch (error) {
 
@@ -2197,26 +2450,30 @@ async function flushClicks() {
             error
         );
 
+
         /*
-         * Возвращаем неотправленные тапания,
-         * чтобы пользователь их не потерял.
+         * Возвращаем тапов в очередь,
+         * если запрос не прошёл.
          */
 
         pendingTaps += taps;
+
 
         showToast(
             error.message ||
             "Ошибка клика"
         );
 
+
     } finally {
 
         clickRequestRunning =
             false;
 
+
         /*
-         * Если за время запроса появились
-         * новые тапы — отправляем их через 50 мс.
+         * Если новые тапы появились,
+         * снова ждём ровно 50 мс.
          */
 
         if (pendingTaps > 0) {
@@ -2226,8 +2483,11 @@ async function flushClicks() {
                     flushClicks,
                     50
                 );
+
         }
+
     }
+
 }
 
 
@@ -2238,13 +2498,16 @@ function animateTap() {
             "click-zone"
         );
 
+
     const element =
         document.createElement(
             "div"
         );
 
+
     element.className =
         "tap-number";
+
 
     const power =
         state &&
@@ -2252,8 +2515,10 @@ function animateTap() {
             ? state.click_power
             : 1;
 
+
     element.textContent =
-        "+" + power;
+        "+" +
+        power;
 
 
     const rect =
@@ -2263,16 +2528,24 @@ function animateTap() {
     const x =
         rect.width / 2 -
         20 +
-        (Math.random() * 80 - 40);
+        (
+            Math.random() * 80 -
+            40
+        );
+
 
     const y =
         rect.height / 2 -
         20 +
-        (Math.random() * 50 - 25);
+        (
+            Math.random() * 50 -
+            25
+        );
 
 
     element.style.left =
         x + "px";
+
 
     element.style.top =
         y + "px";
@@ -2283,11 +2556,15 @@ function animateTap() {
     );
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        element.remove();
+            element.remove();
 
-    }, 700);
+        },
+        700
+    );
+
 }
 
 
@@ -2307,11 +2584,14 @@ clickZone.addEventListener(
 
         event.preventDefault();
 
+
         this.classList.add(
             "pressed"
         );
 
+
         queueTap();
+
     },
     {
         passive: false
@@ -2326,6 +2606,7 @@ clickZone.addEventListener(
         this.classList.remove(
             "pressed"
         );
+
     }
 );
 
@@ -2337,6 +2618,7 @@ clickZone.addEventListener(
         this.classList.remove(
             "pressed"
         );
+
     }
 );
 
@@ -2358,11 +2640,14 @@ document
                 const page =
                     button.dataset.page;
 
+
                 switchPage(
                     page
                 );
+
             }
         );
+
     });
 
 
@@ -2381,6 +2666,7 @@ function switchPage(
                 element.id ===
                 "page-" + page
             );
+
         });
 
 
@@ -2395,6 +2681,7 @@ function switchPage(
                 button.dataset.page ===
                 page
             );
+
         });
 
 
@@ -2402,9 +2689,11 @@ function switchPage(
         loadLeaderboard();
     }
 
+
     if (page === "referrals") {
         loadReferrals();
     }
+
 }
 
 
@@ -2427,10 +2716,13 @@ document
                         "/api/daily/claim",
                         {
                             method: "POST",
-                            body: JSON.stringify({
-                                user_id:
-                                    USER_ID
-                            })
+
+                            body:
+                                JSON.stringify({
+                                    user_id:
+                                        USER_ID
+                                })
+
                         }
                     );
 
@@ -2438,7 +2730,9 @@ document
                 state =
                     result;
 
+
                 renderState();
+
 
                 showToast(
                     `🎁 +${formatNumber(
@@ -2446,12 +2740,15 @@ document
                     )} монет`
                 );
 
+
             } catch (error) {
 
                 showToast(
                     error.message
                 );
+
             }
+
         }
     );
 
@@ -2475,25 +2772,33 @@ document
                         "/api/upgrade/click",
                         {
                             method: "POST",
-                            body: JSON.stringify({
-                                user_id:
-                                    USER_ID
-                            })
+
+                            body:
+                                JSON.stringify({
+                                    user_id:
+                                        USER_ID
+                                })
+
                         }
                     );
 
+
                 renderState();
+
 
                 showToast(
                     "👆 Сила клика улучшена"
                 );
+
 
             } catch (error) {
 
                 showToast(
                     error.message
                 );
+
             }
+
         }
     );
 
@@ -2517,25 +2822,33 @@ document
                         "/api/upgrade/stamina",
                         {
                             method: "POST",
-                            body: JSON.stringify({
-                                user_id:
-                                    USER_ID
-                            })
+
+                            body:
+                                JSON.stringify({
+                                    user_id:
+                                        USER_ID
+                                })
+
                         }
                     );
 
+
                 renderState();
+
 
                 showToast(
                     "⚡ Запас стамины увеличен"
                 );
+
 
             } catch (error) {
 
                 showToast(
                     error.message
                 );
+
             }
+
         }
     );
 
@@ -2556,7 +2869,9 @@ document
                 !state ||
                 !state.can_prestige
             ) {
+
                 return;
+
             }
 
 
@@ -2567,26 +2882,33 @@ document
                         "/api/prestige",
                         {
                             method: "POST",
-                            body: JSON.stringify({
-                                user_id:
-                                    USER_ID
-                            })
+
+                            body:
+                                JSON.stringify({
+                                    user_id:
+                                        USER_ID
+                                })
+
                         }
                     );
 
 
                 renderState();
 
+
                 showToast(
-                    `🚀 Перелёт выполнен!`
+                    "🚀 Перелёт выполнен!"
                 );
+
 
             } catch (error) {
 
                 showToast(
                     error.message
                 );
+
             }
+
         }
     );
 
@@ -2604,7 +2926,9 @@ document
         async () => {
 
             const code =
-                String(USER_ID);
+                String(
+                    USER_ID
+                );
 
 
             try {
@@ -2613,55 +2937,65 @@ document
                     code
                 );
 
+
                 showToast(
                     "📋 Код приглашения скопирован"
                 );
 
-            } catch (error) {
 
-                /*
-                 * Fallback для некоторых
-                 * Telegram/WebView.
-                 */
+            } catch (error) {
 
                 const textarea =
                     document.createElement(
                         "textarea"
                     );
 
+
                 textarea.value =
                     code;
+
 
                 textarea.style.position =
                     "fixed";
 
+
                 textarea.style.opacity =
                     "0";
+
 
                 document.body.appendChild(
                     textarea
                 );
 
+
                 textarea.select();
 
+
                 try {
+
                     document.execCommand(
                         "copy"
                     );
 
+
                     showToast(
                         "📋 Код скопирован"
                     );
+
 
                 } catch (e) {
 
                     showToast(
                         "Выдели код вручную"
                     );
+
                 }
 
+
                 textarea.remove();
+
             }
+
         }
     );
 
@@ -2714,17 +3048,21 @@ async function loadReferrals() {
 
         renderReferrals();
 
+
     } catch (error) {
 
         console.error(
             error
         );
 
+
         showToast(
             error.message ||
             "Не удалось загрузить рефералов"
         );
+
     }
+
 }
 
 
@@ -2748,7 +3086,9 @@ function renderReferrals() {
             </div>
         `;
 
+
         return;
+
     }
 
 
@@ -2796,6 +3136,7 @@ function renderReferrals() {
 
             })
             .join("");
+
 }
 
 
@@ -2804,19 +3145,6 @@ function renderReferrals() {
 ============================================================ */
 
 async function processReferralStart() {
-
-    /*
-     * Telegram Mini Apps могут передавать
-     * start-параметр.
-     *
-     * Ожидаем:
-     *
-     * ref_123456789
-     *
-     * либо просто:
-     *
-     * 123456789
-     */
 
     let startParam = "";
 
@@ -2829,6 +3157,7 @@ async function processReferralStart() {
         startParam =
             tg.initDataUnsafe
                 .start_param || "";
+
     }
 
 
@@ -2839,6 +3168,7 @@ async function processReferralStart() {
                 window.location.search
             );
 
+
         startParam =
             params.get(
                 "startapp"
@@ -2847,6 +3177,7 @@ async function processReferralStart() {
                 "start"
             ) ||
             "";
+
     }
 
 
@@ -2865,8 +3196,12 @@ async function processReferralStart() {
             "ref_"
         )
     ) {
+
         startParam =
-            startParam.substring(4);
+            startParam.substring(
+                4
+            );
+
     }
 
 
@@ -2883,7 +3218,9 @@ async function processReferralStart() {
         referrerId <= 0 ||
         referrerId === USER_ID
     ) {
+
         return;
+
     }
 
 
@@ -2894,12 +3231,18 @@ async function processReferralStart() {
                 "/api/referral/register",
                 {
                     method: "POST",
-                    body: JSON.stringify({
-                        user_id:
-                            USER_ID,
-                        referrer_id:
-                            referrerId
-                    })
+
+                    body:
+                        JSON.stringify({
+
+                            user_id:
+                                USER_ID,
+
+                            referrer_id:
+                                referrerId
+
+                        })
+
                 }
             );
 
@@ -2912,11 +3255,14 @@ async function processReferralStart() {
             state =
                 result.state;
 
+
             renderState();
+
 
             showToast(
                 "🎁 Реферал активирован"
             );
+
         }
 
     } catch (error) {
@@ -2925,7 +3271,9 @@ async function processReferralStart() {
             "Referral:",
             error
         );
+
     }
+
 }
 
 
@@ -2957,12 +3305,15 @@ document
                             "active",
                             tab === button
                         );
+
                     });
 
 
                 renderLeaderboard();
+
             }
         );
+
     });
 
 
@@ -2979,6 +3330,7 @@ async function loadLeaderboard() {
         renderLeaderboard();
 
         return;
+
     }
 
 
@@ -2999,11 +3351,13 @@ async function loadLeaderboard() {
 
         renderLeaderboard();
 
+
     } catch (error) {
 
         console.error(
             error
         );
+
 
         container.innerHTML = `
             <div class="empty">
@@ -3011,10 +3365,13 @@ async function loadLeaderboard() {
             </div>
         `;
 
+
         showToast(
             error.message
         );
+
     }
+
 }
 
 
@@ -3039,7 +3396,9 @@ function renderLeaderboard() {
             </div>
         `;
 
+
         return;
+
     }
 
 
@@ -3057,7 +3416,9 @@ function renderLeaderboard() {
             </div>
         `;
 
+
         return;
+
     }
 
 
@@ -3079,6 +3440,7 @@ function renderLeaderboard() {
                     ) +
                     " 🪙";
 
+
                 sub =
                     row.object_name;
 
@@ -3090,6 +3452,7 @@ function renderLeaderboard() {
                 value =
                     row.progress_percent +
                     "%";
+
 
                 sub =
                     `${row.object_name} · ${formatNumber(
@@ -3103,8 +3466,10 @@ function renderLeaderboard() {
                         row.prestige_count
                     );
 
+
                 sub =
                     row.object_name;
+
             }
 
 
@@ -3139,6 +3504,7 @@ function renderLeaderboard() {
             `;
 
         }).join("");
+
 }
 
 
@@ -3153,16 +3519,13 @@ let lastStateRefresh =
 setInterval(
     async () => {
 
-        /*
-         * Не обновляем состояние слишком часто
-         * во время активного кликанья.
-         */
-
         if (
             pendingTaps > 0 ||
             clickRequestRunning
         ) {
+
             return;
+
         }
 
 
@@ -3171,7 +3534,9 @@ setInterval(
             lastStateRefresh <
             3000
         ) {
+
             return;
+
         }
 
 
@@ -3190,7 +3555,9 @@ setInterval(
             state =
                 fresh;
 
+
             renderState();
+
 
         } catch (error) {
 
@@ -3198,6 +3565,7 @@ setInterval(
                 "Auto refresh:",
                 error
             );
+
         }
 
     },
@@ -3216,6 +3584,7 @@ async function init() {
     await syncTelegramProfile();
 
     await processReferralStart();
+
 }
 
 
@@ -3224,4 +3593,4 @@ init();
 </script>
 
 </body>
-</html>
+    </html>
