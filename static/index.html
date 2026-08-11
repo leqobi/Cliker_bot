@@ -1,2311 +1,1226 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-    >
-
-    <meta name="theme-color" content="#0b0a16">
-
-    <title>Sundered Star</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-            background: #090812;
-            color: #ffffff;
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Arial,
-                sans-serif;
-        }
-
-        body {
-            overflow-x: hidden;
-            padding-bottom: calc(82px + env(safe-area-inset-bottom));
-        }
-
-        button {
-            font: inherit;
-        }
-
-        .app {
-            width: 100%;
-            max-width: 720px;
-            margin: 0 auto;
-            min-height: 100vh;
-            padding:
-                calc(10px + env(safe-area-inset-top))
-                16px
-                24px;
-        }
-
-        /* =====================================================
-           TOP
-        ===================================================== */
-
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background:
-                linear-gradient(
-                    135deg,
-                    #795cff,
-                    #b832ff
-                );
-            box-shadow:
-                0 8px 28px rgba(123, 75, 255, .35);
-            font-size: 20px;
-        }
-
-        .brand-title {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: .2px;
-        }
-
-        .brand-subtitle {
-            margin-top: 2px;
-            color: #77758a;
-            font-size: 11px;
-        }
-
-        .balance-box {
-            text-align: right;
-        }
-
-        .balance-label {
-            color: #77758a;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.4px;
-        }
-
-        .balance {
-            margin-top: 2px;
-            font-size: 22px;
-            font-weight: 900;
-        }
-
-        /* =====================================================
-           PAGES
-        ===================================================== */
-
-        .page {
-            display: none;
-            animation: pageIn .2s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes pageIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* =====================================================
-           EXPLORE
-        ===================================================== */
-
-        .object-title {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .object-name {
-            font-size: 26px;
-            font-weight: 900;
-        }
-
-        .object-category {
-            margin-top: 4px;
-            color: #77758a;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .click-zone {
-            position: relative;
-            width: min(84vw, 410px);
-            aspect-ratio: 1 / 1;
-            margin: 20px auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
-        }
-
-        .click-zone::before {
-            content: "";
-            position: absolute;
-            inset: 5%;
-            border-radius: 50%;
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(119, 83, 255, .22),
-                    rgba(119, 83, 255, 0) 68%
-                );
-            filter: blur(12px);
-        }
-
-        .planet {
-            position: relative;
-            width: 82%;
-            height: 82%;
-            object-fit: contain;
-            z-index: 2;
-            user-select: none;
-            pointer-events: none;
-            filter:
-                drop-shadow(0 20px 35px rgba(0,0,0,.45));
-            transition:
-                transform .06s ease;
-        }
-
-        .click-zone.pressed .planet {
-            transform: scale(.96);
-        }
-
-        .tap-number {
-            position: absolute;
-            z-index: 10;
-            pointer-events: none;
-            font-size: 24px;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow:
-                0 3px 15px rgba(120, 86, 255, .9);
-            animation: tapFloat .65s ease-out forwards;
-        }
-
-        @keyframes tapFloat {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(.85);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translateY(-70px) scale(1.1);
-            }
-        }
-
-        /* =====================================================
-           PROGRESS
-        ===================================================== */
-
-        .stat-card {
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(31, 29, 51, .95),
-                    rgba(19, 18, 34, .95)
-                );
-            border: 1px solid rgba(255,255,255,.07);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .stat-label {
-            color: #aaa7ba;
-            font-size: 13px;
-        }
-
-        .stat-value {
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: #29273b;
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            border-radius: inherit;
-            background:
-                linear-gradient(
-                    90deg,
-                    #7255ff,
-                    #bb55ff
-                );
-            transition: width .2s ease;
-        }
-
-        .stamina-fill {
-            background:
-                linear-gradient(
-                    90deg,
-                    #46a7ff,
-                    #69d0ff
-                );
-        }
-
-        /* =====================================================
-           BUTTONS
-        ===================================================== */
-
-        .primary-button,
-        .secondary-button,
-        .danger-button {
-            width: 100%;
-            border: 0;
-            border-radius: 16px;
-            min-height: 54px;
-            padding: 0 18px;
-            font-weight: 850;
-            cursor: pointer;
-            transition:
-                transform .12s ease,
-                opacity .12s ease;
-        }
-
-        .primary-button {
-            color: #fff;
-            background:
-                linear-gradient(
-                    135deg,
-                    #7654ff,
-                    #ad38ff
-                );
-            box-shadow:
-                0 10px 28px rgba(120, 70, 255, .22);
-        }
-
-        .secondary-button {
-            color: #fff;
-            background: #29273b;
-            border: 1px solid rgba(255,255,255,.06);
-        }
-
-        .danger-button {
-            color: #fff;
-            background:
-                linear-gradient(
-                    135deg,
-                    #ff655f,
-                    #ff3e87
-                );
-        }
-
-        button:active {
-            transform: scale(.97);
-        }
-
-        button:disabled {
-            opacity: .45;
-            cursor: default;
-            transform: none;
-        }
-
-        /* =====================================================
-           DAILY
-        ===================================================== */
-
-        .daily-card {
-            padding: 18px;
-            border-radius: 21px;
-            margin-bottom: 12px;
-            background:
-                linear-gradient(
-                    145deg,
-                    #33251d,
-                    #241c1d
-                );
-            border: 1px solid rgba(255, 180, 60, .25);
-        }
-
-        .daily-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .daily-title {
-            font-size: 17px;
-            font-weight: 850;
-        }
-
-        .daily-streak {
-            color: #ffb340;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .daily-amount {
-            font-size: 23px;
-            font-weight: 950;
-        }
-
-        /* =====================================================
-           UPGRADES
-        ===================================================== */
-
-        .section-title {
-            margin: 22px 3px 10px;
-            color: #aaa7ba;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1.4px;
-            font-weight: 800;
-        }
-
-        .upgrade-card {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 19px;
-            background: #191827;
-            border: 1px solid rgba(255,255,255,.07);
-        }
-
-        .upgrade-icon {
-            width: 48px;
-            height: 48px;
-            flex: 0 0 48px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #27253a;
-            font-size: 23px;
-        }
-
-        .upgrade-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .upgrade-name {
-            font-weight: 850;
-            font-size: 15px;
-        }
-
-        .upgrade-desc {
-            color: #888598;
-            font-size: 11px;
-            margin-top: 4px;
-        }
-
-        .upgrade-button {
-            min-width: 72px;
-            height: 43px;
-            border: 0;
-            border-radius: 13px;
-            background: #29273b;
-            color: #77758a;
-            font-weight: 850;
-            transition:
-                background .15s ease,
-                color .15s ease,
-                transform .12s ease,
-                box-shadow .15s ease;
-        }
-
-        .upgrade-button.can-buy {
-            color: #fff;
-            background:
-                linear-gradient(
-                    135deg,
-                    #7654ff,
-                    #ad38ff
-                );
-            box-shadow:
-                0 7px 20px rgba(120, 70, 255, .25);
-        }
-
-        .upgrade-button:disabled {
-            opacity: 1;
-            cursor: default;
-        }
-
-        /* =====================================================
-           REFERRALS
-        ===================================================== */
-
-        .hero-card {
-            padding: 22px;
-            border-radius: 24px;
-            background:
-                radial-gradient(
-                    circle at top right,
-                    rgba(168, 72, 255, .24),
-                    transparent 45%
-                ),
-                linear-gradient(
-                    145deg,
-                    #201936,
-                    #151322
-                );
-            border: 1px solid rgba(151, 94, 255, .2);
-            margin-bottom: 12px;
-        }
-
-        .hero-title {
-            font-size: 22px;
-            font-weight: 950;
-        }
-
-        .hero-text {
-            color: #aaa7ba;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-top: 7px;
-        }
-
-        .ref-code-title {
-            margin-top: 18px;
-            color: #817d91;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.3px;
-        }
-
-        .ref-code {
-            margin-top: 7px;
-            padding: 15px;
-            border-radius: 15px;
-            background: #0e0d18;
-            border: 1px solid rgba(255,255,255,.08);
-            text-align: center;
-            font-size: 25px;
-            font-weight: 950;
-            letter-spacing: 2px;
-            user-select: text;
-        }
-
-        .ref-copy {
-            margin-top: 10px;
-        }
-
-        .ref-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .ref-stat {
-            background: #191827;
-            border-radius: 18px;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,.06);
-        }
-
-        .ref-stat-value {
-            font-size: 23px;
-            font-weight: 950;
-        }
-
-        .ref-stat-label {
-            color: #858293;
-            font-size: 11px;
-            margin-top: 4px;
-        }
-
-        .ref-item {
-            padding: 15px;
-            border-radius: 17px;
-            background: #191827;
-            border: 1px solid rgba(255,255,255,.06);
-            margin-bottom: 8px;
-        }
-
-        .ref-item-top {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .ref-name {
-            font-weight: 800;
-        }
-
-        .ref-earned {
-            color: #a77bff;
-            font-weight: 850;
-        }
-
-        .ref-small {
-            color: #858293;
-            font-size: 11px;
-            margin-top: 5px;
-        }
-
-        /* =====================================================
-           LEADERBOARD
-        ===================================================== */
-
-        .leader-tabs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 7px;
-            margin: 12px 0;
-        }
-
-        .leader-tab {
-            border: 0;
-            border-radius: 13px;
-            min-height: 42px;
-            background: #191827;
-            color: #858293;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .leader-tab.active {
-            color: #fff;
-            background: #312b50;
-        }
-
-        .leader-item {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 13px;
-            margin-bottom: 8px;
-            border-radius: 17px;
-            background: #191827;
-            border: 1px solid rgba(255,255,255,.06);
-        }
-
-        .leader-rank {
-            width: 32px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 950;
-            color: #888598;
-        }
-
-        .leader-item:nth-child(1) .leader-rank {
-            color: #ffd66b;
-        }
-
-        .leader-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .leader-name {
-            font-size: 13px;
-            font-weight: 850;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .leader-sub {
-            color: #777487;
-            font-size: 10px;
-            margin-top: 3px;
-        }
-
-        .leader-value {
-            text-align: right;
-            font-size: 13px;
-            font-weight: 900;
-        }
-
-        /* =====================================================
-           EMPTY / LOADING
-        ===================================================== */
-
-        .loading {
-            padding: 40px 10px;
-            text-align: center;
-            color: #777487;
-        }
-
-        .empty {
-            padding: 30px 10px;
-            text-align: center;
-            color: #777487;
-        }
-
-        /* =====================================================
-           TOAST
-        ===================================================== */
-
-        .toast {
-            position: fixed;
-            z-index: 1000;
-            left: 50%;
-            bottom: calc(92px + env(safe-area-inset-bottom));
-            transform: translate(-50%, 20px);
-            opacity: 0;
-            pointer-events: none;
-            max-width: calc(100vw - 35px);
-            padding: 12px 16px;
-            border-radius: 14px;
-            background: #29263a;
-            border: 1px solid rgba(255,255,255,.1);
-            box-shadow: 0 15px 40px rgba(0,0,0,.35);
-            font-size: 12px;
-            font-weight: 750;
-            text-align: center;
-            transition: .2s ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-
-        /* =====================================================
-           BOTTOM NAV
-        ===================================================== */
-
-        .bottom-nav {
-            position: fixed;
-            z-index: 500;
-            left: 50%;
-            bottom: 0;
-            transform: translateX(-50%);
-            width: min(720px, 100%);
-            padding:
-                8px
-                10px
-                calc(8px + env(safe-area-inset-bottom));
-            background:
-                rgba(12, 11, 21, .94);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-top: 1px solid rgba(255,255,255,.06);
-        }
-
-        .nav-inner {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-        }
-
-        .nav-button {
-            border: 0;
-            min-height: 56px;
-            border-radius: 16px;
-            background: transparent;
-            color: #706d80;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            font-size: 10px;
-            font-weight: 750;
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            line-height: 20px;
-        }
-
-        .nav-button.active {
-            color: #ffffff;
-            background: #211e32;
-        }
-
-        /* =====================================================
-           SMALL SCREENS
-        ===================================================== */
-
-        @media (max-width: 380px) {
-            .app {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-
-            .object-name {
-                font-size: 23px;
-            }
-
-            .upgrade-card {
-                padding: 12px;
-            }
-
-            .upgrade-button {
-                min-width: 65px;
-            }
-
-            .nav-button {
-                font-size: 9px;
-            }
-
-            .nav-icon {
-                font-size: 18px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b0a16">
+<title>Sundered Star</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+html,body{
+    margin:0;
+    padding:0;
+    background:#090812;
+    color:#fff;
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif
+}
+
+body{
+    overflow-x:hidden;
+    padding-bottom:calc(82px + env(safe-area-inset-bottom))
+}
+
+button{font:inherit}
+
+.app{
+    width:100%;
+    max-width:720px;
+    margin:auto;
+    min-height:100vh;
+    padding:calc(10px + env(safe-area-inset-top)) 16px 24px
+}
+
+.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px
+}
+
+.brand-icon{
+    width:38px;
+    height:38px;
+    border-radius:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#795cff,#b832ff);
+    box-shadow:0 8px 28px #7b4bff59;
+    font-size:20px
+}
+
+.brand-title{font-size:17px;font-weight:800}
+
+.brand-subtitle,
+.balance-label{
+    color:#77758a
+}
+
+.brand-subtitle{
+    margin-top:2px;
+    font-size:11px
+}
+
+.balance-box{text-align:right}
+
+.balance-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1.4px
+}
+
+.balance{
+    margin-top:2px;
+    font-size:22px;
+    font-weight:900
+}
+
+.page{
+    display:none;
+    animation:pageIn .2s ease
+}
+
+.page.active{display:block}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(5px)
+    }
+    to{
+        opacity:1;
+        transform:none
+    }
+}
+
+.object-title{
+    text-align:center;
+    margin-top:10px
+}
+
+.object-name{
+    font-size:26px;
+    font-weight:900
+}
+
+.object-category{
+    margin-top:4px;
+    color:#77758a;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:2px
+}
+
+.click-zone{
+    position:relative;
+    width:min(84vw,410px);
+    aspect-ratio:1;
+    margin:20px auto 16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    touch-action:manipulation;
+    user-select:none
+}
+
+.click-zone:before{
+    content:"";
+    position:absolute;
+    inset:5%;
+    border-radius:50%;
+    background:radial-gradient(circle,#7753ff38,transparent 68%);
+    filter:blur(12px)
+}
+
+.planet{
+    position:relative;
+    width:82%;
+    height:82%;
+    object-fit:contain;
+    z-index:2;
+    pointer-events:none;
+    filter:drop-shadow(0 20px 35px #00000073);
+    transition:transform .06s
+}
+
+.click-zone.pressed .planet{
+    transform:scale(.96)
+}
+
+.tap-number{
+    position:absolute;
+    z-index:10;
+    pointer-events:none;
+    font-size:24px;
+    font-weight:900;
+    color:#fff;
+    text-shadow:0 3px 15px #7856ffe6;
+    animation:tapFloat .65s ease-out forwards
+}
+
+@keyframes tapFloat{
+    0%{
+        opacity:1;
+        transform:translateY(0) scale(.85)
+    }
+    100%{
+        opacity:0;
+        transform:translateY(-70px) scale(1.1)
+    }
+}
+
+.stat-card{
+    background:linear-gradient(145deg,#1f1d33f2,#131222f2);
+    border:1px solid #ffffff12;
+    border-radius:20px;
+    padding:15px;
+    margin-bottom:12px
+}
+
+.stat-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px
+}
+
+.stat-label{
+    color:#aaa7ba;
+    font-size:13px
+}
+
+.stat-value{
+    font-size:13px;
+    font-weight:800
+}
+
+.progress-bar{
+    height:8px;
+    background:#29273b;
+    border-radius:999px;
+    overflow:hidden;
+    margin-top:10px
+}
+
+.progress-fill{
+    height:100%;
+    width:0;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#7255ff,#bb55ff);
+    transition:width .2s
+}
+
+.stamina-fill{
+    background:linear-gradient(90deg,#46a7ff,#69d0ff)
+}
+
+.primary-button,
+.secondary-button,
+.danger-button{
+    width:100%;
+    border:0;
+    border-radius:16px;
+    min-height:54px;
+    padding:0 18px;
+    font-weight:850;
+    cursor:pointer;
+    transition:transform .12s,opacity .12s
+}
+
+.primary-button{
+    color:#fff;
+    background:linear-gradient(135deg,#7654ff,#ad38ff);
+    box-shadow:0 10px 28px #7846ff38
+}
+
+.secondary-button{
+    color:#fff;
+    background:#29273b;
+    border:1px solid #ffffff0f
+}
+
+.danger-button{
+    color:#fff;
+    background:linear-gradient(135deg,#ff655f,#ff3e87)
+}
+
+button:active{
+    transform:scale(.97)
+}
+
+button:disabled{
+    opacity:.45;
+    cursor:default;
+    transform:none
+}
+
+.section-title{
+    margin:22px 3px 10px;
+    color:#aaa7ba;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1.4px;
+    font-weight:800
+}
+
+.daily-card,
+.hero-card{
+    padding:18px;
+    border-radius:21px;
+    margin-bottom:12px
+}
+
+.daily-card{
+    background:linear-gradient(145deg,#33251d,#241c1d);
+    border:1px solid #ffb43c40
+}
+
+.daily-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px
+}
+
+.daily-title{
+    font-size:17px;
+    font-weight:850
+}
+
+.daily-streak{
+    color:#ffb340;
+    font-size:12px;
+    margin-top:4px
+}
+
+.daily-amount{
+    font-size:23px;
+    font-weight:950
+}
+
+.upgrade-card{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:15px;
+    margin-bottom:10px;
+    border-radius:19px;
+    background:#191827;
+    border:1px solid #ffffff12
+}
+
+.upgrade-icon{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    border-radius:15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#27253a;
+    font-size:23px
+}
+
+.upgrade-info{
+    flex:1;
+    min-width:0
+}
+
+.upgrade-name{
+    font-weight:850;
+    font-size:15px
+}
+
+.upgrade-desc{
+    color:#888598;
+    font-size:11px;
+    margin-top:4px
+}
+
+.upgrade-button{
+    min-width:76px;
+    height:43px;
+    border:0;
+    border-radius:13px;
+    background:#302e43;
+    color:#fff;
+    font-weight:850
+}
+
+.upgrade-button.can-buy{
+    background:linear-gradient(135deg,#7654ff,#ad38ff);
+    box-shadow:0 7px 20px #7846ff45
+}
+
+.upgrade-button.maxed{
+    background:#29273b;
+    color:#77758a
+}
+
+.hero-card{
+    padding:22px;
+    border-radius:24px;
+    background:
+        radial-gradient(circle at top right,#a848ff3d,transparent 45%),
+        linear-gradient(145deg,#201936,#151322);
+    border:1px solid #975eff33
+}
+
+.hero-title{
+    font-size:22px;
+    font-weight:950
+}
+
+.hero-text{
+    color:#aaa7ba;
+    font-size:13px;
+    line-height:1.5;
+    margin-top:7px
+}
+
+.ref-code-title{
+    margin-top:18px;
+    color:#817d91;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1.3px
+}
+
+.ref-code{
+    margin-top:7px;
+    padding:15px;
+    border-radius:15px;
+    background:#0e0d18;
+    border:1px solid #ffffff14;
+    text-align:center;
+    font-size:13px;
+    font-weight:750;
+    line-height:1.4;
+    word-break:break-all;
+    user-select:text
+}
+
+.ref-copy{
+    margin-top:10px
+}
+
+.ref-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:12px
+}
+
+.ref-stat{
+    background:#191827;
+    border-radius:18px;
+    padding:16px;
+    border:1px solid #ffffff0f
+}
+
+.ref-stat-value{
+    font-size:23px;
+    font-weight:950
+}
+
+.ref-stat-label{
+    color:#858293;
+    font-size:11px;
+    margin-top:4px
+}
+
+.ref-item{
+    padding:15px;
+    border-radius:17px;
+    background:#191827;
+    border:1px solid #ffffff0f;
+    margin-bottom:8px
+}
+
+.ref-item-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px
+}
+
+.ref-name{
+    font-weight:800
+}
+
+.ref-earned{
+    color:#a77bff;
+    font-weight:850
+}
+
+.ref-small{
+    color:#858293;
+    font-size:11px;
+    margin-top:5px
+}
+
+.leader-item{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:13px;
+    margin-bottom:8px;
+    border-radius:17px;
+    background:#191827;
+    border:1px solid #ffffff0f
+}
+
+.leader-rank{
+    width:32px;
+    text-align:center;
+    font-size:14px;
+    font-weight:950;
+    color:#888598
+}
+
+.leader-info{
+    flex:1;
+    min-width:0
+}
+
+.leader-name{
+    font-size:13px;
+    font-weight:850;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap
+}
+
+.leader-sub{
+    color:#777487;
+    font-size:10px;
+    margin-top:3px
+}
+
+.leader-value{
+    text-align:right;
+    font-size:13px;
+    font-weight:900
+}
+
+.loading,
+.empty{
+    padding:30px 10px;
+    text-align:center;
+    color:#777487
+}
+
+.toast{
+    position:fixed;
+    z-index:1000;
+    left:50%;
+    bottom:calc(92px + env(safe-area-inset-bottom));
+    transform:translate(-50%,20px);
+    opacity:0;
+    pointer-events:none;
+    max-width:calc(100vw - 35px);
+    padding:12px 16px;
+    border-radius:14px;
+    background:#29263a;
+    border:1px solid #ffffff1a;
+    box-shadow:0 15px 40px #00000059;
+    font-size:12px;
+    font-weight:750;
+    text-align:center;
+    transition:.2s
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0)
+}
+
+.bottom-nav{
+    position:fixed;
+    z-index:500;
+    left:50%;
+    bottom:0;
+    transform:translateX(-50%);
+    width:min(720px,100%);
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+    background:#0c0b15f0;
+    backdrop-filter:blur(18px);
+    border-top:1px solid #ffffff0f
+}
+
+.nav-inner{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:5px
+}
+
+.nav-button{
+    border:0;
+    min-height:56px;
+    border-radius:16px;
+    background:transparent;
+    color:#706d80;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    font-size:10px;
+    font-weight:750
+}
+
+.nav-icon{
+    font-size:20px;
+    line-height:20px
+}
+
+.nav-button.active{
+    color:#fff;
+    background:#211e32
+}
+
+@media(max-width:380px){
+    .app{
+        padding-left:12px;
+        padding-right:12px
+    }
+
+    .object-name{
+        font-size:23px
+    }
+
+    .upgrade-card{
+        padding:12px
+    }
+
+    .upgrade-button{
+        min-width:68px
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-    <!-- =====================================================
-         TOP
-    ====================================================== -->
+<div class="topbar">
 
-    <div class="topbar">
+<div class="brand">
 
-        <div class="brand">
+<div class="brand-icon">
+✦
+</div>
 
-            <div class="brand-icon">
-                ✦
-            </div>
+<div>
 
-            <div>
-                <div class="brand-title">
-                    Sundered Star
-                </div>
+<div class="brand-title">
+Sundered Star
+</div>
 
-                <div
-                    class="brand-subtitle"
-                    id="user-name"
-                >
-                    Исследователь
-                </div>
-            </div>
+<div class="brand-subtitle" id="user-name">
+Исследователь
+</div>
 
-        </div>
+</div>
 
-        <div class="balance-box">
+</div>
 
-            <div class="balance-label">
-                Баланс
-            </div>
+<div class="balance-box">
 
-            <div
-                class="balance"
-                id="balance"
-            >
-                0
-            </div>
+<div class="balance-label">
+Баланс
+</div>
 
-        </div>
+<div class="balance" id="balance">
+0
+</div>
 
-    </div>
-
-
-    <!-- =====================================================
-         PAGE: EXPLORE
-    ====================================================== -->
-
-    <section
-        class="page active"
-        id="page-explore"
-    >
-
-        <div class="object-title">
-
-            <div
-                class="object-name"
-                id="object-name"
-            >
-                Меркурий
-            </div>
-
-            <div
-                class="object-category"
-                id="object-category"
-            >
-                Планета
-            </div>
-
-        </div>
-
-
-        <div
-            class="click-zone"
-            id="click-zone"
-        >
-
-            <img
-                class="planet"
-                id="object-image"
-                src="/mercury.png"
-                alt="Космический объект"
-                draggable="false"
-            >
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-row">
-
-                <div class="stat-label">
-                    🌌 Прогресс
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="progress-text"
-                >
-                    0 / 2000
-                </div>
-
-            </div>
-
-            <div class="progress-bar">
-
-                <div
-                    class="progress-fill"
-                    id="progress-fill"
-                ></div>
-
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-row">
-
-                <div class="stat-label">
-                    ⚡ Ста́мина
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="stamina-text"
-                >
-                    1500 / 1500
-                </div>
-
-            </div>
-
-            <div class="progress-bar">
-
-                <div
-                    class="progress-fill stamina-fill"
-                    id="stamina-fill"
-                ></div>
-
-            </div>
-
-        </div>
-
-
-        <button
-            class="primary-button"
-            id="prestige-button"
-            disabled
-        >
-            Набери прогресс для перелёта
-        </button>
-
-    </section>
-
-
-    <!-- =====================================================
-         PAGE: LEADERBOARD
-    ====================================================== -->
-
-    <section
-        class="page"
-        id="page-leaderboard"
-    >
-
-        <div class="section-title">
-            🏆 Лидерборд
-        </div>
-
-        <div class="leader-tabs">
-
-            <button
-                class="leader-tab active"
-                data-leader-tab="balance"
-            >
-                Монеты
-            </button>
-
-            <button
-                class="leader-tab"
-                data-leader-tab="progress"
-            >
-                Прогресс
-            </button>
-
-            <button
-                class="leader-tab"
-                data-leader-tab="prestige"
-            >
-                Перелёты
-            </button>
-
-        </div>
-
-        <div id="leaderboard-list">
-
-            <div class="loading">
-                Загрузка...
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PAGE: BONUSES
-    ====================================================== -->
-
-    <section
-        class="page"
-        id="page-bonuses"
-    >
-
-        <div class="section-title">
-            🎁 Награды
-        </div>
-
-
-        <div class="daily-card">
-
-            <div class="daily-head">
-
-                <div>
-
-                    <div class="daily-title">
-                        🎁 Ежедневный бонус
-                    </div>
-
-                    <div
-                        class="daily-streak"
-                        id="daily-streak"
-                    >
-                        Серия: 0 дней
-                    </div>
-
-                </div>
-
-                <div
-                    class="daily-amount"
-                    id="daily-amount"
-                >
-                    +100
-                </div>
-
-            </div>
-
-            <button
-                class="primary-button"
-                id="daily-button"
-                style="margin-top:14px"
-            >
-                Забрать
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PAGE: UPGRADES
-    ====================================================== -->
-
-    <section
-        class="page"
-        id="page-upgrades"
-    >
-
-        <div class="section-title">
-            ⚙️ Улучшения
-        </div>
-
-
-        <div class="upgrade-card">
-
-            <div class="upgrade-icon">
-                👆
-            </div>
-
-            <div class="upgrade-info">
-
-                <div class="upgrade-name">
-                    Сила клика
-                </div>
-
-                <div
-                    class="upgrade-desc"
-                    id="click-upgrade-desc"
-                >
-                    Уровень 1 · +1 монета за клик
-                </div>
-
-            </div>
-
-            <button
-                class="upgrade-button"
-                id="click-upgrade-button"
-            >
-                50
-            </button>
-
-        </div>
-
-
-        <div class="upgrade-card">
-
-            <div class="upgrade-icon">
-                ⚡
-            </div>
-
-            <div class="upgrade-info">
-
-                <div class="upgrade-name">
-                    Запас стамины
-                </div>
-
-                <div
-                    class="upgrade-desc"
-                    id="stamina-upgrade-desc"
-                >
-                    Уровень 1 · макс. 1500
-                </div>
-
-            </div>
-
-            <button
-                class="upgrade-button"
-                id="stamina-upgrade-button"
-            >
-                80
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         PAGE: REFERRALS
-    ====================================================== -->
-
-    <section
-        class="page"
-        id="page-referrals"
-    >
-
-        <div class="hero-card">
-
-            <div class="hero-title">
-                👥 Рефералы
-            </div>
-
-            <div class="hero-text">
-                Приглашай исследователей и получай
-                бонус за каждого нового участника.
-                Дополнительно получай 10% от его
-                заработка каждую неделю.
-            </div>
-
-
-            <div class="ref-code-title">
-                Твой код приглашения
-            </div>
-
-            <div
-                class="ref-code"
-                id="ref-code"
-            >
-                —
-            </div>
-
-            <button
-                class="primary-button ref-copy"
-                id="copy-ref-code"
-            >
-                📋 Скопировать код
-            </button>
-
-        </div>
-
-
-        <div class="ref-stats">
-
-            <div class="ref-stat">
-
-                <div
-                    class="ref-stat-value"
-                    id="ref-count"
-                >
-                    0
-                </div>
-
-                <div class="ref-stat-label">
-                    Приглашено
-                </div>
-
-            </div>
-
-            <div class="ref-stat">
-
-                <div
-                    class="ref-stat-value"
-                    id="ref-earned"
-                >
-                    0
-                </div>
-
-                <div class="ref-stat-label">
-                    Получено монет
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-row">
-
-                <div class="stat-label">
-                    🎁 Бонус за приглашение
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="ref-bonus"
-                >
-                    +7000
-                </div>
-
-            </div>
-
-            <div
-                class="stat-row"
-                style="margin-top:12px"
-            >
-
-                <div class="stat-label">
-                    💎 Доля от заработка
-                </div>
-
-                <div
-                    class="stat-value"
-                    id="ref-percent"
-                >
-                    10%
-                </div>
-
-            </div>
-
-            <div
-                class="stat-row"
-                style="margin-top:12px"
-            >
-
-                <div class="stat-label">
-                    📅 Выплата
-                </div>
-
-                <div class="stat-value">
-                    раз в 7 дней
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="section-title">
-            👤 Твои рефералы
-        </div>
-
-        <div id="referral-list">
-
-            <div class="empty">
-                Пока никто не приглашён
-            </div>
-
-        </div>
-
-    </section>
+</div>
 
 </div>
 
 
-<!-- =========================================================
-     BOTTOM NAV
-========================================================== -->
+<section class="page active" id="page-explore">
+
+<div class="object-title">
+
+<div class="object-name" id="object-name">
+Меркурий
+</div>
+
+<div class="object-category" id="object-category">
+Планета
+</div>
+
+</div>
+
+<div class="click-zone" id="click-zone">
+
+<img
+class="planet"
+id="object-image"
+src="/mercury.png"
+alt="Космический объект"
+draggable="false"
+>
+
+</div>
+
+<div class="stat-card">
+
+<div class="stat-row">
+
+<div class="stat-label">
+🌌 Прогресс
+</div>
+
+<div class="stat-value" id="progress-text">
+0 / 2000
+</div>
+
+</div>
+
+<div class="progress-bar">
+
+<div
+class="progress-fill"
+id="progress-fill"
+></div>
+
+</div>
+
+</div>
+
+<div class="stat-card">
+
+<div class="stat-row">
+
+<div class="stat-label">
+⚡ Ста́мина
+</div>
+
+<div class="stat-value" id="stamina-text">
+1500 / 1500
+</div>
+
+</div>
+
+<div class="progress-bar">
+
+<div
+class="progress-fill stamina-fill"
+id="stamina-fill"
+></div>
+
+</div>
+
+</div>
+
+<button
+class="primary-button"
+id="prestige-button"
+disabled
+>
+Набери прогресс для перелёта
+</button>
+
+</section>
+
+
+<section class="page" id="page-leaderboard">
+
+<div class="section-title">
+🏆 Лидерборд · монеты
+</div>
+
+<div id="leaderboard-list">
+
+<div class="loading">
+Загрузка...
+</div>
+
+</div>
+
+</section>
+
+
+<section class="page" id="page-bonuses">
+
+<div class="section-title">
+🎁 Награды
+</div>
+
+<div class="daily-card">
+
+<div class="daily-head">
+
+<div>
+
+<div class="daily-title">
+🎁 Ежедневный бонус
+</div>
+
+<div
+class="daily-streak"
+id="daily-streak"
+>
+Серия: 0 дней
+</div>
+
+</div>
+
+<div
+class="daily-amount"
+id="daily-amount"
+>
++100
+</div>
+
+</div>
+
+<button
+class="primary-button"
+id="daily-button"
+style="margin-top:14px"
+>
+Забрать
+</button>
+
+</div>
+
+<div class="stat-card">
+
+<div class="stat-row">
+
+<div class="stat-label">
+💎 Всего заработано
+</div>
+
+<div
+class="stat-value"
+id="bonus-balance"
+>
+0
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="page" id="page-upgrades">
+
+<div class="section-title">
+⚙️ Улучшения
+</div>
+
+<div class="upgrade-card">
+
+<div class="upgrade-icon">
+👆
+</div>
+
+<div class="upgrade-info">
+
+<div class="upgrade-name">
+Сила клика
+</div>
+
+<div
+class="upgrade-desc"
+id="click-upgrade-desc"
+>
+Уровень 1 · +1 монета за клик
+</div>
+
+</div>
+
+<button
+class="upgrade-button"
+id="click-upgrade-button"
+>
+50
+</button>
+
+</div>
+
+<div class="upgrade-card">
+
+<div class="upgrade-icon">
+⚡
+</div>
+
+<div class="upgrade-info">
+
+<div class="upgrade-name">
+Запас стамины
+</div>
+
+<div
+class="upgrade-desc"
+id="stamina-upgrade-desc"
+>
+Уровень 1 · макс. 1500
+</div>
+
+</div>
+
+<button
+class="upgrade-button"
+id="stamina-upgrade-button"
+>
+80
+</button>
+
+</div>
+
+</section>
+
+
+<section class="page" id="page-referrals">
+
+<div class="hero-card">
+
+<div class="hero-title">
+👥 Рефералы
+</div>
+
+<div class="hero-text">
+Приглашай исследователей и получай бонус за каждого нового участника.
+Дополнительно получай 10% от его заработка каждую неделю.
+</div>
+
+<div class="ref-code-title">
+Твоя ссылка приглашения
+</div>
+
+<div
+class="ref-code"
+id="ref-code"
+>
+—
+</div>
+
+<button
+class="primary-button ref-copy"
+id="copy-ref-code"
+>
+📋 Скопировать ссылку
+</button>
+
+</div>
+
+<div class="ref-stats">
+
+<div class="ref-stat">
+
+<div
+class="ref-stat-value"
+id="ref-count"
+>
+0
+</div>
+
+<div class="ref-stat-label">
+Приглашено
+</div>
+
+</div>
+
+<div class="ref-stat">
+
+<div
+class="ref-stat-value"
+id="ref-earned"
+>
+0
+</div>
+
+<div class="ref-stat-label">
+Получено монет
+</div>
+
+</div>
+
+</div>
+
+<div class="stat-card">
+
+<div class="stat-row">
+
+<div class="stat-label">
+🎁 Бонус за приглашение
+</div>
+
+<div
+class="stat-value"
+id="ref-bonus"
+>
++7000
+</div>
+
+</div>
+
+<div
+class="stat-row"
+style="margin-top:12px"
+>
+
+<div class="stat-label">
+💎 Доля от заработка
+</div>
+
+<div
+class="stat-value"
+id="ref-percent"
+>
+10%
+</div>
+
+</div>
+
+<div
+class="stat-row"
+style="margin-top:12px"
+>
+
+<div class="stat-label">
+📅 Выплата
+</div>
+
+<div class="stat-value">
+раз в 7 дней
+</div>
+
+</div>
+
+</div>
+
+<div class="section-title">
+👤 Твои рефералы
+</div>
+
+<div id="referral-list">
+
+<div class="empty">
+Пока никто не приглашён
+</div>
+
+</div>
+
+</section>
+
+</div>
+
 
 <nav class="bottom-nav">
 
-    <div class="nav-inner">
+<div class="nav-inner">
 
-        <button
-            class="nav-button active"
-            data-page="explore"
-        >
+<button
+class="nav-button active"
+data-page="explore"
+>
 
-            <span class="nav-icon">
-                🌌
-            </span>
+<span class="nav-icon">
+🌌
+</span>
 
-            <span>
-                Исследовать
-            </span>
+<span>
+Исследовать
+</span>
 
-        </button>
+</button>
 
+<button
+class="nav-button"
+data-page="leaderboard"
+>
 
-        <button
-            class="nav-button"
-            data-page="leaderboard"
-        >
+<span class="nav-icon">
+🏆
+</span>
 
-            <span class="nav-icon">
-                🏆
-            </span>
+<span>
+Лидеры
+</span>
 
-            <span>
-                Лидеры
-            </span>
+</button>
 
-        </button>
+<button
+class="nav-button"
+data-page="bonuses"
+>
 
+<span class="nav-icon">
+🎁
+</span>
 
-        <button
-            class="nav-button"
-            data-page="bonuses"
-        >
+<span>
+Бонусы
+</span>
 
-            <span class="nav-icon">
-                🎁
-            </span>
+</button>
 
-            <span>
-                Бонусы
-            </span>
+<button
+class="nav-button"
+data-page="upgrades"
+>
 
-        </button>
+<span class="nav-icon">
+⚙️
+</span>
 
+<span>
+Улучшения
+</span>
 
-        <button
-            class="nav-button"
-            data-page="upgrades"
-        >
+</button>
 
-            <span class="nav-icon">
-                ⚙️
-            </span>
+<button
+class="nav-button"
+data-page="referrals"
+>
 
-            <span>
-                Улучшения
-            </span>
+<span class="nav-icon">
+👥
+</span>
 
-        </button>
+<span>
+Рефералы
+</span>
 
+</button>
 
-        <button
-            class="nav-button"
-            data-page="referrals"
-        >
-
-            <span class="nav-icon">
-                👥
-            </span>
-
-            <span>
-                Рефералы
-            </span>
-
-        </button>
-
-    </div>
+</div>
 
 </nav>
 
 
-<!-- =========================================================
-     TOAST
-========================================================== -->
-
 <div
-    class="toast"
-    id="toast"
+class="toast"
+id="toast"
 >
-    Готово
+Готово
 </div>
 
 
 <script>
 
-/* ============================================================
-   TELEGRAM
-============================================================ */
-
 const tg =
-    window.Telegram &&
-    window.Telegram.WebApp
-        ? window.Telegram.WebApp
-        : null;
+window.Telegram &&
+window.Telegram.WebApp
+? window.Telegram.WebApp
+: null;
 
-if (tg) {
+if(tg){
 
-    tg.ready();
-    tg.expand();
+tg.ready();
+tg.expand();
 
-    try {
+try{
 
-        tg.setHeaderColor("#0b0a16");
-        tg.setBackgroundColor("#090812");
+tg.setHeaderColor("#0b0a16");
+tg.setBackgroundColor("#090812");
 
-    } catch (e) {}
+}catch(e){}
 
 }
 
-
-/* ============================================================
-   API
-============================================================ */
 
 const API = "";
 
 
-/* ============================================================
-   USER ID
-============================================================ */
+function getUserId(){
 
-function getUserId() {
+if(
+tg &&
+tg.initDataUnsafe &&
+tg.initDataUnsafe.user &&
+tg.initDataUnsafe.user.id
+){
 
-    if (
-        tg &&
-        tg.initDataUnsafe &&
-        tg.initDataUnsafe.user &&
-        tg.initDataUnsafe.user.id
-    ) {
+return Number(
+tg.initDataUnsafe.user.id
+);
 
-        return Number(
-            tg.initDataUnsafe.user.id
-        );
+}
 
-    }
+const p =
+new URLSearchParams(
+location.search
+);
 
+const id =
+Number(
+p.get("user_id")
+);
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+if(
+Number.isInteger(id) &&
+id > 0
+){
 
+return id;
 
-    const urlId =
-        Number(
-            params.get("user_id")
-        );
+}
 
+let x =
+Number(
+localStorage.getItem(
+"sundered_star_test_user"
+)
+);
 
-    if (
-        Number.isInteger(urlId) &&
-        urlId > 0
-    ) {
+if(
+!Number.isInteger(x) ||
+x <= 0
+){
 
-        return urlId;
+x =
+Math.floor(
+100000000 +
+Math.random() *
+800000000
+);
 
-    }
+localStorage.setItem(
+"sundered_star_test_user",
+String(x)
+);
 
+}
 
-    let localId =
-        Number(
-            localStorage.getItem(
-                "sundered_star_test_user"
-            )
-        );
-
-
-    if (
-        !Number.isInteger(localId) ||
-        localId <= 0
-    ) {
-
-        localId =
-            Math.floor(
-                100000000 +
-                Math.random() * 800000000
-            );
-
-
-        localStorage.setItem(
-            "sundered_star_test_user",
-            String(localId)
-        );
-
-    }
-
-
-    return localId;
+return x;
 
 }
 
 
-const USER_ID = getUserId();
+const USER_ID =
+getUserId();
 
+const BOT_USERNAME =
+"SunderedStarBot";
 
-/* ============================================================
-   STATE
-============================================================ */
 
 let state = null;
 
 let leaderboardData = null;
 
-let currentLeaderTab = "balance";
-
 let referralData = null;
-
-
-/* ============================================================
-   HELPERS
-============================================================ */
-
-function formatNumber(value) {
-
-    return Number(
-        value || 0
-    ).toLocaleString("ru-RU");
-
-}
-
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-function showToast(message) {
-
-    const toast =
-        document.getElementById(
-            "toast"
-        );
-
-
-    toast.textContent =
-        message;
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        showToast.timer
-    );
-
-
-    showToast.timer =
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            1800
-        );
-
-}
-
-
-async function api(
-    path,
-    options = {}
-) {
-
-    const response =
-        await fetch(
-            API + path,
-            {
-                ...options,
-                headers: {
-                    "Content-Type":
-                        "application/json",
-                    ...(options.headers || {})
-                }
-            }
-        );
-
-
-    let data = null;
-
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch (e) {
-
-        data = null;
-
-    }
-
-
-    if (!response.ok) {
-
-        const message =
-            data &&
-            data.detail
-                ? data.detail
-                : "Произошла ошибка";
-
-
-        throw new Error(
-            message
-        );
-
-    }
-
-
-    return data;
-
-}
-
-
-/* ============================================================
-   STATE LOAD
-============================================================ */
-
-async function loadState() {
-
-    try {
-
-        state =
-            await api(
-                `/api/state/${USER_ID}`
-            );
-
-
-        renderState();
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        showToast(
-            error.message ||
-            "Не удалось загрузить игру"
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   PROFILE
-============================================================ */
-
-async function syncTelegramProfile() {
-
-    if (
-        !tg ||
-        !tg.initDataUnsafe ||
-        !tg.initDataUnsafe.user
-    ) {
-
-        return;
-
-    }
-
-
-    const user =
-        tg.initDataUnsafe.user;
-
-
-    try {
-
-        state =
-            await api(
-                "/api/profile",
-                {
-                    method: "POST",
-                    body: JSON.stringify({
-
-                        user_id:
-                            USER_ID,
-
-                        username:
-                            user.username || null,
-
-                        first_name:
-                            user.first_name || null,
-
-                        last_name:
-                            user.last_name || null
-
-                    })
-                }
-            );
-
-
-        renderState();
-
-    } catch (error) {
-
-        console.warn(
-            "Profile sync:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   RENDER STATE
-============================================================ */
-
-function renderState() {
-
-    if (!state) {
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       TOP
-    --------------------------------------------- */
-
-    document.getElementById(
-        "balance"
-    ).textContent =
-        formatNumber(
-            state.balance
-        );
-
-
-    document.getElementById(
-        "user-name"
-    ).textContent =
-        state.display_name ||
-        "Исследователь";
-
-
-    /* ---------------------------------------------
-       OBJECT
-    --------------------------------------------- */
-
-    document.getElementById(
-        "object-name"
-    ).textContent =
-        state.object_name ||
-        "Неизвестный объект";
-
-
-    const category =
-        state.object_category ===
-        "planet"
-            ? "Планета"
-            : state.object_category ===
-              "star"
-                ? "Звезда"
-                : "Чёрная дыра";
-
-
-    document.getElementById(
-        "object-category"
-    ).textContent =
-        category;
-
-
-    const image =
-        document.getElementById(
-            "object-image"
-        );
-
-
-    if (state.object_image) {
-
-        image.src =
-            "/" +
-            state.object_image;
-
-
-        image.onerror =
-            function () {
-
-                this.onerror = null;
-
-                this.src =
-                    createFallbackSvg(
-                        state.object_category
-                    );
-
-            };
-
-    }
-
-
-    /* ---------------------------------------------
-       PROGRESS
-    --------------------------------------------- */
-
-    const threshold =
-        state.object_threshold;
-
-
-    const progress =
-        Number(
-            state.object_progress || 0
-        );
-
-
-    if (threshold) {
-
-        document.getElementById(
-            "progress-text"
-        ).textContent =
-            `${formatNumber(progress)} / ${formatNumber(threshold)}`;
-
-
-        const percent =
-            Math.min(
-                100,
-                Math.max(
-                    0,
-                    progress /
-                    threshold *
-                    100
-                )
-            );
-
-
-        document.getElementById(
-            "progress-fill"
-        ).style.width =
-            percent + "%";
-
-    } else {
-
-        document.getElementById(
-            "progress-text"
-        ).textContent =
-            `${formatNumber(progress)} · максимум`;
-
-
-        document.getElementById(
-            "progress-fill"
-        ).style.width =
-            "100%";
-
-    }
-
-
-    /* ---------------------------------------------
-       STAMINA
-    --------------------------------------------- */
-
-    const stamina =
-        Number(
-            state.stamina || 0
-        );
-
-
-    const staminaMax =
-        Number(
-            state.stamina_max || 1
-        );
-
-
-    document.getElementById(
-        "stamina-text"
-    ).textContent =
-        `${formatNumber(stamina)} / ${formatNumber(staminaMax)}`;
-
-
-    document.getElementById(
-        "stamina-fill"
-    ).style.width =
-        Math.min(
-            100,
-            stamina /
-            staminaMax *
-            100
-        ) + "%";
-
-
-    /* ---------------------------------------------
-       PRESTIGE
-    --------------------------------------------- */
-
-    const prestigeButton =
-        document.getElementById(
-            "prestige-button"
-        );
-
-
-    if (state.can_prestige) {
-
-        prestigeButton.disabled =
-            false;
-
-
-        prestigeButton.textContent =
-            "🚀 Исследовать следующий объект";
-
-    } else if (
-        state.is_final_object
-    ) {
-
-        prestigeButton.disabled =
-            true;
-
-
-        prestigeButton.textContent =
-            "🌌 Финальный объект";
-
-    } else {
-
-        prestigeButton.disabled =
-            true;
-
-
-        prestigeButton.textContent =
-            `Набери ${formatNumber(
-                state.object_threshold
-            )} прогресса`;
-
-    }
-
-
-    /* ---------------------------------------------
-       DAILY
-    --------------------------------------------- */
-
-    const daily =
-        state.daily_status || {};
-
-
-    document.getElementById(
-        "daily-streak"
-    ).textContent =
-        `Серия: ${formatNumber(
-            state.daily_streak
-        )} ${pluralDays(
-            state.daily_streak
-        )}`;
-
-
-    document.getElementById(
-        "daily-amount"
-    ).textContent =
-        "+" +
-        formatNumber(
-            state.daily_next_amount
-        );
-
-
-    const dailyButton =
-        document.getElementById(
-            "daily-button"
-        );
-
-
-    if (daily.can_claim) {
-
-        dailyButton.disabled =
-            false;
-
-
-        dailyButton.textContent =
-            "Забрать";
-
-    } else {
-
-        dailyButton.disabled =
-            true;
-
-
-        dailyButton.textContent =
-            `Через ${daily.hours_until_next} ч.`;
-
-    }
-
-
-    /* ---------------------------------------------
-       CLICK UPGRADE
-    --------------------------------------------- */
-
-    document.getElementById(
-        "click-upgrade-desc"
-    ).textContent =
-        `Уровень ${state.click_level} · +${state.click_power} монет за клик`;
-
-
-    const clickCost =
-        Number(
-            state.click_upgrade_cost
-        );
-
-
-    const clickButton =
-        document.getElementById(
-            "click-upgrade-button"
-        );
-
-
-    if (clickCost === -1) {
-
-        clickButton.textContent =
-            "MAX";
-
-
-        clickButton.disabled =
-            true;
-
-
-        clickButton.classList.remove(
-            "can-buy"
-        );
-
-    } else {
-
-        clickButton.textContent =
-            formatNumber(
-                clickCost
-            );
-
-
-        const canBuy =
-            Number(state.balance) >=
-            clickCost;
-
-
-        clickButton.disabled =
-            !canBuy;
-
-
-        clickButton.classList.toggle(
-            "can-buy",
-            canBuy
-        );
-
-    }
-
-
-    /* ---------------------------------------------
-       STAMINA UPGRADE
-    --------------------------------------------- */
-
-    document.getElementById(
-        "stamina-upgrade-desc"
-    ).textContent =
-        `Уровень ${state.stamina_level} · макс. ${formatNumber(state.stamina_max)}`;
-
-
-    const staminaCost =
-        Number(
-            state.stamina_upgrade_cost
-        );
-
-
-    const staminaButton =
-        document.getElementById(
-            "stamina-upgrade-button"
-        );
-
-
-    if (staminaCost === -1) {
-
-        staminaButton.textContent =
-            "MAX";
-
-
-        staminaButton.disabled =
-            true;
-
-
-        staminaButton.classList.remove(
-            "can-buy"
-        );
-
-    } else {
-
-        staminaButton.textContent =
-            formatNumber(
-                staminaCost
-            );
-
-
-        const canBuy =
-            Number(state.balance) >=
-            staminaCost;
-
-
-        staminaButton.disabled =
-            !canBuy;
-
-
-        staminaButton.classList.toggle(
-            "can-buy",
-            canBuy
-        );
-
-    }
-
-
-    /* ---------------------------------------------
-       REFERRAL
-    --------------------------------------------- */
-
-    document.getElementById(
-        "ref-code"
-    ).textContent =
-        String(
-            USER_ID
-        );
-
-
-    document.getElementById(
-        "ref-count"
-    ).textContent =
-        formatNumber(
-            state.referral_count
-        );
-
-
-    document.getElementById(
-        "ref-earned"
-    ).textContent =
-        formatNumber(
-            state.referral_total_earned
-        );
-
-
-    document.getElementById(
-        "ref-bonus"
-    ).textContent =
-        "+" +
-        formatNumber(
-            state.referral_bonus
-        );
-
-
-    document.getElementById(
-        "ref-percent"
-    ).textContent =
-        state.referral_percent +
-        "%";
-
-}
-
-
-function pluralDays(number) {
-
-    number =
-        Math.abs(
-            Number(number)
-        ) % 100;
-
-
-    const last =
-        number % 10;
-
-
-    if (
-        number > 10 &&
-        number < 20
-    ) {
-
-        return "дней";
-
-    }
-
-
-    if (last === 1) {
-
-        return "день";
-
-    }
-
-
-    if (
-        last >= 2 &&
-        last <= 4
-    ) {
-
-        return "дня";
-
-    }
-
-
-    return "дней";
-
-}
-
-
-/* ============================================================
-   FALLBACK IMAGE
-============================================================ */
-
-function createFallbackSvg(
-    category
-) {
-
-    let symbol = "✦";
-
-
-    if (category === "planet") {
-        symbol = "◉";
-    }
-
-
-    if (category === "star") {
-        symbol = "★";
-    }
-
-
-    if (category === "blackhole") {
-        symbol = "●";
-    }
-
-
-    const svg = `
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 400 400"
-        >
-
-            <defs>
-
-                <radialGradient id="g">
-
-                    <stop
-                        offset="0"
-                        stop-color="#8b72ff"
-                    />
-
-                    <stop
-                        offset=".7"
-                        stop-color="#35235c"
-                    />
-
-                    <stop
-                        offset="1"
-                        stop-color="#11101d"
-                    />
-
-                </radialGradient>
-
-            </defs>
-
-
-            <circle
-                cx="200"
-                cy="200"
-                r="145"
-                fill="url(#g)"
-            />
-
-
-            <text
-                x="200"
-                y="220"
-                text-anchor="middle"
-                font-size="110"
-                fill="white"
-            >
-                ${symbol}
-            </text>
-
-        </svg>
-    `;
-
-
-    return (
-        "data:image/svg+xml;charset=utf-8," +
-        encodeURIComponent(svg)
-    );
-
-}
-
-
-/* ============================================================
-   CLICK SYSTEM — EXACTLY 50 MS
-============================================================ */
 
 let pendingTaps = 0;
 
@@ -2314,1276 +1229,1376 @@ let clickTimer = null;
 let clickRequestRunning = false;
 
 
-/*
- * Каждый тап сначала проверяет,
- * есть ли доступная стамина.
- *
- * pendingTaps тоже учитывается,
- * поэтому нельзя визуально сделать
- * больше тапов, чем есть стамины.
- */
+function formatNumber(v){
 
-function queueTap() {
-
-    if (!state) {
-        return;
-    }
-
-
-    const stamina =
-        Number(
-            state.stamina || 0
-        );
-
-
-    /*
-     * Сколько стамины реально осталось
-     * с учётом уже поставленных в очередь тапов.
-     */
-
-    const available =
-        stamina -
-        pendingTaps;
-
-
-    /*
-     * Стамина закончилась.
-     * Никакого +6 и никакого запроса.
-     */
-
-    if (available <= 0) {
-        return;
-    }
-
-
-    pendingTaps += 1;
-
-
-    animateTap();
-
-
-    /*
-     * ВАЖНО:
-     * задержка РОВНО 50 мс.
-     */
-
-    if (!clickTimer) {
-
-        clickTimer =
-            setTimeout(
-                flushClicks,
-                50
-            );
-
-    }
+return Number(
+v || 0
+).toLocaleString(
+"ru-RU"
+);
 
 }
 
 
-async function flushClicks() {
+function escapeHtml(v){
 
-    clickTimer = null;
-
-
-    if (
-        pendingTaps <= 0 ||
-        clickRequestRunning
-    ) {
-
-        return;
-
-    }
-
-
-    /*
-     * Максимум 1000 тапов за запрос.
-     */
-
-    const taps =
-        Math.min(
-            pendingTaps,
-            1000
-        );
-
-
-    pendingTaps -= taps;
-
-
-    clickRequestRunning =
-        true;
-
-
-    try {
-
-        const result =
-            await api(
-                "/api/click",
-                {
-                    method: "POST",
-
-                    body:
-                        JSON.stringify({
-
-                            user_id:
-                                USER_ID,
-
-                            taps:
-                                taps
-
-                        })
-
-                }
-            );
-
-
-        state =
-            result;
-
-
-        renderState();
-
-
-    } catch (error) {
-
-        console.error(
-            "Click error:",
-            error
-        );
-
-
-        /*
-         * Возвращаем тапов в очередь,
-         * если запрос не прошёл.
-         */
-
-        pendingTaps += taps;
-
-
-        showToast(
-            error.message ||
-            "Ошибка клика"
-        );
-
-
-    } finally {
-
-        clickRequestRunning =
-            false;
-
-
-        /*
-         * Если новые тапы появились,
-         * снова ждём ровно 50 мс.
-         */
-
-        if (pendingTaps > 0) {
-
-            clickTimer =
-                setTimeout(
-                    flushClicks,
-                    50
-                );
-
-        }
-
-    }
+return String(
+v ?? ""
+)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
 }
 
 
-function animateTap() {
+function showToast(m){
 
-    const zone =
-        document.getElementById(
-            "click-zone"
-        );
+const t =
+document.getElementById(
+"toast"
+);
 
+t.textContent = m;
 
-    const element =
-        document.createElement(
-            "div"
-        );
+t.classList.add("show");
 
+clearTimeout(
+showToast.timer
+);
 
-    element.className =
-        "tap-number";
-
-
-    const power =
-        state &&
-        state.click_power
-            ? state.click_power
-            : 1;
-
-
-    element.textContent =
-        "+" +
-        power;
-
-
-    const rect =
-        zone.getBoundingClientRect();
-
-
-    const x =
-        rect.width / 2 -
-        20 +
-        (
-            Math.random() * 80 -
-            40
-        );
-
-
-    const y =
-        rect.height / 2 -
-        20 +
-        (
-            Math.random() * 50 -
-            25
-        );
-
-
-    element.style.left =
-        x + "px";
-
-
-    element.style.top =
-        y + "px";
-
-
-    zone.appendChild(
-        element
-    );
-
-
-    setTimeout(
-        () => {
-
-            element.remove();
-
-        },
-        700
-    );
+showToast.timer =
+setTimeout(
+() =>
+t.classList.remove("show"),
+1800
+);
 
 }
 
 
-/* ============================================================
-   CLICK EVENTS
-============================================================ */
+async function api(
+path,
+options={}
+){
+
+const r =
+await fetch(
+API + path,
+{
+...options,
+headers:{
+"Content-Type":
+"application/json",
+...(options.headers || {})
+}
+}
+);
+
+let d = null;
+
+try{
+d = await r.json();
+}catch(e){}
+
+if(!r.ok){
+
+throw new Error(
+d &&
+d.detail
+? d.detail
+: "Произошла ошибка"
+);
+
+}
+
+return d;
+
+}
+
+
+function referralLink(){
+
+return `https://t.me/${BOT_USERNAME}?startapp=ref_${USER_ID}`;
+
+}
+
+
+function pluralDays(n){
+
+n =
+Math.abs(
+Number(n)
+) % 100;
+
+const l =
+n % 10;
+
+if(
+n > 10 &&
+n < 20
+){
+
+return "дней";
+
+}
+
+if(l === 1){
+
+return "день";
+
+}
+
+if(
+l >= 2 &&
+l <= 4
+){
+
+return "дня";
+
+}
+
+return "дней";
+
+}
+
+
+function renderState(){
+
+if(!state)return;
+
+
+document.getElementById(
+"balance"
+).textContent =
+formatNumber(
+state.balance
+);
+
+
+document.getElementById(
+"bonus-balance"
+).textContent =
+formatNumber(
+state.balance
+);
+
+
+document.getElementById(
+"user-name"
+).textContent =
+state.display_name ||
+"Исследователь";
+
+
+document.getElementById(
+"object-name"
+).textContent =
+state.object_name ||
+"Неизвестный объект";
+
+
+document.getElementById(
+"object-category"
+).textContent =
+state.object_category ===
+"planet"
+? "Планета"
+: state.object_category ===
+"star"
+? "Звезда"
+: "Чёрная дыра";
+
+
+const img =
+document.getElementById(
+"object-image"
+);
+
+if(
+state.object_image
+){
+
+img.src =
+"/" +
+state.object_image;
+
+}
+
+
+const threshold =
+Number(
+state.object_threshold ||
+0
+);
+
+const progress =
+Number(
+state.object_progress ||
+0
+);
+
+
+document.getElementById(
+"progress-text"
+).textContent =
+threshold
+? `${formatNumber(progress)} / ${formatNumber(threshold)}`
+: `${formatNumber(progress)} · максимум`;
+
+
+document.getElementById(
+"progress-fill"
+).style.width =
+threshold
+? Math.min(
+100,
+progress /
+threshold *
+100
+) + "%"
+: "100%";
+
+
+const stamina =
+Number(
+state.stamina ||
+0
+);
+
+const max =
+Number(
+state.stamina_max ||
+1
+);
+
+
+document.getElementById(
+"stamina-text"
+).textContent =
+`${formatNumber(stamina)} / ${formatNumber(max)}`;
+
+
+document.getElementById(
+"stamina-fill"
+).style.width =
+Math.min(
+100,
+stamina /
+max *
+100
+) + "%";
+
+
+const pb =
+document.getElementById(
+"prestige-button"
+);
+
+
+if(
+state.can_prestige
+){
+
+pb.disabled = false;
+
+pb.textContent =
+"🚀 Исследовать следующий объект";
+
+}
+else if(
+state.is_final_object
+){
+
+pb.disabled = true;
+
+pb.textContent =
+"🌌 Финальный объект";
+
+}
+else{
+
+pb.disabled = true;
+
+pb.textContent =
+`Набери ${formatNumber(
+state.object_threshold
+)} прогресса`;
+
+}
+
+
+const daily =
+state.daily_status ||
+{};
+
+
+document.getElementById(
+"daily-streak"
+).textContent =
+`Серия: ${formatNumber(
+state.daily_streak
+)} ${pluralDays(
+state.daily_streak
+)}`;
+
+
+document.getElementById(
+"daily-amount"
+).textContent =
+"+" +
+formatNumber(
+state.daily_next_amount
+);
+
+
+const db =
+document.getElementById(
+"daily-button"
+);
+
+
+db.disabled =
+!daily.can_claim;
+
+db.textContent =
+daily.can_claim
+? "Забрать"
+: `Через ${daily.hours_until_next} ч.`;
+
+
+updateUpgrade(
+"click",
+state.click_upgrade_cost,
+"click-upgrade-button"
+);
+
+updateUpgrade(
+"stamina",
+state.stamina_upgrade_cost,
+"stamina-upgrade-button"
+);
+
+
+document.getElementById(
+"click-upgrade-desc"
+).textContent =
+`Уровень ${state.click_level} · +${state.click_power} монет за клик`;
+
+
+document.getElementById(
+"stamina-upgrade-desc"
+).textContent =
+`Уровень ${state.stamina_level} · макс. ${formatNumber(state.stamina_max)}`;
+
+
+document.getElementById(
+"ref-code"
+).textContent =
+referralLink();
+
+
+document.getElementById(
+"ref-count"
+).textContent =
+formatNumber(
+state.referral_count
+);
+
+
+document.getElementById(
+"ref-earned"
+).textContent =
+formatNumber(
+state.referral_total_earned
+);
+
+
+document.getElementById(
+"ref-bonus"
+).textContent =
+"+" +
+formatNumber(
+state.referral_bonus
+);
+
+
+document.getElementById(
+"ref-percent"
+).textContent =
+state.referral_percent +
+"%";
+
+}
+
+
+function updateUpgrade(
+type,
+cost,
+id
+){
+
+const b =
+document.getElementById(
+id
+);
+
+b.classList.remove(
+"can-buy",
+"maxed"
+);
+
+
+if(cost === -1){
+
+b.textContent =
+"MAX";
+
+b.disabled = true;
+
+b.classList.add(
+"maxed"
+);
+
+return;
+
+}
+
+
+b.textContent =
+formatNumber(
+cost
+);
+
+b.disabled =
+Number(state.balance) <
+Number(cost);
+
+
+if(!b.disabled){
+
+b.classList.add(
+"can-buy"
+);
+
+}
+
+}
+
+
+async function loadState(){
+
+try{
+
+state =
+await api(
+`/api/state/${USER_ID}`
+);
+
+renderState();
+
+}
+catch(e){
+
+console.error(e);
+
+showToast(
+e.message
+);
+
+}
+
+}
+
+
+async function syncTelegramProfile(){
+
+if(
+!tg?.initDataUnsafe?.user
+)return;
+
+const u =
+tg.initDataUnsafe.user;
+
+try{
+
+state =
+await api(
+"/api/profile",
+{
+method:"POST",
+body:JSON.stringify({
+user_id:USER_ID,
+username:u.username || null,
+first_name:u.first_name || null,
+last_name:u.last_name || null
+})
+}
+);
+
+renderState();
+
+}
+catch(e){
+
+console.warn(
+"Profile sync",
+e
+);
+
+}
+
+}
+
+
+function animateTap(
+power
+){
+
+const z =
+document.getElementById(
+"click-zone"
+);
+
+const el =
+document.createElement(
+"div"
+);
+
+el.className =
+"tap-number";
+
+el.textContent =
+"+" + power;
+
+
+const r =
+z.getBoundingClientRect();
+
+
+el.style.left =
+(
+r.width / 2 -
+20 +
+(Math.random()*80-40)
+) + "px";
+
+
+el.style.top =
+(
+r.height / 2 -
+20 +
+(Math.random()*50-25)
+) + "px";
+
+
+z.appendChild(el);
+
+
+setTimeout(
+() => el.remove(),
+700
+);
+
+}
+
+
+function queueTap(){
+
+if(
+!state ||
+Number(state.stamina || 0) <= 0
+)return;
+
+
+const power =
+Number(
+state.click_power ||
+1
+);
+
+
+pendingTaps++;
+
+animateTap(power);
+
+
+if(!clickTimer){
+
+clickTimer =
+setTimeout(
+flushClicks,
+50
+);
+
+}
+
+}
+
+
+async function flushClicks(){
+
+clickTimer = null;
+
+
+if(
+pendingTaps <= 0 ||
+clickRequestRunning
+){
+
+return;
+
+}
+
+
+const taps =
+Math.min(
+pendingTaps,
+1000
+);
+
+
+pendingTaps -= taps;
+
+clickRequestRunning =
+true;
+
+
+try{
+
+state =
+await api(
+"/api/click",
+{
+method:"POST",
+body:JSON.stringify({
+user_id:USER_ID,
+taps:taps
+})
+}
+);
+
+renderState();
+
+updateLeaderboardSoon();
+
+}
+catch(e){
+
+pendingTaps += taps;
+
+showToast(
+e.message
+);
+
+}
+finally{
+
+clickRequestRunning =
+false;
+
+
+if(
+pendingTaps > 0
+){
+
+clickTimer =
+setTimeout(
+flushClicks,
+50
+);
+
+}
+
+}
+
+}
+
 
 const clickZone =
-    document.getElementById(
-        "click-zone"
-    );
-
-
-clickZone.addEventListener(
-    "pointerdown",
-    function(event) {
-
-        event.preventDefault();
-
-
-        this.classList.add(
-            "pressed"
-        );
-
-
-        queueTap();
-
-    },
-    {
-        passive: false
-    }
+document.getElementById(
+"click-zone"
 );
 
 
 clickZone.addEventListener(
-    "pointerup",
-    function() {
+"pointerdown",
+e => {
 
-        this.classList.remove(
-            "pressed"
-        );
+e.preventDefault();
 
-    }
+
+if(
+Number(
+state?.stamina || 0
+) <= 0
+){
+
+return;
+
+}
+
+
+clickZone.classList.add(
+"pressed"
+);
+
+queueTap();
+
+},
+{
+passive:false
+}
 );
 
 
+[
+"pointerup",
+"pointercancel",
+"pointerleave"
+].forEach(
+x =>
 clickZone.addEventListener(
-    "pointercancel",
-    function() {
-
-        this.classList.remove(
-            "pressed"
-        );
-
-    }
+x,
+() =>
+clickZone.classList.remove(
+"pressed"
+)
+)
 );
-
-
-/* ============================================================
-   NAVIGATION
-============================================================ */
-
-document
-    .querySelectorAll(
-        ".nav-button"
-    )
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const page =
-                    button.dataset.page;
-
-
-                switchPage(
-                    page
-                );
-
-            }
-        );
-
-    });
 
 
 function switchPage(
-    page
-) {
-
-    document
-        .querySelectorAll(
-            ".page"
-        )
-        .forEach(element => {
-
-            element.classList.toggle(
-                "active",
-                element.id ===
-                "page-" + page
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(
-            ".nav-button"
-        )
-        .forEach(button => {
-
-            button.classList.toggle(
-                "active",
-                button.dataset.page ===
-                page
-            );
-
-        });
-
-
-    if (page === "leaderboard") {
-        loadLeaderboard();
-    }
-
-
-    if (page === "referrals") {
-        loadReferrals();
-    }
-
-}
-
-
-/* ============================================================
-   DAILY
-============================================================ */
+page
+){
 
 document
-    .getElementById(
-        "daily-button"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            try {
-
-                const result =
-                    await api(
-                        "/api/daily/claim",
-                        {
-                            method: "POST",
-
-                            body:
-                                JSON.stringify({
-                                    user_id:
-                                        USER_ID
-                                })
-
-                        }
-                    );
-
-
-                state =
-                    result;
-
-
-                renderState();
-
-
-                showToast(
-                    `🎁 +${formatNumber(
-                        result.claimed_amount
-                    )} монет`
-                );
-
-
-            } catch (error) {
-
-                showToast(
-                    error.message
-                );
-
-            }
-
-        }
-    );
-
-
-/* ============================================================
-   CLICK UPGRADE
-============================================================ */
-
-document
-    .getElementById(
-        "click-upgrade-button"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            try {
-
-                state =
-                    await api(
-                        "/api/upgrade/click",
-                        {
-                            method: "POST",
-
-                            body:
-                                JSON.stringify({
-                                    user_id:
-                                        USER_ID
-                                })
-
-                        }
-                    );
-
-
-                renderState();
-
-
-                showToast(
-                    "👆 Сила клика улучшена"
-                );
-
-
-            } catch (error) {
-
-                showToast(
-                    error.message
-                );
-
-            }
-
-        }
-    );
-
-
-/* ============================================================
-   STAMINA UPGRADE
-============================================================ */
-
-document
-    .getElementById(
-        "stamina-upgrade-button"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            try {
-
-                state =
-                    await api(
-                        "/api/upgrade/stamina",
-                        {
-                            method: "POST",
-
-                            body:
-                                JSON.stringify({
-                                    user_id:
-                                        USER_ID
-                                })
-
-                        }
-                    );
-
-
-                renderState();
-
-
-                showToast(
-                    "⚡ Запас стамины увеличен"
-                );
-
-
-            } catch (error) {
-
-                showToast(
-                    error.message
-                );
-
-            }
-
-        }
-    );
-
-
-/* ============================================================
-   PRESTIGE
-============================================================ */
-
-document
-    .getElementById(
-        "prestige-button"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            if (
-                !state ||
-                !state.can_prestige
-            ) {
-
-                return;
-
-            }
-
-
-            try {
-
-                state =
-                    await api(
-                        "/api/prestige",
-                        {
-                            method: "POST",
-
-                            body:
-                                JSON.stringify({
-                                    user_id:
-                                        USER_ID
-                                })
-
-                        }
-                    );
-
-
-                renderState();
-
-
-                showToast(
-                    "🚀 Перелёт выполнен!"
-                );
-
-
-            } catch (error) {
-
-                showToast(
-                    error.message
-                );
-
-            }
-
-        }
-    );
-
-
-/* ============================================================
-   REFERRAL COPY
-============================================================ */
-
-document
-    .getElementById(
-        "copy-ref-code"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            const code =
-                String(
-                    USER_ID
-                );
-
-
-            try {
-
-                await navigator.clipboard.writeText(
-                    code
-                );
-
-
-                showToast(
-                    "📋 Код приглашения скопирован"
-                );
-
-
-            } catch (error) {
-
-                const textarea =
-                    document.createElement(
-                        "textarea"
-                    );
-
-
-                textarea.value =
-                    code;
-
-
-                textarea.style.position =
-                    "fixed";
-
-
-                textarea.style.opacity =
-                    "0";
-
-
-                document.body.appendChild(
-                    textarea
-                );
-
-
-                textarea.select();
-
-
-                try {
-
-                    document.execCommand(
-                        "copy"
-                    );
-
-
-                    showToast(
-                        "📋 Код скопирован"
-                    );
-
-
-                } catch (e) {
-
-                    showToast(
-                        "Выдели код вручную"
-                    );
-
-                }
-
-
-                textarea.remove();
-
-            }
-
-        }
-    );
-
-
-/* ============================================================
-   REFERRALS
-============================================================ */
-
-async function loadReferrals() {
-
-    try {
-
-        referralData =
-            await api(
-                `/api/referral/${USER_ID}`
-            );
-
-
-        document.getElementById(
-            "ref-count"
-        ).textContent =
-            formatNumber(
-                referralData.referral_count
-            );
-
-
-        document.getElementById(
-            "ref-earned"
-        ).textContent =
-            formatNumber(
-                referralData.total_earned
-            );
-
-
-        document.getElementById(
-            "ref-bonus"
-        ).textContent =
-            "+" +
-            formatNumber(
-                referralData.referral_bonus
-            );
-
-
-        document.getElementById(
-            "ref-percent"
-        ).textContent =
-            referralData.referral_percent +
-            "%";
-
-
-        renderReferrals();
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        showToast(
-            error.message ||
-            "Не удалось загрузить рефералов"
-        );
-
-    }
-
-}
-
-
-function renderReferrals() {
-
-    const container =
-        document.getElementById(
-            "referral-list"
-        );
-
-
-    if (
-        !referralData ||
-        !referralData.referrals ||
-        referralData.referrals.length === 0
-    ) {
-
-        container.innerHTML = `
-            <div class="empty">
-                Пока никто не приглашён
-            </div>
-        `;
-
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        referralData.referrals
-            .map(ref => {
-
-                return `
-                    <div class="ref-item">
-
-                        <div class="ref-item-top">
-
-                            <div class="ref-name">
-                                ${escapeHtml(
-                                    ref.name
-                                )}
-                            </div>
-
-                            <div class="ref-earned">
-                                +${formatNumber(
-                                    ref.total_paid
-                                )}
-                            </div>
-
-                        </div>
-
-                        <div class="ref-small">
-                            Заработано кликами:
-                            ${formatNumber(
-                                ref.total_click_earnings
-                            )}
-                        </div>
-
-                        <div class="ref-small">
-                            Следующая выплата:
-                            ${
-                                ref.days_until_payout <= 0
-                                    ? "сейчас"
-                                    : `через ${ref.days_until_payout} дн.`
-                            }
-                        </div>
-
-                    </div>
-                `;
-
-            })
-            .join("");
-
-}
-
-
-/* ============================================================
-   REFERRAL REGISTRATION
-============================================================ */
-
-async function processReferralStart() {
-
-    let startParam = "";
-
-
-    if (
-        tg &&
-        tg.initDataUnsafe
-    ) {
-
-        startParam =
-            tg.initDataUnsafe
-                .start_param || "";
-
-    }
-
-
-    if (!startParam) {
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        startParam =
-            params.get(
-                "startapp"
-            ) ||
-            params.get(
-                "start"
-            ) ||
-            "";
-
-    }
-
-
-    if (!startParam) {
-        return;
-    }
-
-
-    startParam =
-        String(startParam)
-            .trim();
-
-
-    if (
-        startParam.startsWith(
-            "ref_"
-        )
-    ) {
-
-        startParam =
-            startParam.substring(
-                4
-            );
-
-    }
-
-
-    const referrerId =
-        Number(
-            startParam
-        );
-
-
-    if (
-        !Number.isInteger(
-            referrerId
-        ) ||
-        referrerId <= 0 ||
-        referrerId === USER_ID
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const result =
-            await api(
-                "/api/referral/register",
-                {
-                    method: "POST",
-
-                    body:
-                        JSON.stringify({
-
-                            user_id:
-                                USER_ID,
-
-                            referrer_id:
-                                referrerId
-
-                        })
-
-                }
-            );
-
-
-        if (
-            result &&
-            !result.already_registered
-        ) {
-
-            state =
-                result.state;
-
-
-            renderState();
-
-
-            showToast(
-                "🎁 Реферал активирован"
-            );
-
-        }
-
-    } catch (error) {
-
-        console.warn(
-            "Referral:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   LEADERBOARD
-============================================================ */
-
-document
-    .querySelectorAll(
-        ".leader-tab"
-    )
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                currentLeaderTab =
-                    button.dataset.leaderTab;
-
-
-                document
-                    .querySelectorAll(
-                        ".leader-tab"
-                    )
-                    .forEach(tab => {
-
-                        tab.classList.toggle(
-                            "active",
-                            tab === button
-                        );
-
-                    });
-
-
-                renderLeaderboard();
-
-            }
-        );
-
-    });
-
-
-async function loadLeaderboard() {
-
-    const container =
-        document.getElementById(
-            "leaderboard-list"
-        );
-
-
-    if (leaderboardData) {
-
-        renderLeaderboard();
-
-        return;
-
-    }
-
-
-    container.innerHTML = `
-        <div class="loading">
-            Загрузка лидерборда...
-        </div>
-    `;
-
-
-    try {
-
-        leaderboardData =
-            await api(
-                "/api/leaderboard?limit=50"
-            );
-
-
-        renderLeaderboard();
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        container.innerHTML = `
-            <div class="empty">
-                Не удалось загрузить лидерборд
-            </div>
-        `;
-
-
-        showToast(
-            error.message
-        );
-
-    }
-
-}
-
-
-function renderLeaderboard() {
-
-    const container =
-        document.getElementById(
-            "leaderboard-list"
-        );
-
-
-    if (
-        !leaderboardData ||
-        !leaderboardData[
-            currentLeaderTab
-        ]
-    ) {
-
-        container.innerHTML = `
-            <div class="empty">
-                Нет данных
-            </div>
-        `;
-
-
-        return;
-
-    }
-
-
-    const rows =
-        leaderboardData[
-            currentLeaderTab
-        ];
-
-
-    if (!rows.length) {
-
-        container.innerHTML = `
-            <div class="empty">
-                Пока здесь никого нет
-            </div>
-        `;
-
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        rows.map(row => {
-
-            let value = "";
-            let sub = "";
-
-
-            if (
-                currentLeaderTab ===
-                "balance"
-            ) {
-
-                value =
-                    formatNumber(
-                        row.balance
-                    ) +
-                    " 🪙";
-
-
-                sub =
-                    row.object_name;
-
-            } else if (
-                currentLeaderTab ===
-                "progress"
-            ) {
-
-                value =
-                    row.progress_percent +
-                    "%";
-
-
-                sub =
-                    `${row.object_name} · ${formatNumber(
-                        row.object_progress
-                    )}`;
-
-            } else {
-
-                value =
-                    formatNumber(
-                        row.prestige_count
-                    );
-
-
-                sub =
-                    row.object_name;
-
-            }
-
-
-            return `
-                <div class="leader-item">
-
-                    <div class="leader-rank">
-                        #${row.rank}
-                    </div>
-
-                    <div class="leader-info">
-
-                        <div class="leader-name">
-                            ${escapeHtml(
-                                row.name
-                            )}
-                        </div>
-
-                        <div class="leader-sub">
-                            ${escapeHtml(
-                                sub
-                            )}
-                        </div>
-
-                    </div>
-
-                    <div class="leader-value">
-                        ${value}
-                    </div>
-
-                </div>
-            `;
-
-        }).join("");
-
-}
-
-
-/* ============================================================
-   AUTO REFRESH
-============================================================ */
-
-let lastStateRefresh =
-    Date.now();
-
-
-setInterval(
-    async () => {
-
-        if (
-            pendingTaps > 0 ||
-            clickRequestRunning
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            Date.now() -
-            lastStateRefresh <
-            3000
-        ) {
-
-            return;
-
-        }
-
-
-        lastStateRefresh =
-            Date.now();
-
-
-        try {
-
-            const fresh =
-                await api(
-                    `/api/state/${USER_ID}`
-                );
-
-
-            state =
-                fresh;
-
-
-            renderState();
-
-
-        } catch (error) {
-
-            console.warn(
-                "Auto refresh:",
-                error
-            );
-
-        }
-
-    },
-    3000
+.querySelectorAll(
+".page"
+)
+.forEach(
+x =>
+x.classList.toggle(
+"active",
+x.id ===
+"page-" + page
+)
 );
 
 
-/* ============================================================
-   INITIALIZATION
-============================================================ */
+document
+.querySelectorAll(
+".nav-button"
+)
+.forEach(
+x =>
+x.classList.toggle(
+"active",
+x.dataset.page ===
+page
+)
+);
 
-async function init() {
 
-    await loadState();
+if(
+page ===
+"leaderboard"
+){
 
-    await syncTelegramProfile();
+loadLeaderboard();
 
-    await processReferralStart();
+}
+
+
+if(
+page ===
+"referrals"
+){
+
+loadReferrals();
+
+}
+
+}
+
+
+document
+.querySelectorAll(
+".nav-button"
+)
+.forEach(
+b =>
+b.addEventListener(
+"click",
+() =>
+switchPage(
+b.dataset.page
+)
+)
+);
+
+
+document
+.getElementById(
+"daily-button"
+)
+.addEventListener(
+"click",
+async () => {
+
+try{
+
+state =
+await api(
+"/api/daily/claim",
+{
+method:"POST",
+body:JSON.stringify({
+user_id:USER_ID
+})
+}
+);
+
+renderState();
+
+showToast(
+`🎁 +${formatNumber(
+state.daily_next_amount || 0
+)} монет`
+);
+
+updateLeaderboardSoon();
+
+}
+catch(e){
+
+showToast(
+e.message
+);
+
+}
+
+}
+);
+
+
+async function upgrade(
+path,
+msg
+){
+
+try{
+
+state =
+await api(
+path,
+{
+method:"POST",
+body:JSON.stringify({
+user_id:USER_ID
+})
+}
+);
+
+renderState();
+
+showToast(msg);
+
+updateLeaderboardSoon();
+
+}
+catch(e){
+
+showToast(
+e.message
+);
+
+}
+
+}
+
+
+document
+.getElementById(
+"click-upgrade-button"
+)
+.addEventListener(
+"click",
+() =>
+upgrade(
+"/api/upgrade/click",
+"👆 Сила клика улучшена"
+)
+);
+
+
+document
+.getElementById(
+"stamina-upgrade-button"
+)
+.addEventListener(
+"click",
+() =>
+upgrade(
+"/api/upgrade/stamina",
+"⚡ Запас стамины увеличен"
+)
+);
+
+
+document
+.getElementById(
+"prestige-button"
+)
+.addEventListener(
+"click",
+async () => {
+
+if(
+!state?.can_prestige
+)return;
+
+
+try{
+
+state =
+await api(
+"/api/prestige",
+{
+method:"POST",
+body:JSON.stringify({
+user_id:USER_ID
+})
+}
+);
+
+renderState();
+
+showToast(
+"🚀 Перелёт выполнен!"
+);
+
+updateLeaderboardSoon();
+
+}
+catch(e){
+
+showToast(
+e.message
+);
+
+}
+
+}
+);
+
+
+document
+.getElementById(
+"copy-ref-code"
+)
+.addEventListener(
+"click",
+async () => {
+
+const link =
+referralLink();
+
+
+try{
+
+await navigator.clipboard.writeText(
+link
+);
+
+showToast(
+"📋 Реферальная ссылка скопирована"
+);
+
+}
+catch(e){
+
+const ta =
+document.createElement(
+"textarea"
+);
+
+ta.value = link;
+
+ta.style.position =
+"fixed";
+
+ta.style.opacity =
+"0";
+
+document.body.appendChild(
+ta
+);
+
+ta.select();
+
+document.execCommand(
+"copy"
+);
+
+ta.remove();
+
+showToast(
+"📋 Ссылка скопирована"
+);
+
+}
+
+}
+);
+
+
+async function loadReferrals(){
+
+try{
+
+referralData =
+await api(
+`/api/referral/${USER_ID}`
+);
+
+renderReferrals();
+
+}
+catch(e){
+
+showToast(
+e.message
+);
+
+}
+
+}
+
+
+function renderReferrals(){
+
+const c =
+document.getElementById(
+"referral-list"
+);
+
+
+if(
+!referralData?.referrals?.length
+){
+
+c.innerHTML =
+'<div class="empty">Пока никто не приглашён</div>';
+
+return;
+
+}
+
+
+c.innerHTML =
+referralData.referrals
+.map(
+r =>
+`<div class="ref-item">
+
+<div class="ref-item-top">
+
+<div class="ref-name">
+${escapeHtml(r.name)}
+</div>
+
+<div class="ref-earned">
++${formatNumber(r.total_paid)}
+</div>
+
+</div>
+
+<div class="ref-small">
+Заработано кликами:
+${formatNumber(r.total_click_earnings)}
+</div>
+
+<div class="ref-small">
+Следующая выплата:
+${
+r.days_until_payout <= 0
+? "сейчас"
+: `через ${r.days_until_payout} дн.`
+}
+</div>
+
+</div>`
+)
+.join("");
+
+}
+
+
+async function processReferralStart(){
+
+let p =
+tg?.initDataUnsafe?.start_param ||
+"";
+
+
+if(!p){
+
+const q =
+new URLSearchParams(
+location.search
+);
+
+p =
+q.get("startapp") ||
+q.get("start") ||
+"";
+
+}
+
+
+if(!p)return;
+
+
+p =
+String(p)
+.trim()
+.replace(
+/^ref_/,
+""
+);
+
+
+const ref =
+Number(p);
+
+
+if(
+!Number.isInteger(ref) ||
+ref <= 0 ||
+ref === USER_ID
+){
+
+return;
+
+}
+
+
+try{
+
+const r =
+await api(
+"/api/referral/register",
+{
+method:"POST",
+body:JSON.stringify({
+user_id:USER_ID,
+referrer_id:ref
+})
+}
+);
+
+
+if(
+r &&
+!r.already_registered
+){
+
+state =
+r.state;
+
+renderState();
+
+showToast(
+"🎁 Реферал активирован"
+);
+
+}
+
+}
+catch(e){
+
+console.warn(
+"Referral",
+e
+);
+
+}
+
+}
+
+
+async function loadLeaderboard(){
+
+const c =
+document.getElementById(
+"leaderboard-list"
+);
+
+c.innerHTML =
+'<div class="loading">Загрузка лидерборда...</div>';
+
+
+try{
+
+leaderboardData =
+await api(
+"/api/leaderboard?limit=50"
+);
+
+renderLeaderboard();
+
+}
+catch(e){
+
+c.innerHTML =
+'<div class="empty">Не удалось загрузить лидерборд</div>';
+
+}
+
+}
+
+
+function renderLeaderboard(){
+
+const c =
+document.getElementById(
+"leaderboard-list"
+);
+
+const rows =
+leaderboardData?.balance ||
+[];
+
+
+if(!rows.length){
+
+c.innerHTML =
+'<div class="empty">Пока здесь никого нет</div>';
+
+return;
+
+}
+
+
+c.innerHTML =
+rows
+.map(
+r =>
+`<div class="leader-item">
+
+<div class="leader-rank">
+#${r.rank}
+</div>
+
+<div class="leader-info">
+
+<div class="leader-name">
+${escapeHtml(r.name)}
+</div>
+
+<div class="leader-sub">
+${escapeHtml(r.object_name || "")}
+</div>
+
+</div>
+
+<div class="leader-value">
+${formatNumber(r.balance)} 🪙
+</div>
+
+</div>`
+)
+.join("");
+
+}
+
+
+let leaderRefreshTimer =
+null;
+
+
+function updateLeaderboardSoon(){
+
+clearTimeout(
+leaderRefreshTimer
+);
+
+
+leaderRefreshTimer =
+setTimeout(
+async () => {
+
+try{
+
+leaderboardData =
+await api(
+"/api/leaderboard?limit=50"
+);
+
+
+if(
+document
+.getElementById(
+"page-leaderboard"
+)
+.classList
+.contains("active")
+){
+
+renderLeaderboard();
+
+}
+
+}
+catch(e){}
+
+},
+250
+);
+
+}
+
+
+setInterval(
+async () => {
+
+if(
+pendingTaps ||
+clickRequestRunning
+){
+
+return;
+
+}
+
+
+try{
+
+state =
+await api(
+`/api/state/${USER_ID}`
+);
+
+renderState();
+
+}
+catch(e){}
+
+},
+3000
+);
+
+
+async function init(){
+
+await loadState();
+
+await syncTelegramProfile();
+
+await processReferralStart();
 
 }
 
@@ -3593,4 +2608,4 @@ init();
 </script>
 
 </body>
-    </html>
+</html>
