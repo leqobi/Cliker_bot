@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Sundered Star</title>
 
@@ -10,347 +11,735 @@
 
 <style>
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 }
 
+:root {
+    --bg: #050711;
+    --panel: rgba(15, 19, 38, .78);
+    --panel-border: rgba(255,255,255,.09);
+
+    --text: #f5f7ff;
+    --muted: rgba(230,235,255,.55);
+
+    --gold: #ffc76b;
+    --gold2: #ff8b38;
+
+    --blue: #65b9ff;
+    --purple: #9d70ff;
+    --pink: #ed69ff;
+
+    --green: #63e6a8;
+}
+
 html,
 body {
-    width: 100%;
     min-height: 100%;
+    background: var(--bg);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background:
-        radial-gradient(circle at 50% 20%, rgba(120, 70, 220, 0.15), transparent 35%),
-        linear-gradient(180deg, #070711 0%, #111126 100%);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     min-height: 100vh;
-    padding: 14px 16px 24px;
     overflow-x: hidden;
+    color: var(--text);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 50% 22%,
+            rgba(91, 62, 170, .22),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 10% 90%,
+            rgba(36, 105, 180, .12),
+            transparent 35%
+        ),
+        linear-gradient(
+            180deg,
+            #04050c 0%,
+            #080a17 45%,
+            #101326 100%
+        );
 }
 
-/* Верх */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .32;
+
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,.75) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,.45) 1px, transparent 1px);
+
+    background-size: 83px 83px, 137px 137px;
+    background-position: 12px 20px, 40px 70px;
+}
+
+.app {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    max-width: 430px;
+
+    margin: 0 auto;
+    padding: 18px 15px 28px;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 12px;
+}
+
+.logo {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+}
+
+.logo span {
+    color: var(--gold);
+}
+
+.expedition {
+    padding: 7px 10px;
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.08);
+
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--muted);
+}
+
+/* ================= MISSION ================= */
+
+.mission {
+    text-align: center;
+    margin-top: 4px;
+}
+
+.mission-kicker {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--muted);
+}
 
 .object-name {
-    margin-top: 4px;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    opacity: 0.95;
+    margin-top: 5px;
+
+    font-size: 25px;
+    font-weight: 800;
+
+    letter-spacing: .5px;
+
+    text-shadow:
+        0 0 24px rgba(255,255,255,.12);
+}
+
+.object-name::before {
+    content: "✦ ";
+    color: var(--gold);
+}
+
+/* ================= BALANCE ================= */
+
+.balance-card {
+    text-align: center;
+    margin-top: 13px;
 }
 
 .balance-label {
-    margin-top: 8px;
-    font-size: 10px;
-    text-transform: uppercase;
+    font-size: 9px;
+    color: var(--muted);
     letter-spacing: 2px;
-    opacity: 0.45;
+    text-transform: uppercase;
 }
 
 .balance {
-    margin-top: 1px;
-    font-size: 42px;
-    line-height: 1.1;
-    font-weight: 800;
-    text-shadow: 0 0 25px rgba(255, 180, 80, 0.35);
+    margin-top: 2px;
+
+    font-size: 38px;
+    line-height: 1;
+
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            180deg,
+            #fff8e7,
+            #ffc76b 65%,
+            #ff8b38
+        );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    filter:
+        drop-shadow(0 0 14px rgba(255,170,65,.18));
 }
 
-/* Космический объект */
+/* ================= OBJECT ================= */
 
-.object-wrap {
+.object-zone {
     position: relative;
-    width: 230px;
-    height: 230px;
-    margin: 10px 0 8px;
-    cursor: pointer;
-    touch-action: manipulation;
+
+    width: 290px;
+    height: 290px;
+
+    margin: 3px auto 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.object-glow {
+.object-zone::before {
+    content: "";
+
     position: absolute;
-    left: -25px;
-    top: -25px;
-    width: 280px;
-    height: 280px;
+
+    width: 245px;
+    height: 245px;
+
     border-radius: 50%;
+
     background:
         radial-gradient(
             circle,
-            rgba(170, 100, 255, 0.30) 0%,
-            rgba(120, 70, 220, 0.12) 35%,
+            rgba(255,190,90,.18),
+            rgba(130,85,255,.08) 42%,
             transparent 70%
         );
+
+    filter: blur(9px);
+
+    transition:
+        transform .5s ease,
+        opacity .5s ease;
+}
+
+.object-zone::after {
+    content: "";
+
+    position: absolute;
+
+    width: 215px;
+    height: 215px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(255,255,255,.055);
+
+    box-shadow:
+        0 0 45px rgba(119,92,255,.08),
+        inset 0 0 35px rgba(255,255,255,.025);
+
     pointer-events: none;
-    transition: filter 0.3s ease;
+}
+
+.object-wrap {
+    position: relative;
+
+    width: 230px;
+    height: 230px;
+
+    cursor: pointer;
+
+    z-index: 2;
 }
 
 .object-img {
     position: absolute;
+
     inset: 0;
-    width: 230px;
-    height: 230px;
+
+    width: 100%;
+    height: 100%;
+
     object-fit: contain;
-    pointer-events: none;
-    -webkit-user-drag: none;
+
     transition:
-        transform 0.07s ease,
-        filter 0.35s ease;
+        transform .08s ease,
+        filter .45s ease;
+
+    -webkit-user-drag: none;
+
+    filter:
+        drop-shadow(
+            0 0 25px rgba(255,180,80,.12)
+        );
 }
 
 .cracks-overlay {
     position: absolute;
+
     inset: 0;
-    width: 230px;
-    height: 230px;
+
+    width: 100%;
+    height: 100%;
+
     object-fit: contain;
+
     pointer-events: none;
-    transition: opacity 0.5s ease;
+
+    mix-blend-mode: multiply;
+
+    transition:
+        opacity .7s ease;
 }
 
 .object-wrap:active .object-img {
-    transform: scale(0.91);
+    transform: scale(.91);
 }
 
-/* Всплывающие монеты */
+/* ================= CLICK EFFECT ================= */
 
-.float-text {
+.click-ring {
     position: fixed;
-    font-size: 21px;
-    font-weight: 800;
-    color: #ffb347;
+
+    width: 25px;
+    height: 25px;
+
+    margin-left: -12px;
+    margin-top: -12px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(255,195,105,.9);
+
     pointer-events: none;
-    z-index: 100;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-    animation: floatUp 0.75s ease-out forwards;
+
+    animation: clickRing .55s ease-out forwards;
+
+    z-index: 20;
 }
 
-@keyframes floatUp {
+@keyframes clickRing {
     0% {
-        transform: translateY(0) scale(1);
+        transform: scale(.5);
         opacity: 1;
     }
 
     100% {
-        transform: translateY(-70px) scale(1.08);
+        transform: scale(3);
         opacity: 0;
     }
 }
 
-/* Прогресс */
+.float-text {
+    position: fixed;
 
-.progress-block,
-.stamina-block,
-.daily-card,
-.prestige-btn,
-.upgrades {
+    color: var(--gold);
+
+    font-size: 20px;
+    font-weight: 900;
+
+    pointer-events: none;
+
+    text-shadow:
+        0 0 12px rgba(255,160,50,.7),
+        0 2px 4px rgba(0,0,0,.6);
+
+    animation:
+        floatUp .8s ease-out forwards;
+
+    z-index: 30;
+}
+
+@keyframes floatUp {
+    0% {
+        transform:
+            translateY(0)
+            scale(.85);
+
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    100% {
+        transform:
+            translateY(-75px)
+            scale(1.1);
+
+        opacity: 0;
+    }
+}
+
+/* ================= PROGRESS ================= */
+
+.panel {
     width: 100%;
-    max-width: 340px;
+
+    background: var(--panel);
+
+    border:
+        1px solid var(--panel-border);
+
+    border-radius: 17px;
+
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.22);
+
+    padding: 13px 14px;
 }
 
-.progress-block {
-    margin-top: 2px;
-}
-
-.progress-label,
-.stamina-label {
+.progress-head,
+.stamina-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 11px;
-    opacity: 0.7;
-    margin-bottom: 5px;
+
+    font-size: 10px;
 }
 
-.progress-bar-bg,
-.stamina-bar-bg {
+.progress-title,
+.stamina-title {
+    color: var(--muted);
+}
+
+.progress-value,
+.stamina-value {
+    font-weight: 700;
+}
+
+.bar {
     width: 100%;
     height: 9px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
+
+    margin-top: 7px;
+
+    background: rgba(255,255,255,.07);
+
+    border-radius: 999px;
+
     overflow: hidden;
 }
 
-.progress-bar-fill {
+.bar-fill {
     height: 100%;
+
     width: 0%;
-    border-radius: 10px;
-    background: linear-gradient(90deg, #8b5cf6, #d946ef);
-    transition: width 0.25s ease;
+
+    border-radius: inherit;
+
+    transition: width .3s ease;
 }
 
-.stamina-block {
-    margin-top: 10px;
+.progress-fill {
+    background:
+        linear-gradient(
+            90deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    box-shadow:
+        0 0 12px rgba(170,95,255,.45);
 }
 
-.stamina-bar-fill {
-    height: 100%;
-    width: 0%;
-    border-radius: 10px;
-    background: linear-gradient(90deg, #3182ce, #63b3ed);
-    transition: width 0.2s ease;
+.stamina-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #4b9df5,
+            #70d4ff
+        );
+
+    box-shadow:
+        0 0 12px rgba(80,180,255,.35);
 }
 
-/* Daily */
-
-.daily-card {
+.stamina-section {
     margin-top: 13px;
-    margin-bottom: 10px;
-    padding: 13px 15px;
+}
+
+/* ================= DAILY ================= */
+
+.daily {
+    margin-top: 10px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 10px;
 
-    background: linear-gradient(
-        135deg,
-        rgba(255, 180, 50, 0.14),
-        rgba(255, 100, 50, 0.07)
-    );
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,180,70,.13),
+            rgba(255,90,60,.05)
+        );
 
-    border: 1px solid rgba(255, 180, 50, 0.25);
-    border-radius: 15px;
+    border:
+        1px solid rgba(255,185,80,.18);
+
+    border-radius: 17px;
+
+    padding: 13px 14px;
+}
+
+.daily-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,180,70,.13);
+
+    font-size: 19px;
 }
 
 .daily-info {
+    flex: 1;
     text-align: left;
 }
 
 .daily-title {
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .daily-sub {
     margin-top: 3px;
+
+    font-size: 9px;
+
+    color: var(--muted);
+}
+
+.daily-btn {
+    border: 0;
+
+    padding: 9px 13px;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--gold),
+            var(--gold2)
+        );
+
+    color: #211307;
+
     font-size: 10px;
-    opacity: 0.65;
+    font-weight: 900;
 }
 
-.daily-btn,
-.upgrade-btn {
-    border: none;
-    border-radius: 10px;
-    padding: 9px 14px;
-    background: linear-gradient(135deg, #ffb347, #ff8c00);
-    color: #171717;
-    font-weight: 800;
-    font-size: 12px;
-    white-space: nowrap;
+.daily-btn:disabled {
+    background: rgba(255,255,255,.07);
+    color: rgba(255,255,255,.3);
 }
 
-.daily-btn:disabled,
-.upgrade-btn:disabled {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.32);
-}
-
-/* Prestige */
+/* ================= PRESTIGE ================= */
 
 .prestige-btn {
-    margin-bottom: 10px;
+    width: 100%;
+
+    margin-top: 10px;
+
+    border: 0;
+
+    border-radius: 17px;
+
     padding: 14px;
 
-    border: none;
-    border-radius: 15px;
-
-    background: linear-gradient(135deg, #9333ea, #d946ef);
-
     color: white;
-    font-size: 14px;
-    font-weight: 800;
 
-    box-shadow: 0 5px 22px rgba(168, 85, 247, 0.3);
+    font-size: 12px;
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7651e8,
+            #d84df2
+        );
+
+    box-shadow:
+        0 8px 28px rgba(155,70,240,.22);
+
+    transition:
+        transform .12s ease,
+        opacity .2s ease;
+}
+
+.prestige-btn:not(:disabled):active {
+    transform: scale(.97);
 }
 
 .prestige-btn:disabled {
-    background: rgba(255, 255, 255, 0.07);
-    color: rgba(255, 255, 255, 0.3);
+    background: rgba(255,255,255,.055);
+    color: rgba(255,255,255,.28);
     box-shadow: none;
 }
 
-/* Улучшения */
+/* ================= UPGRADES ================= */
+
+.section-title {
+    margin: 18px 2px 8px;
+
+    font-size: 9px;
+
+    color: var(--muted);
+
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
 
 .upgrades {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
     gap: 9px;
 }
 
 .upgrade-card {
-    width: 100%;
-    padding: 12px 14px;
+    min-width: 0;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    padding: 13px;
 
-    background: rgba(255, 255, 255, 0.055);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-radius: 15px;
+    background:
+        rgba(255,255,255,.045);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    border-radius: 16px;
 }
 
-.upgrade-info {
-    text-align: left;
+.upgrade-icon {
+    font-size: 18px;
 }
 
 .upgrade-title {
-    font-size: 13px;
-    font-weight: 700;
+    margin-top: 7px;
+
+    font-size: 11px;
+    font-weight: 800;
 }
 
 .upgrade-sub {
     margin-top: 3px;
-    font-size: 10px;
-    opacity: 0.58;
+
+    min-height: 25px;
+
+    font-size: 8px;
+
+    line-height: 1.4;
+
+    color: var(--muted);
 }
 
-/* Статус */
+.upgrade-btn {
+    width: 100%;
+
+    margin-top: 10px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    padding: 9px 5px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffbd5b,
+            #ff8c32
+        );
+
+    color: #211307;
+
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.upgrade-btn:disabled {
+    background: rgba(255,255,255,.07);
+    color: rgba(255,255,255,.3);
+}
+
+/* ================= STATUS ================= */
 
 .status {
-    margin-top: 12px;
-    font-size: 10px;
-    opacity: 0.3;
+    margin-top: 16px;
+
     text-align: center;
+
+    font-size: 8px;
+
+    color: rgba(255,255,255,.28);
+
+    letter-spacing: .5px;
 }
 
-/* Маленькие экраны */
+/* ================= RESPONSIVE ================= */
 
 @media (max-height: 700px) {
-    body {
-        padding-top: 8px;
+    .app {
+        padding-top: 10px;
+    }
+
+    .object-zone {
+        width: 250px;
+        height: 250px;
     }
 
     .object-wrap {
-        width: 190px;
-        height: 190px;
-        margin: 5px 0;
+        width: 200px;
+        height: 200px;
     }
 
-    .object-img,
-    .cracks-overlay {
-        width: 190px;
-        height: 190px;
+    .object-zone::before {
+        width: 215px;
+        height: 215px;
     }
 
-    .object-glow {
-        width: 235px;
-        height: 235px;
-        left: -22px;
-        top: -22px;
+    .object-zone::after {
+        width: 190px;
+        height: 190px;
     }
 
     .balance {
-        font-size: 36px;
+        font-size: 32px;
     }
 }
 </style>
@@ -358,138 +747,202 @@ body {
 
 <body>
 
-<div class="object-name" id="object-name">
-    Загрузка...
-</div>
+<div class="app">
 
-<div class="balance-label">
-    Твой баланс
-</div>
-
-<div class="balance" id="balance">
-    0
-</div>
-
-<div class="object-wrap" id="object-wrap">
-
-    <div class="object-glow" id="object-glow"></div>
-
-    <img
-        class="object-img"
-        id="object-img"
-        src=""
-        alt="Космический объект"
-    >
-
-    <img
-        class="cracks-overlay"
-        id="cracks-overlay"
-        src="/images/cracks.png"
-        alt=""
-    >
-
-</div>
-
-<div class="progress-block">
-
-    <div class="progress-label">
-        <span>🌌 Прогресс</span>
-        <span id="progress-text">0/0</span>
-    </div>
-
-    <div class="progress-bar-bg">
-        <div
-            class="progress-bar-fill"
-            id="progress-fill"
-        ></div>
-    </div>
-
-</div>
-
-<div class="stamina-block">
-
-    <div class="stamina-label">
-        <span>⚡ Стамина</span>
-        <span id="stamina-text">0/0</span>
-    </div>
-
-    <div class="stamina-bar-bg">
-        <div
-            class="stamina-bar-fill"
-            id="stamina-fill"
-        ></div>
-    </div>
-
-</div>
-
-<div class="daily-card">
-
-    <div class="daily-info">
-
-        <div class="daily-title">
-            🎁 Ежедневный бонус
+    <header class="header">
+        <div class="logo">
+            SUNDERED <span>STAR</span>
         </div>
 
-        <div
-            class="daily-sub"
-            id="daily-sub"
-        >
+        <div class="expedition">
+            EXPEDITION
+        </div>
+    </header>
+
+
+    <section class="mission">
+
+        <div class="mission-kicker">
+            Объект восстановления
+        </div>
+
+        <div class="object-name" id="object-name">
             Загрузка...
         </div>
 
-    </div>
+    </section>
+
+
+    <section class="balance-card">
+
+        <div class="balance-label">
+            Ресурс экспедиции
+        </div>
+
+        <div class="balance" id="balance">
+            0
+        </div>
+
+    </section>
+
+
+    <section class="object-zone">
+
+        <div class="object-wrap" id="object-wrap">
+
+            <img
+                class="object-img"
+                id="object-img"
+                src=""
+                alt="celestial object"
+            >
+
+            <img
+                class="cracks-overlay"
+                id="cracks-overlay"
+                src="/images/cracks.png"
+                alt=""
+            >
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <div class="progress-head">
+            <span class="progress-title">
+                🌌 Восстановление
+            </span>
+
+            <span
+                class="progress-value"
+                id="progress-text"
+            >
+                0/0
+            </span>
+        </div>
+
+        <div class="bar">
+            <div
+                class="bar-fill progress-fill"
+                id="progress-fill"
+            ></div>
+        </div>
+
+
+        <div class="stamina-section">
+
+            <div class="stamina-head">
+
+                <span class="stamina-title">
+                    ⚡ Энергия костюма
+                </span>
+
+                <span
+                    class="stamina-value"
+                    id="stamina-text"
+                >
+                    0/0
+                </span>
+
+            </div>
+
+            <div class="bar">
+                <div
+                    class="bar-fill stamina-fill"
+                    id="stamina-fill"
+                ></div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="daily">
+
+        <div class="daily-icon">
+            🎁
+        </div>
+
+        <div class="daily-info">
+
+            <div class="daily-title">
+                Ежедневное снабжение
+            </div>
+
+            <div
+                class="daily-sub"
+                id="daily-sub"
+            >
+                Загрузка...
+            </div>
+
+        </div>
+
+        <button
+            class="daily-btn"
+            id="daily-btn"
+        >
+            ...
+        </button>
+
+    </section>
+
 
     <button
-        class="daily-btn"
-        id="daily-btn"
+        class="prestige-btn"
+        id="prestige-btn"
+        disabled
     >
-        ...
+        Завершите восстановление объекта
     </button>
 
-</div>
 
-<button
-    class="prestige-btn"
-    id="prestige-btn"
-    disabled
->
-    Набери прогресс для перелёта
-</button>
+    <div class="section-title">
+        Модули экспедиции
+    </div>
 
-<div class="upgrades">
 
-    <div class="upgrade-card">
+    <section class="upgrades">
 
-        <div class="upgrade-info">
+        <div class="upgrade-card">
+
+            <div class="upgrade-icon">
+                👆
+            </div>
 
             <div class="upgrade-title">
-                👆 Сила клика
+                Усилитель
             </div>
 
             <div
                 class="upgrade-sub"
                 id="click-level-text"
             >
-                Уровень 1 · +1 монета
+                Уровень 1
             </div>
+
+            <button
+                class="upgrade-btn"
+                id="upgrade-click-btn"
+            >
+                ...
+            </button>
 
         </div>
 
-        <button
-            class="upgrade-btn"
-            id="upgrade-click-btn"
-        >
-            ...
-        </button>
 
-    </div>
+        <div class="upgrade-card">
 
-    <div class="upgrade-card">
-
-        <div class="upgrade-info">
+            <div class="upgrade-icon">
+                ⚡
+            </div>
 
             <div class="upgrade-title">
-                ⚡ Запас стамины
+                Батарея
             </div>
 
             <div
@@ -499,24 +952,25 @@ body {
                 Уровень 1
             </div>
 
+            <button
+                class="upgrade-btn"
+                id="upgrade-stamina-btn"
+            >
+                ...
+            </button>
+
         </div>
 
-        <button
-            class="upgrade-btn"
-            id="upgrade-stamina-btn"
-        >
-            ...
-        </button>
+    </section>
 
+
+    <div
+        class="status"
+        id="status"
+    >
+        Подключение к экспедиционному центру...
     </div>
 
-</div>
-
-<div
-    class="status"
-    id="status"
->
-    Загрузка...
 </div>
 
 
@@ -527,17 +981,20 @@ const tg = window.Telegram?.WebApp;
 if (tg) {
     tg.ready();
     tg.expand();
+
+    try {
+        tg.setHeaderColor("#050711");
+        tg.setBackgroundColor("#050711");
+    } catch (e) {}
 }
 
+
 const userId =
-    tg?.initDataUnsafe?.user?.id ||
-    12345;
+    tg?.initDataUnsafe?.user?.id || 12345;
 
 const API_URL =
     window.location.origin;
 
-
-/* DOM */
 
 const objectNameEl =
     document.getElementById("object-name");
@@ -551,11 +1008,11 @@ const objectWrapEl =
 const objectImgEl =
     document.getElementById("object-img");
 
-const objectGlowEl =
-    document.getElementById("object-glow");
-
 const cracksOverlayEl =
     document.getElementById("cracks-overlay");
+
+const statusEl =
+    document.getElementById("status");
 
 const progressTextEl =
     document.getElementById("progress-text");
@@ -590,11 +1047,6 @@ const dailySubEl =
 const dailyBtn =
     document.getElementById("daily-btn");
 
-const statusEl =
-    document.getElementById("status");
-
-
-/* Состояние */
 
 let state = null;
 
@@ -609,68 +1061,50 @@ let localStamina = 0;
 let currentObjectIndex = -1;
 
 
-/* =========================
-   OBJECTS
-========================= */
+/* ================= OBJECTS ================= */
 
 async function loadObjectsList() {
 
-    const response =
+    const res =
         await fetch(`${API_URL}/api/objects`);
 
-    if (!response.ok) {
-        throw new Error("Не удалось загрузить объекты");
+    if (!res.ok) {
+        throw new Error("Objects loading failed");
     }
 
     objectsList =
-        await response.json();
+        await res.json();
 }
 
 
-/* =========================
-   VISUAL
-========================= */
+/* ================= VISUAL ================= */
 
 function updateObjectVisual() {
 
     if (!state) return;
 
-    const index =
-        state.object_index;
+    if (
+        currentObjectIndex !==
+        state.object_index
+    ) {
 
-    const obj =
-        objectsList[index];
+        currentObjectIndex =
+            state.object_index;
 
-    if (!obj) return;
+        const obj =
+            objectsList[state.object_index];
 
-    if (currentObjectIndex !== index) {
+        if (obj) {
 
-        currentObjectIndex = index;
-
-        /*
-         * ВАЖНО:
-         * твои изображения находятся
-         * в static/images/
-         */
-
-        objectImgEl.src =
-            `/images/${obj.image}`;
-
-        /*
-         * Трещины нужны только планетам
-         */
-
-        if (state.object_category === "planet") {
-
-            cracksOverlayEl.style.display =
-                "block";
-
-        } else {
-
-            cracksOverlayEl.style.display =
-                "none";
+            objectImgEl.src =
+                `/images/${obj.image}`;
 
         }
+
+        cracksOverlayEl.style.display =
+            state.object_category === "planet"
+                ? "block"
+                : "none";
     }
 
 
@@ -690,26 +1124,15 @@ function updateObjectVisual() {
     } else {
 
         progressPct = 100;
-
     }
 
-
-    /*
-     * Трещины постепенно исчезают
-     */
 
     if (state.object_category === "planet") {
 
         cracksOverlayEl.style.opacity =
-            1 - (progressPct / 100) * 0.9;
-
+            1 - (progressPct / 100) * .9;
     }
 
-
-    /*
-     * Звёзды и чёрные дыры
-     * становятся ярче
-     */
 
     if (
         state.object_category === "star" ||
@@ -717,28 +1140,20 @@ function updateObjectVisual() {
     ) {
 
         const brightness =
-            0.55 + (progressPct / 100) * 0.85;
+            .5 + (progressPct / 100) * .9;
 
         objectImgEl.style.filter =
-            `brightness(${brightness})`;
-
-        objectGlowEl.style.filter =
-            `brightness(${brightness})`;
+            `brightness(${brightness}) drop-shadow(0 0 30px rgba(180,120,255,.22))`;
 
     } else {
 
         objectImgEl.style.filter =
-            "none";
-
-        objectGlowEl.style.filter =
-            "none";
+            "drop-shadow(0 0 25px rgba(255,180,80,.12))";
     }
 }
 
 
-/* =========================
-   RENDER
-========================= */
+/* ================= RENDER ================= */
 
 function renderState() {
 
@@ -748,24 +1163,22 @@ function renderState() {
     objectNameEl.textContent =
         state.object_name;
 
-
     balanceEl.textContent =
-        state.balance.toLocaleString("ru-RU");
+        Number(state.balance).toLocaleString("ru-RU");
 
-
-    /*
-     * STAMINA
-     */
 
     const staminaPct =
         Math.max(
             0,
             Math.min(
                 100,
-                (localStamina /
-                    state.stamina_max) * 100
+                (
+                    localStamina /
+                    state.stamina_max
+                ) * 100
             )
         );
+
 
     staminaFillEl.style.width =
         `${staminaPct}%`;
@@ -773,10 +1186,6 @@ function renderState() {
     staminaTextEl.textContent =
         `${Math.floor(localStamina)}/${state.stamina_max}`;
 
-
-    /*
-     * PROGRESS
-     */
 
     if (state.object_threshold) {
 
@@ -801,16 +1210,12 @@ function renderState() {
             "100%";
 
         progressTextEl.textContent =
-            "Финал";
+            "ФИНАЛ";
     }
 
 
-    /*
-     * CLICK UPGRADE
-     */
-
     clickLevelTextEl.textContent =
-        `Уровень ${state.click_level} · +${state.click_power} монета`;
+        `Уровень ${state.click_level} · +${state.click_power} ресурс`;
 
 
     if (state.click_upgrade_cost === -1) {
@@ -824,7 +1229,7 @@ function renderState() {
     } else {
 
         upgradeClickBtn.textContent =
-            state.click_upgrade_cost.toLocaleString("ru-RU");
+            `⚡ ${state.click_upgrade_cost}`;
 
         upgradeClickBtn.disabled =
             state.balance <
@@ -832,12 +1237,8 @@ function renderState() {
     }
 
 
-    /*
-     * STAMINA UPGRADE
-     */
-
     staminaLevelTextEl.textContent =
-        `Уровень ${state.stamina_level} · макс ${state.stamina_max}`;
+        `Уровень ${state.stamina_level} · ${state.stamina_max} энергии`;
 
 
     if (state.stamina_upgrade_cost === -1) {
@@ -851,7 +1252,7 @@ function renderState() {
     } else {
 
         upgradeStaminaBtn.textContent =
-            state.stamina_upgrade_cost.toLocaleString("ru-RU");
+            `⚡ ${state.stamina_upgrade_cost}`;
 
         upgradeStaminaBtn.disabled =
             state.balance <
@@ -859,27 +1260,18 @@ function renderState() {
     }
 
 
-    /*
-     * PRESTIGE
-     */
-
     if (state.is_final_object) {
 
         prestigeBtn.textContent =
-            "🌟 Это финальный объект!";
+            "✦ Квазар — финальный объект";
 
         prestigeBtn.disabled =
             true;
 
     } else if (state.can_prestige) {
 
-        const percent =
-            Math.round(
-                state.prestige_multiplier * 100 - 100
-            );
-
         prestigeBtn.textContent =
-            `🚀 Лететь дальше (+${percent}% навсегда)`;
+            `🚀 Перейти к следующему объекту · +60%`;
 
         prestigeBtn.disabled =
             false;
@@ -887,29 +1279,25 @@ function renderState() {
     } else {
 
         prestigeBtn.textContent =
-            "Набери прогресс для перелёта";
+            "Завершите восстановление объекта";
 
         prestigeBtn.disabled =
             true;
     }
 
 
-    /*
-     * DAILY
-     */
-
     const daily =
         state.daily_status;
 
 
     dailySubEl.textContent =
-        `Стрик: ${state.daily_streak} дн. · +${state.daily_next_amount} монет`;
+        `Серия: ${state.daily_streak} дн. · награда +${state.daily_next_amount}`;
 
 
     if (daily.can_claim) {
 
         dailyBtn.textContent =
-            "Забрать";
+            "ЗАБРАТЬ";
 
         dailyBtn.disabled =
             false;
@@ -924,62 +1312,62 @@ function renderState() {
     }
 
 
+    statusEl.textContent =
+        `Экспедиция #${state.prestige_count + 1} · ID ${userId}`;
+
+
     updateObjectVisual();
 }
 
 
-/* =========================
-   LOAD STATE
-========================= */
+/* ================= LOAD ================= */
 
 async function loadState() {
 
     try {
 
-        const response =
+        const res =
             await fetch(
                 `${API_URL}/api/state/${userId}`
             );
 
-        if (!response.ok) {
-            throw new Error();
+        if (!res.ok) {
+            throw new Error("State loading failed");
         }
 
         state =
-            await response.json();
+            await res.json();
 
         localStamina =
             state.stamina;
 
-        statusEl.textContent =
-            `ID: ${userId} · Перелётов: ${state.prestige_count}`;
-
         renderState();
 
-    } catch (error) {
+    } catch (e) {
 
-        console.error(error);
+        console.error(e);
 
         statusEl.textContent =
-            "Ошибка загрузки сервера";
+            "Ошибка связи с экспедиционным центром";
     }
 }
 
 
-/* =========================
-   LOCAL STAMINA REGEN
-========================= */
+/* ================= STAMINA ================= */
 
 setInterval(() => {
 
-    if (!state) return;
-
-    if (localStamina < state.stamina_max) {
+    if (
+        state &&
+        localStamina <
+        state.stamina_max
+    ) {
 
         localStamina =
             Math.min(
                 state.stamina_max,
-                localStamina + 0.4
+                localStamina +
+                (2 * .2)
             );
 
         renderState();
@@ -988,82 +1376,78 @@ setInterval(() => {
 }, 200);
 
 
-/* =========================
-   SEND CLICKS
-========================= */
+/* ================= SYNC ================= */
 
 function scheduleSend() {
 
     clearTimeout(sendTimeout);
 
+
     sendTimeout =
-        setTimeout(async () => {
+        setTimeout(
+            async () => {
 
-            const taps =
-                pendingTaps;
+                const taps =
+                    pendingTaps;
 
-            pendingTaps = 0;
-
-            if (taps <= 0) return;
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_URL}/api/click`,
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                user_id: userId,
-                                taps: taps
-                            })
-                        }
-                    );
+                pendingTaps = 0;
 
 
-                if (!response.ok) {
-
-                    /*
-                     * Если сервер отклонил клики,
-                     * обновляем состояние
-                     */
-
-                    await loadState();
-
+                if (taps <= 0) {
                     return;
                 }
 
 
-                state =
-                    await response.json();
+                try {
 
-                localStamina =
-                    state.stamina;
+                    const res =
+                        await fetch(
+                            `${API_URL}/api/click`,
+                            {
+                                method: "POST",
 
-                renderState();
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
 
-            } catch (error) {
+                                body: JSON.stringify({
+                                    user_id: userId,
+                                    taps: taps
+                                })
+                            }
+                        );
 
-                console.error(error);
 
-                statusEl.textContent =
-                    "Ошибка синхронизации";
-            }
+                    if (!res.ok) {
+                        throw new Error("Click sync failed");
+                    }
 
-        }, 350);
+
+                    state =
+                        await res.json();
+
+                    localStamina =
+                        state.stamina;
+
+                    renderState();
+
+
+                } catch (e) {
+
+                    console.error(e);
+
+                    statusEl.textContent =
+                        "Ошибка синхронизации";
+                }
+
+            },
+            300
+        );
 }
 
 
-/* =========================
-   FLOAT TEXT
-========================= */
+/* ================= EFFECTS ================= */
 
 function showFloatText(
     x,
@@ -1078,7 +1462,7 @@ function showFloatText(
         "float-text";
 
     el.textContent =
-        "+" + amount;
+        `+${amount}`;
 
     el.style.left =
         `${x}px`;
@@ -1089,25 +1473,52 @@ function showFloatText(
     document.body.appendChild(el);
 
 
-    setTimeout(() => {
-
-        el.remove();
-
-    }, 800);
+    setTimeout(
+        () => el.remove(),
+        800
+    );
 }
 
 
-/* =========================
-   CLICK
-========================= */
+function showClickRing(
+    x,
+    y
+) {
+
+    const ring =
+        document.createElement("div");
+
+    ring.className =
+        "click-ring";
+
+    ring.style.left =
+        `${x}px`;
+
+    ring.style.top =
+        `${y}px`;
+
+    document.body.appendChild(ring);
+
+
+    setTimeout(
+        () => ring.remove(),
+        600
+    );
+}
+
+
+/* ================= CLICK ================= */
 
 objectWrapEl.addEventListener(
     "click",
-    (event) => {
+    (e) => {
 
-        if (!state) return;
-
-        if (localStamina < 1) return;
+        if (
+            !state ||
+            localStamina < 1
+        ) {
+            return;
+        }
 
 
         localStamina -= 1;
@@ -1126,30 +1537,27 @@ objectWrapEl.addEventListener(
             );
 
 
-        /*
-         * Показываем баланс
-         * с учётом ещё не отправленных кликов
-         */
-
-        const predictedBalance =
-            state.balance +
-            (
-                pendingTaps *
-                state.click_power *
-                prestigeMult
-            );
-
-
         balanceEl.textContent =
-            Math.round(
-                predictedBalance
+            (
+                state.balance +
+                Math.round(
+                    pendingTaps *
+                    state.click_power *
+                    prestigeMult
+                )
             ).toLocaleString("ru-RU");
 
 
         showFloatText(
-            event.clientX - 10,
-            event.clientY - 20,
+            e.clientX - 10,
+            e.clientY - 20,
             earnedThisClick
+        );
+
+
+        showClickRing(
+            e.clientX,
+            e.clientY
         );
 
 
@@ -1158,28 +1566,25 @@ objectWrapEl.addEventListener(
         scheduleSend();
 
 
-        if (tg?.HapticFeedback) {
+        try {
 
-            tg.HapticFeedback
-                .impactOccurred("light");
-        }
+            tg?.HapticFeedback
+                ?.impactOccurred("light");
+
+        } catch (e) {}
     }
 );
 
 
-/* =========================
-   CLICK UPGRADE
-========================= */
+/* ================= UPGRADE CLICK ================= */
 
 upgradeClickBtn.addEventListener(
     "click",
     async () => {
 
-        if (!state) return;
-
         try {
 
-            const response =
+            const res =
                 await fetch(
                     `${API_URL}/api/upgrade/click`,
                     {
@@ -1197,22 +1602,13 @@ upgradeClickBtn.addEventListener(
                 );
 
 
-            if (!response.ok) {
-
-                const error =
-                    await response.json();
-
-                alert(
-                    error.detail ||
-                    "Не удалось улучшить"
-                );
-
+            if (!res.ok) {
                 return;
             }
 
 
             state =
-                await response.json();
+                await res.json();
 
             localStamina =
                 state.stamina;
@@ -1220,38 +1616,26 @@ upgradeClickBtn.addEventListener(
             renderState();
 
 
-            if (tg?.HapticFeedback) {
+            tg?.HapticFeedback
+                ?.notificationOccurred("success");
 
-                tg.HapticFeedback
-                    .notificationOccurred(
-                        "success"
-                    );
-            }
+        } catch (e) {
 
-        } catch (error) {
-
-            console.error(error);
-
-            statusEl.textContent =
-                "Ошибка покупки";
+            console.error(e);
         }
     }
 );
 
 
-/* =========================
-   STAMINA UPGRADE
-========================= */
+/* ================= UPGRADE STAMINA ================= */
 
 upgradeStaminaBtn.addEventListener(
     "click",
     async () => {
 
-        if (!state) return;
-
         try {
 
-            const response =
+            const res =
                 await fetch(
                     `${API_URL}/api/upgrade/stamina`,
                     {
@@ -1269,22 +1653,13 @@ upgradeStaminaBtn.addEventListener(
                 );
 
 
-            if (!response.ok) {
-
-                const error =
-                    await response.json();
-
-                alert(
-                    error.detail ||
-                    "Не удалось улучшить"
-                );
-
+            if (!res.ok) {
                 return;
             }
 
 
             state =
-                await response.json();
+                await res.json();
 
             localStamina =
                 state.stamina;
@@ -1292,41 +1667,38 @@ upgradeStaminaBtn.addEventListener(
             renderState();
 
 
-            if (tg?.HapticFeedback) {
+            tg?.HapticFeedback
+                ?.notificationOccurred("success");
 
-                tg.HapticFeedback
-                    .notificationOccurred(
-                        "success"
-                    );
-            }
+        } catch (e) {
 
-        } catch (error) {
-
-            console.error(error);
-
-            statusEl.textContent =
-                "Ошибка покупки";
+            console.error(e);
         }
     }
 );
 
 
-/* =========================
-   PRESTIGE
-========================= */
+/* ================= PRESTIGE ================= */
 
 prestigeBtn.addEventListener(
     "click",
     async () => {
 
-        if (!state) return;
-
-        if (!state.can_prestige) return;
+        if (
+            !state ||
+            !state.can_prestige
+        ) {
+            return;
+        }
 
 
         try {
 
-            const response =
+            prestigeBtn.disabled =
+                true;
+
+
+            const res =
                 await fetch(
                     `${API_URL}/api/prestige`,
                     {
@@ -1344,66 +1716,60 @@ prestigeBtn.addEventListener(
                 );
 
 
-            if (!response.ok) {
+            if (!res.ok) {
 
-                const error =
-                    await response.json();
-
-                alert(
-                    error.detail ||
-                    "Перелёт невозможен"
-                );
+                renderState();
 
                 return;
             }
 
 
             state =
-                await response.json();
+                await res.json();
 
             localStamina =
                 state.stamina;
 
-
-            statusEl.textContent =
-                `ID: ${userId} · Перелётов: ${state.prestige_count}`;
-
+            currentObjectIndex =
+                -1;
 
             renderState();
 
 
-            if (tg?.HapticFeedback) {
+            tg?.HapticFeedback
+                ?.notificationOccurred("success");
 
-                tg.HapticFeedback
-                    .notificationOccurred(
-                        "success"
-                    );
-            }
+        } catch (e) {
 
-        } catch (error) {
+            console.error(e);
 
-            console.error(error);
-
-            statusEl.textContent =
-                "Ошибка перелёта";
+            renderState();
         }
     }
 );
 
 
-/* =========================
-   DAILY
-========================= */
+/* ================= DAILY ================= */
 
 dailyBtn.addEventListener(
     "click",
     async () => {
 
-        if (!state) return;
+        if (
+            !state ||
+            !state.daily_status.can_claim
+        ) {
+            return;
+        }
+
 
         try {
 
-            const response =
+            dailyBtn.disabled =
+                true;
+
+
+            const res =
                 await fetch(
                     `${API_URL}/api/daily/claim`,
                     {
@@ -1421,22 +1787,16 @@ dailyBtn.addEventListener(
                 );
 
 
-            if (!response.ok) {
+            if (!res.ok) {
 
-                const error =
-                    await response.json();
-
-                alert(
-                    error.detail ||
-                    "Бонус пока недоступен"
-                );
+                renderState();
 
                 return;
             }
 
 
             state =
-                await response.json();
+                await res.json();
 
             localStamina =
                 state.stamina;
@@ -1444,46 +1804,38 @@ dailyBtn.addEventListener(
             renderState();
 
 
-            if (tg?.HapticFeedback) {
+            tg?.HapticFeedback
+                ?.notificationOccurred("success");
 
-                tg.HapticFeedback
-                    .notificationOccurred(
-                        "success"
-                    );
-            }
+        } catch (e) {
 
-        } catch (error) {
+            console.error(e);
 
-            console.error(error);
-
-            statusEl.textContent =
-                "Ошибка получения бонуса";
+            renderState();
         }
     }
 );
 
 
-/* =========================
-   INIT
-========================= */
+/* ================= INIT ================= */
 
 async function init() {
 
     try {
 
         statusEl.textContent =
-            "Загрузка...";
+            "Загрузка экспедиции...";
 
         await loadObjectsList();
 
         await loadState();
 
-    } catch (error) {
+    } catch (e) {
 
-        console.error(error);
+        console.error(e);
 
         statusEl.textContent =
-            "Ошибка запуска игры";
+            "Не удалось загрузить экспедицию";
     }
 }
 
@@ -1493,4 +1845,4 @@ init();
 </script>
 
 </body>
-   </html>
+    </html>
