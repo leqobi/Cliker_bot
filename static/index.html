@@ -2,2251 +2,3511 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+      maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
 <title>Sundered Star</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+:root {
+    --bg: #090916;
+    --bg2: #111126;
+    --card: rgba(255,255,255,.065);
+    --card2: rgba(255,255,255,.09);
+    --border: rgba(255,255,255,.11);
+    --text: #fff;
+    --muted: rgba(255,255,255,.52);
+    --purple: #a855f7;
+    --pink: #d946ef;
+    --orange: #ffad32;
+    --blue: #4d9cff;
+    --green: #42d392;
+}
+
+html,
+body {
+    min-height: 100%;
+    background:
+        radial-gradient(circle at 50% -10%, #29204d 0%, transparent 38%),
+        linear-gradient(180deg, #080812 0%, #111126 100%);
+    color: var(--text);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    padding:
+        env(safe-area-inset-top)
+        14px
+        calc(78px + env(safe-area-inset-bottom))
+        14px;
+
+    overflow-x: hidden;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.page {
+    display: none;
+    animation: pageIn .22s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
     }
 
-    :root {
-        --bg-main: #070812;
-        --bg-second: #101225;
-        --panel: rgba(20, 23, 45, 0.82);
-        --panel-border: rgba(255,255,255,0.10);
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        --purple: #9d6cff;
-        --purple-light: #c08cff;
+/* =========================
+   TOP
+========================= */
 
-        --gold: #ffb347;
-        --gold-light: #ffd27a;
+.top {
+    text-align: center;
+    padding-top: 8px;
+}
 
-        --blue: #4fa3ff;
-        --blue-light: #78c2ff;
+.object-name {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: .8px;
+}
 
-        --text: #ffffff;
-        --muted: rgba(255,255,255,0.55);
+.balance-label {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.balance {
+    margin-top: 2px;
+    font-size: 52px;
+    line-height: 1.05;
+    font-weight: 800;
+
+    background: linear-gradient(
+        180deg,
+        #fff 0%,
+        #ffe0aa 100%
+    );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    text-shadow:
+        0 0 28px rgba(255,170,70,.28);
+}
+
+/* =========================
+   OBJECT
+========================= */
+
+.object-wrap {
+    position: relative;
+
+    width: 280px;
+    height: 280px;
+
+    margin: 10px auto 12px;
+
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.object-glow {
+    position: absolute;
+
+    width: 330px;
+    height: 330px;
+
+    left: -25px;
+    top: -25px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,180,80,.34) 0%,
+            rgba(168,85,247,.12) 35%,
+            transparent 72%
+        );
+
+    filter: blur(3px);
+    pointer-events: none;
+}
+
+.object-img {
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    left: 0;
+    top: 0;
+
+    object-fit: contain;
+
+    transition:
+        transform .07s ease,
+        filter .3s ease;
+}
+
+.cracks-overlay {
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    left: 0;
+    top: 0;
+
+    object-fit: contain;
+
+    pointer-events: none;
+    mix-blend-mode: multiply;
+
+    transition: opacity .4s ease;
+}
+
+.object-wrap:active .object-img {
+    transform: scale(.94);
+}
+
+/* =========================
+   FLOAT
+========================= */
+
+.float-text {
+    position: fixed;
+
+    color: #ffc15a;
+    font-size: 21px;
+    font-weight: 800;
+
+    pointer-events: none;
+    z-index: 999;
+
+    text-shadow:
+        0 2px 8px rgba(0,0,0,.7);
+
+    animation:
+        floatUp .7s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
     }
 
-    html {
-        min-height: 100%;
-        background: var(--bg-main);
+    100% {
+        transform: translateY(-65px) scale(1.08);
+        opacity: 0;
     }
+}
 
+/* =========================
+   BARS
+========================= */
+
+.bar-block {
+    margin-top: 12px;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+    color: rgba(255,255,255,.66);
+}
+
+.bar-bg {
+    width: 100%;
+    height: 8px;
+
+    background: rgba(255,255,255,.09);
+
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0;
+
+    border-radius: 99px;
+
+    transition: width .25s ease;
+}
+
+.progress-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #9d4edd,
+            #e052ff
+        );
+
+    box-shadow:
+        0 0 12px rgba(210,70,255,.35);
+}
+
+.stamina-fill {
+    background:
+        linear-gradient(
+            90deg,
+            #388bea,
+            #67b7ff
+        );
+
+    box-shadow:
+        0 0 12px rgba(70,150,255,.25);
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.075),
+            rgba(255,255,255,.035)
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    padding: 16px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,.14);
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 750;
+
+    margin-bottom: 12px;
+}
+
+/* =========================
+   UPGRADE
+========================= */
+
+.upgrades {
+    margin-top: 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upgrade-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 14px 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.075),
+            rgba(255,255,255,.035)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.11);
+
+    border-radius: 17px;
+}
+
+.upgrade-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.upgrade-icon {
+    width: 43px;
+    height: 43px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(168,85,247,.25),
+            rgba(217,70,239,.12)
+        );
+
+    font-size: 21px;
+}
+
+.upgrade-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.upgrade-sub {
+    margin-top: 3px;
+
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.action-btn {
+    border: none;
+
+    min-width: 74px;
+
+    padding: 10px 13px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffbd45,
+            #ff8c18
+        );
+
+    color: #17110a;
+
+    font-weight: 800;
+    font-size: 13px;
+
+    box-shadow:
+        0 5px 18px rgba(255,150,30,.16);
+}
+
+.action-btn:disabled {
+    background: rgba(255,255,255,.09);
+    color: rgba(255,255,255,.3);
+    box-shadow: none;
+}
+
+/* =========================
+   PRESTIGE
+========================= */
+
+.prestige-btn {
+    width: 100%;
+
+    margin-top: 14px;
+
+    border: none;
+    border-radius: 16px;
+
+    padding: 15px;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    background:
+        linear-gradient(
+            135deg,
+            #9149ec,
+            #d946ef
+        );
+
+    box-shadow:
+        0 7px 25px rgba(168,85,247,.25);
+}
+
+.prestige-btn:disabled {
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.3);
+    box-shadow: none;
+}
+
+/* =========================
+   REWARD
+========================= */
+
+.reward-main {
+    margin-top: 20px;
+
+    text-align: center;
+
+    padding: 25px 18px;
+}
+
+.reward-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.reward-title {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.reward-description {
+    margin-top: 7px;
+
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.reward-amount {
+    margin: 20px 0;
+
+    font-size: 38px;
+    font-weight: 850;
+
+    color: #ffc15a;
+}
+
+.big-btn {
+    width: 100%;
+
+    border: none;
+    border-radius: 15px;
+
+    padding: 15px;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffbe46,
+            #ff8a16
+        );
+
+    color: #1b1307;
+}
+
+.big-btn:disabled {
+    background: rgba(255,255,255,.09);
+    color: rgba(255,255,255,.3);
+}
+
+/* =========================
+   REFERRALS
+========================= */
+
+.referral-card {
+    margin-top: 18px;
+}
+
+.referral-big {
+    text-align: center;
+
+    padding: 22px 15px;
+}
+
+.referral-number {
+    font-size: 38px;
+    font-weight: 850;
+
+    color: #b978ff;
+}
+
+.referral-label {
+    margin-top: 3px;
+
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.referral-rules {
+    margin-top: 15px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+}
+
+.rule {
+    padding: 13px;
+
+    background: rgba(255,255,255,.045);
+
+    border-radius: 13px;
+}
+
+.rule-value {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.rule-label {
+    margin-top: 3px;
+
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.referral-link {
+    margin-top: 14px;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background: rgba(0,0,0,.22);
+
+    color: rgba(255,255,255,.7);
+
+    font-size: 11px;
+
+    word-break: break-all;
+}
+
+.copy-btn {
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px;
+
+    border: none;
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a855f7,
+            #d946ef
+        );
+
+    color: white;
+
+    font-weight: 800;
+}
+
+/* =========================
+   LEADERBOARD
+========================= */
+
+.leader-header {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 14px;
+}
+
+.leader-title {
+    font-size: 25px;
+    font-weight: 850;
+}
+
+.leader-sub {
+    margin-top: 4px;
+
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.leader-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.leader-row {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        1fr
+        auto;
+
+    align-items: center;
+
+    padding: 13px;
+
+    border-radius: 15px;
+
+    background: rgba(255,255,255,.055);
+
+    border: 1px solid rgba(255,255,255,.07);
+}
+
+.leader-row.me {
+    border-color: rgba(168,85,247,.5);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(168,85,247,.16),
+            rgba(217,70,239,.07)
+        );
+}
+
+.rank {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.player-name {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.player-small {
+    margin-top: 2px;
+
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.player-score {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffc15a;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile-card {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.avatar {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a855f7,
+            #d946ef
+        );
+
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.profile-name {
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.profile-id {
+    margin-top: 4px;
+
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.stats-grid {
+    margin-top: 16px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 9px;
+}
+
+.stat {
+    padding: 13px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,.05);
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.stat-label {
+    margin-top: 3px;
+
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =========================
+   NAV
+========================= */
+
+.bottom-nav {
+    position: fixed;
+
+    left: 50%;
+    bottom: 0;
+
+    transform: translateX(-50%);
+
+    width: min(100%, 520px);
+
+    padding:
+        9px
+        10px
+        calc(9px + env(safe-area-inset-bottom));
+
+    background:
+        rgba(10,10,22,.92);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-top:
+        1px solid rgba(255,255,255,.08);
+
+    z-index: 100;
+}
+
+.nav-inner {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 5px;
+}
+
+.nav-btn {
+    border: none;
+    background: transparent;
+
+    color: rgba(255,255,255,.4);
+
+    padding: 7px 3px;
+
+    border-radius: 13px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.nav-icon {
+    display: block;
+
+    margin-bottom: 3px;
+
+    font-size: 20px;
+}
+
+.nav-btn.active {
+    color: white;
+
+    background:
+        rgba(168,85,247,.14);
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+    text-align: center;
+
+    margin-top: 15px;
+
+    color: rgba(255,255,255,.25);
+
+    font-size: 10px;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading {
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #090916;
+
+    z-index: 1000;
+}
+
+.loading-box {
+    text-align: center;
+}
+
+.loading-star {
+    font-size: 45px;
+
+    animation: pulse 1.2s infinite;
+}
+
+.loading-text {
+    margin-top: 8px;
+
+    color: rgba(255,255,255,.55);
+
+    font-size: 12px;
+}
+
+@keyframes pulse {
+    50% {
+        transform: scale(1.12);
+        opacity: .65;
+    }
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty {
+    text-align: center;
+
+    padding: 35px 15px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast {
+    position: fixed;
+
+    left: 50%;
+    bottom: 85px;
+
+    transform:
+        translateX(-50%)
+        translateY(15px);
+
+    opacity: 0;
+
+    z-index: 9999;
+
+    padding: 11px 17px;
+
+    border-radius: 13px;
+
+    background:
+        rgba(30,30,45,.95);
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    color: white;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition: .25s ease;
+
+    pointer-events: none;
+}
+
+.toast.show {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+/* =========================
+   DESKTOP
+========================= */
+
+@media (min-width: 600px) {
     body {
-        min-height: 100vh;
-        padding: 12px 14px 24px;
-
-        font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            Roboto,
-            Arial,
-            sans-serif;
-
-        color: var(--text);
-
-        background:
-            radial-gradient(
-                circle at 50% 18%,
-                rgba(110, 70, 180, 0.18),
-                transparent 35%
-            ),
-            radial-gradient(
-                circle at 20% 80%,
-                rgba(40, 80, 180, 0.10),
-                transparent 35%
-            ),
-            linear-gradient(
-                180deg,
-                #060710 0%,
-                #0a0b19 45%,
-                #101225 100%
-            );
-
-        overflow-x: hidden;
+        padding-bottom: 100px;
     }
-
-    /* =========================
-       BACKGROUND STARS
-    ========================= */
-
-    .space {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        overflow: hidden;
-        z-index: 0;
-    }
-
-    .star {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.7);
-        animation: twinkle 3s ease-in-out infinite;
-    }
-
-    .star:nth-child(1) { left: 8%; top: 13%; animation-delay: .3s; }
-    .star:nth-child(2) { left: 21%; top: 30%; animation-delay: 1.2s; }
-    .star:nth-child(3) { left: 34%; top: 8%; animation-delay: 2s; }
-    .star:nth-child(4) { left: 47%; top: 22%; animation-delay: .8s; }
-    .star:nth-child(5) { left: 63%; top: 11%; animation-delay: 1.7s; }
-    .star:nth-child(6) { left: 76%; top: 28%; animation-delay: .4s; }
-    .star:nth-child(7) { left: 90%; top: 17%; animation-delay: 2.3s; }
-    .star:nth-child(8) { left: 14%; top: 55%; animation-delay: 1.1s; }
-    .star:nth-child(9) { left: 29%; top: 69%; animation-delay: 2.1s; }
-    .star:nth-child(10) { left: 51%; top: 59%; animation-delay: .5s; }
-    .star:nth-child(11) { left: 71%; top: 71%; animation-delay: 1.4s; }
-    .star:nth-child(12) { left: 88%; top: 62%; animation-delay: 2.4s; }
-    .star:nth-child(13) { left: 5%; top: 86%; animation-delay: .7s; }
-    .star:nth-child(14) { left: 40%; top: 91%; animation-delay: 1.9s; }
-    .star:nth-child(15) { left: 81%; top: 91%; animation-delay: .9s; }
-
-    @keyframes twinkle {
-        0%, 100% {
-            opacity: .25;
-            transform: scale(.7);
-        }
-
-        50% {
-            opacity: 1;
-            transform: scale(1.5);
-        }
-    }
-
-    /* =========================
-       MAIN
-    ========================= */
-
-    .app {
-        position: relative;
-        z-index: 2;
-
-        width: 100%;
-        max-width: 430px;
-
-        margin: 0 auto;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    /* =========================
-       OBJECT NAME
-    ========================= */
-
-    .object-name {
-        margin-top: 2px;
-
-        font-size: 22px;
-        font-weight: 700;
-
-        letter-spacing: 1px;
-
-        text-align: center;
-
-        text-shadow:
-            0 0 15px rgba(255,255,255,.15);
-    }
-
-    .object-type {
-        margin-top: 3px;
-
-        font-size: 9px;
-        letter-spacing: 3px;
-
-        text-transform: uppercase;
-
-        color: rgba(255,255,255,.35);
-    }
-
-    /* =========================
-       BALANCE
-    ========================= */
-
-    .balance-label {
-        margin-top: 15px;
-
-        font-size: 10px;
-        font-weight: 600;
-
-        letter-spacing: 3px;
-
-        color: rgba(255,255,255,.43);
-
-        text-transform: uppercase;
-    }
-
-    .balance {
-        margin-top: 1px;
-
-        font-size: 48px;
-        line-height: 1;
-
-        font-weight: 800;
-
-        letter-spacing: -2px;
-
-        color: #fff;
-
-        text-shadow:
-            0 0 12px rgba(255,179,71,.18),
-            0 0 35px rgba(255,179,71,.15);
-
-        transition: transform .12s ease;
-    }
-
-    .balance.bump {
-        transform: scale(1.08);
-    }
-
-    /* =========================
-       OBJECT
-    ========================= */
 
     .object-wrap {
-        position: relative;
-
-        width: min(300px, 82vw);
-        height: min(300px, 82vw);
-
-        margin: 8px 0 10px;
-
-        cursor: pointer;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        touch-action: manipulation;
+        width: 300px;
+        height: 300px;
     }
 
-    .object-aura {
-        position: absolute;
-
-        width: 90%;
-        height: 90%;
-
-        border-radius: 50%;
-
-        background:
-            radial-gradient(
-                circle,
-                rgba(255,190,100,.22) 0%,
-                rgba(255,150,70,.12) 30%,
-                transparent 70%
-            );
-
-        filter: blur(8px);
-
-        transition:
-            transform .3s ease,
-            opacity .3s ease,
-            filter .3s ease;
-    }
-
-    .object-ring {
-        position: absolute;
-
-        width: 82%;
-        height: 82%;
-
-        border-radius: 50%;
-
-        border: 1px solid rgba(255,255,255,.06);
-
-        box-shadow:
-            0 0 50px rgba(150,100,255,.08),
-            inset 0 0 40px rgba(255,255,255,.025);
-    }
-
-    .object-img {
-        position: absolute;
-
-        width: 82%;
-        height: 82%;
-
-        object-fit: contain;
-
-        z-index: 3;
-
-        transition:
-            transform .08s ease,
-            filter .35s ease;
-
-        -webkit-user-drag: none;
-
-        /*
-         * У PNG прозрачный фон должен остаться прозрачным.
-         */
-        mix-blend-mode: normal;
-    }
-
+    .object-img,
     .cracks-overlay {
-        position: absolute;
-
-        width: 82%;
-        height: 82%;
-
-        object-fit: contain;
-
-        z-index: 4;
-
-        pointer-events: none;
-
-        transition:
-            opacity .5s ease,
-            transform .2s ease;
-
-        mix-blend-mode: normal;
+        width: 300px;
+        height: 300px;
     }
 
-    .object-wrap:active .object-img {
-        transform: scale(.94);
+    .object-glow {
+        width: 350px;
+        height: 350px;
+        left: -25px;
+        top: -25px;
     }
-
-    .object-wrap.hit .object-img {
-        animation: objectHit .18s ease;
-    }
-
-    .object-wrap.hit .object-aura {
-        animation: auraHit .25s ease;
-    }
-
-    @keyframes objectHit {
-        0% {
-            transform: scale(1);
-        }
-
-        45% {
-            transform: scale(.91);
-        }
-
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    @keyframes auraHit {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        50% {
-            transform: scale(1.15);
-            opacity: .75;
-        }
-
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
-
-    /* =========================
-       FLOAT TEXT
-    ========================= */
-
-    .float-text {
-        position: fixed;
-
-        z-index: 100;
-
-        pointer-events: none;
-
-        font-size: 21px;
-        font-weight: 800;
-
-        color: var(--gold-light);
-
-        text-shadow:
-            0 0 8px rgba(255,179,71,.5),
-            0 2px 8px rgba(0,0,0,.7);
-
-        animation:
-            floatUp .75s cubic-bezier(.2,.8,.3,1) forwards;
-    }
-
-    @keyframes floatUp {
-        0% {
-            transform:
-                translateY(0)
-                scale(.8);
-
-            opacity: 0;
-        }
-
-        15% {
-            opacity: 1;
-        }
-
-        100% {
-            transform:
-                translateY(-75px)
-                scale(1.1);
-
-            opacity: 0;
-        }
-    }
-
-    /* =========================
-       PROGRESS
-    ========================= */
-
-    .progress-block,
-    .stamina-block {
-        width: 100%;
-        max-width: 370px;
-    }
-
-    .progress-block {
-        margin-top: 2px;
-    }
-
-    .stamina-block {
-        margin-top: 10px;
-    }
-
-    .bar-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        margin-bottom: 5px;
-
-        font-size: 11px;
-    }
-
-    .bar-title {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        color: rgba(255,255,255,.65);
-    }
-
-    .bar-value {
-        color: rgba(255,255,255,.72);
-
-        font-variant-numeric: tabular-nums;
-    }
-
-    .bar-bg {
-        width: 100%;
-        height: 8px;
-
-        padding: 1px;
-
-        border-radius: 99px;
-
-        background: rgba(255,255,255,.08);
-
-        box-shadow:
-            inset 0 1px 2px rgba(0,0,0,.5);
-    }
-
-    .bar-fill {
-        height: 100%;
-
-        width: 0%;
-
-        border-radius: 99px;
-
-        transition: width .3s ease;
-    }
-
-    .progress-bar-fill {
-        background:
-            linear-gradient(
-                90deg,
-                #8251e9,
-                #bd68f5
-            );
-
-        box-shadow:
-            0 0 12px rgba(168,85,247,.55);
-    }
-
-    .stamina-bar-fill {
-        background:
-            linear-gradient(
-                90deg,
-                #3988ed,
-                #72c0ff
-            );
-
-        box-shadow:
-            0 0 12px rgba(79,163,255,.45);
-    }
-
-    /* =========================
-       DAILY
-    ========================= */
-
-    .daily-card {
-        width: 100%;
-        max-width: 370px;
-
-        margin-top: 17px;
-
-        padding: 14px;
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-
-        border-radius: 17px;
-
-        background:
-            linear-gradient(
-                135deg,
-                rgba(255,179,71,.13),
-                rgba(255,100,50,.07)
-            );
-
-        border: 1px solid rgba(255,179,71,.25);
-
-        box-shadow:
-            0 8px 30px rgba(0,0,0,.18);
-    }
-
-    .daily-info {
-        min-width: 0;
-    }
-
-    .daily-title {
-        font-size: 14px;
-        font-weight: 750;
-    }
-
-    .daily-sub {
-        margin-top: 3px;
-
-        font-size: 10px;
-
-        color: rgba(255,255,255,.55);
-    }
-
-    button {
-        font-family: inherit;
-
-        border: none;
-
-        cursor: pointer;
-
-        touch-action: manipulation;
-    }
-
-    .daily-btn {
-        flex-shrink: 0;
-
-        padding: 9px 15px;
-
-        border-radius: 11px;
-
-        background:
-            linear-gradient(
-                135deg,
-                #ffc15b,
-                #ff9017
-            );
-
-        color: #18120b;
-
-        font-size: 12px;
-        font-weight: 800;
-
-        box-shadow:
-            0 4px 15px rgba(255,143,24,.25);
-
-        transition:
-            transform .1s ease,
-            filter .2s ease;
-    }
-
-    .daily-btn:active {
-        transform: scale(.95);
-    }
-
-    .daily-btn:disabled {
-        background: rgba(255,255,255,.08);
-        color: rgba(255,255,255,.32);
-        box-shadow: none;
-    }
-
-    /* =========================
-       PRESTIGE
-    ========================= */
-
-    .prestige-btn {
-        width: 100%;
-        max-width: 370px;
-
-        margin-top: 12px;
-
-        padding: 14px;
-
-        border-radius: 16px;
-
-        background:
-            linear-gradient(
-                135deg,
-                #9959ee,
-                #d24ee9
-            );
-
-        color: white;
-
-        font-size: 14px;
-        font-weight: 800;
-
-        box-shadow:
-            0 6px 25px rgba(168,85,247,.25);
-
-        transition:
-            transform .1s ease,
-            filter .2s ease;
-    }
-
-    .prestige-btn:active:not(:disabled) {
-        transform: scale(.98);
-    }
-
-    .prestige-btn:disabled {
-        background:
-            linear-gradient(
-                135deg,
-                rgba(255,255,255,.08),
-                rgba(255,255,255,.06)
-            );
-
-        color: rgba(255,255,255,.28);
-
-        box-shadow: none;
-
-        cursor: default;
-    }
-
-    /* =========================
-       UPGRADES
-    ========================= */
-
-    .upgrades {
-        width: 100%;
-        max-width: 370px;
-
-        display: flex;
-        flex-direction: column;
-
-        gap: 9px;
-
-        margin-top: 11px;
-    }
-
-    .upgrade-card {
-        width: 100%;
-
-        padding: 13px 14px;
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        border-radius: 16px;
-
-        background:
-            linear-gradient(
-                135deg,
-                rgba(255,255,255,.075),
-                rgba(255,255,255,.035)
-            );
-
-        border: 1px solid rgba(255,255,255,.09);
-
-        box-shadow:
-            0 5px 20px rgba(0,0,0,.12);
-    }
-
-    .upgrade-info {
-        min-width: 0;
-    }
-
-    .upgrade-title {
-        font-size: 14px;
-        font-weight: 750;
-    }
-
-    .upgrade-sub {
-        margin-top: 3px;
-
-        font-size: 10px;
-
-        color: rgba(255,255,255,.48);
-    }
-
-    .upgrade-btn {
-        min-width: 64px;
-
-        padding: 10px 13px;
-
-        border-radius: 12px;
-
-        background:
-            linear-gradient(
-                135deg,
-                #ffbd50,
-                #ff8e18
-            );
-
-        color: #18120b;
-
-        font-size: 12px;
-        font-weight: 850;
-
-        box-shadow:
-            0 3px 12px rgba(255,150,30,.15);
-
-        transition:
-            transform .1s ease,
-            filter .2s ease;
-    }
-
-    .upgrade-btn:active:not(:disabled) {
-        transform: scale(.94);
-    }
-
-    .upgrade-btn:disabled {
-        background: rgba(255,255,255,.10);
-        color: rgba(255,255,255,.3);
-
-        box-shadow: none;
-    }
-
-    /* =========================
-       STATUS
-    ========================= */
-
-    .status {
-        margin-top: 15px;
-
-        font-size: 10px;
-
-        color: rgba(255,255,255,.3);
-
-        text-align: center;
-    }
-
-    /* =========================
-       PARTICLE
-    ========================= */
-
-    .click-particle {
-        position: fixed;
-
-        width: 5px;
-        height: 5px;
-
-        border-radius: 50%;
-
-        background: #ffd27a;
-
-        pointer-events: none;
-
-        z-index: 90;
-
-        animation: particle .45s ease-out forwards;
-    }
-
-    @keyframes particle {
-        from {
-            opacity: 1;
-            transform: translate(0,0) scale(1);
-        }
-
-        to {
-            opacity: 0;
-            transform:
-                translate(
-                    var(--x),
-                    var(--y)
-                )
-                scale(.2);
-        }
-    }
-
-    /* =========================
-       SMALL SCREENS
-    ========================= */
-
-    @media (max-height: 700px) {
-        body {
-            padding-top: 5px;
-        }
-
-        .balance-label {
-            margin-top: 8px;
-        }
-
-        .object-wrap {
-            width: 250px;
-            height: 250px;
-
-            margin-top: 4px;
-            margin-bottom: 4px;
-        }
-
-        .daily-card {
-            margin-top: 11px;
-        }
-
-        .upgrade-card {
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-    }
-
-    @media (max-width: 350px) {
-        body {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .balance {
-            font-size: 42px;
-        }
-
-        .object-wrap {
-            width: 250px;
-            height: 250px;
-        }
-
-        .daily-title,
-        .upgrade-title {
-            font-size: 13px;
-        }
-    }
+}
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-     SPACE BACKGROUND
-========================= -->
-
-<div class="space">
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
-    <div class="star"></div>
+<div class="loading" id="loading">
+    <div class="loading-box">
+        <div class="loading-star">🌌</div>
+        <div class="loading-text">
+            Sundered Star загружается...
+        </div>
+    </div>
 </div>
-
 
 <div class="app">
 
-    <!-- OBJECT NAME -->
+    <!-- ======================
+         GAME
+    ======================= -->
 
-    <div class="object-name" id="object-name">
-        Загрузка...
-    </div>
+    <section class="page active" id="page-game">
 
-    <div class="object-type" id="object-type">
-        CELESTIAL OBJECT
-    </div>
+        <div class="top">
 
+            <div class="object-name" id="object-name">
+                Загрузка...
+            </div>
 
-    <!-- BALANCE -->
+            <div class="balance-label">
+                Твой баланс
+            </div>
 
-    <div class="balance-label">
-        Твой баланс
-    </div>
+            <div class="balance" id="balance">
+                0
+            </div>
 
-    <div class="balance" id="balance">
-        0
-    </div>
+        </div>
 
-
-    <!-- OBJECT -->
-
-    <div class="object-wrap" id="object-wrap">
-
-        <div class="object-aura" id="object-aura"></div>
-
-        <div class="object-ring"></div>
-
-        <img
-            class="object-img"
-            id="object-img"
-            src=""
-            alt="Космический объект"
+        <div
+            class="object-wrap"
+            id="object-wrap"
         >
 
-        <img
-            class="cracks-overlay"
-            id="cracks-overlay"
-            src="/images/cracks.png"
-            alt=""
+            <div
+                class="object-glow"
+                id="object-glow"
+            ></div>
+
+            <img
+                class="object-img"
+                id="object-img"
+                src=""
+                alt="object"
+            >
+
+            <img
+                class="cracks-overlay"
+                id="cracks-overlay"
+                src="/images/cracks.png"
+                alt=""
+            >
+
+        </div>
+
+        <div class="bar-block">
+
+            <div class="bar-label">
+                <span>🌌 Прогресс</span>
+                <span id="progress-text">
+                    0/0
+                </span>
+            </div>
+
+            <div class="bar-bg">
+                <div
+                    class="bar-fill progress-fill"
+                    id="progress-fill"
+                ></div>
+            </div>
+
+        </div>
+
+        <div class="bar-block">
+
+            <div class="bar-label">
+                <span>⚡ Стамина</span>
+                <span id="stamina-text">
+                    0/0
+                </span>
+            </div>
+
+            <div class="bar-bg">
+                <div
+                    class="bar-fill stamina-fill"
+                    id="stamina-fill"
+                ></div>
+            </div>
+
+        </div>
+
+        <button
+            class="prestige-btn"
+            id="prestige-btn"
+            disabled
         >
+            Набери прогресс для перелёта
+        </button>
 
-    </div>
+        <div class="upgrades">
+
+            <div class="upgrade-card">
+
+                <div class="upgrade-left">
+
+                    <div class="upgrade-icon">
+                        👆
+                    </div>
+
+                    <div>
+                        <div class="upgrade-title">
+                            Сила клика
+                        </div>
+
+                        <div
+                            class="upgrade-sub"
+                            id="click-level-text"
+                        >
+                            Уровень 1 · +1
+                        </div>
+                    </div>
+
+                </div>
+
+                <button
+                    class="action-btn"
+                    id="upgrade-click-btn"
+                >
+                    ...
+                </button>
+
+            </div>
 
 
-    <!-- PROGRESS -->
+            <div class="upgrade-card">
 
-    <div class="progress-block">
+                <div class="upgrade-left">
 
-        <div class="bar-header">
+                    <div class="upgrade-icon">
+                        ⚡
+                    </div>
 
-            <div class="bar-title">
-                <span>🌌</span>
-                <span>Прогресс</span>
+                    <div>
+                        <div class="upgrade-title">
+                            Запас стамины
+                        </div>
+
+                        <div
+                            class="upgrade-sub"
+                            id="stamina-level-text"
+                        >
+                            Уровень 1
+                        </div>
+                    </div>
+
+                </div>
+
+                <button
+                    class="action-btn"
+                    id="upgrade-stamina-btn"
+                >
+                    ...
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            class="status"
+            id="status"
+        >
+            Загрузка...
+        </div>
+
+    </section>
+
+
+    <!-- ======================
+         REWARDS
+    ======================= -->
+
+    <section
+        class="page"
+        id="page-rewards"
+    >
+
+        <div class="leader-header">
+            <div class="leader-title">
+                🎁 Награды
+            </div>
+
+            <div class="leader-sub">
+                Заходи каждый день и увеличивай стрик
+            </div>
+        </div>
+
+        <div class="card reward-main">
+
+            <div class="reward-icon">
+                🎁
+            </div>
+
+            <div class="reward-title">
+                Ежедневный бонус
+            </div>
+
+            <div class="reward-description">
+                Получай монеты каждый день.
+                Чем длиннее серия посещений —
+                тем больше награда.
             </div>
 
             <div
-                class="bar-value"
-                id="progress-text"
+                class="reward-amount"
+                id="daily-amount"
             >
-                0/0
+                +100
             </div>
 
-        </div>
-
-        <div class="bar-bg">
-
-            <div
-                class="bar-fill progress-bar-fill"
-                id="progress-fill"
-            ></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- STAMINA -->
-
-    <div class="stamina-block">
-
-        <div class="bar-header">
-
-            <div class="bar-title">
-                <span>⚡</span>
-                <span>Стамина</span>
-            </div>
-
-            <div
-                class="bar-value"
-                id="stamina-text"
+            <button
+                class="big-btn"
+                id="daily-btn"
             >
-                0/0
-            </div>
+                Забрать
+            </button>
 
         </div>
 
-        <div class="bar-bg">
 
-            <div
-                class="bar-fill stamina-bar-fill"
-                id="stamina-fill"
-            ></div>
+        <div class="card" style="margin-top:12px;">
 
-        </div>
-
-    </div>
-
-
-    <!-- DAILY BONUS -->
-
-    <div class="daily-card">
-
-        <div class="daily-info">
-
-            <div class="daily-title">
-                🎁 Ежедневный бонус
+            <div class="section-title">
+                🔥 Твой стрик
             </div>
 
             <div
-                class="daily-sub"
-                id="daily-sub"
+                style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                "
+            >
+
+                <span
+                    style="
+                    color:rgba(255,255,255,.55);
+                    font-size:12px;
+                    "
+                >
+                    Дней подряд
+                </span>
+
+                <strong
+                    id="daily-streak"
+                    style="
+                    font-size:22px;
+                    color:#ffb347;
+                    "
+                >
+                    0
+                </strong>
+
+            </div>
+
+            <div
+                id="daily-status"
+                style="
+                margin-top:9px;
+                color:rgba(255,255,255,.4);
+                font-size:11px;
+                "
             >
                 Загрузка...
             </div>
 
         </div>
 
-        <button
-            class="daily-btn"
-            id="daily-btn"
+    </section>
+
+
+    <!-- ======================
+         REFERRALS
+    ======================= -->
+
+    <section
+        class="page"
+        id="page-referrals"
+    >
+
+        <div class="leader-header">
+
+            <div class="leader-title">
+                👥 Рефералы
+            </div>
+
+            <div class="leader-sub">
+                Приглашай игроков и получай бонусы
+            </div>
+
+        </div>
+
+
+        <div class="card referral-card referral-big">
+
+            <div
+                class="referral-number"
+                id="referral-count"
+            >
+                0
+            </div>
+
+            <div class="referral-label">
+                приглашённых игроков
+            </div>
+
+            <div class="referral-rules">
+
+                <div class="rule">
+
+                    <div
+                        class="rule-value"
+                    >
+                        +7 000
+                    </div>
+
+                    <div class="rule-label">
+                        за приглашённого
+                    </div>
+
+                </div>
+
+                <div class="rule">
+
+                    <div
+                        class="rule-value"
+                    >
+                        10%
+                    </div>
+
+                    <div class="rule-label">
+                        от недельного заработка
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card referral-card">
+
+            <div class="section-title">
+                🔗 Твоя ссылка
+            </div>
+
+            <div
+                class="referral-link"
+                id="referral-link"
+            >
+                Создаём ссылку...
+            </div>
+
+            <button
+                class="copy-btn"
+                id="copy-referral-btn"
+            >
+                📋 Скопировать ссылку
+            </button>
+
+        </div>
+
+
+        <div class="card referral-card">
+
+            <div class="section-title">
+                💰 Реферальный доход
+            </div>
+
+            <div
+                style="
+                display:flex;
+                justify-content:space-between;
+                "
+            >
+
+                <span
+                    style="
+                    color:rgba(255,255,255,.5);
+                    font-size:12px;
+                    "
+                >
+                    Всего заработано
+                </span>
+
+                <strong
+                    id="referral-earned"
+                >
+                    0
+                </strong>
+
+            </div>
+
+            <div
+                style="
+                display:flex;
+                justify-content:space-between;
+                margin-top:9px;
+                "
+            >
+
+                <span
+                    style="
+                    color:rgba(255,255,255,.5);
+                    font-size:12px;
+                    "
+                >
+                    За эту неделю
+                </span>
+
+                <strong
+                    id="referral-weekly"
+                >
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="card referral-card"
+            id="referral-history-card"
         >
-            ...
-        </button>
 
-    </div>
-
-
-    <!-- PRESTIGE -->
-
-    <button
-        class="prestige-btn"
-        id="prestige-btn"
-        disabled
-    >
-        Набери прогресс для перелёта
-    </button>
-
-
-    <!-- UPGRADES -->
-
-    <div class="upgrades">
-
-        <div class="upgrade-card">
-
-            <div class="upgrade-info">
-
-                <div class="upgrade-title">
-                    👆 Сила клика
-                </div>
-
-                <div
-                    class="upgrade-sub"
-                    id="click-level-text"
-                >
-                    Уровень 1 · +1 монета
-                </div>
-
+            <div class="section-title">
+                📜 Последние рефералы
             </div>
 
-            <button
-                class="upgrade-btn"
-                id="upgrade-click-btn"
+            <div id="referral-history">
+                <div class="empty">
+                    Загрузка...
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ======================
+         LEADERBOARD
+    ======================= -->
+
+    <section
+        class="page"
+        id="page-leaderboard"
+    >
+
+        <div class="leader-header">
+
+            <div class="leader-title">
+                🏆 Лидерборд
+            </div>
+
+            <div class="leader-sub">
+                Лучшие игроки Sundered Star
+            </div>
+
+        </div>
+
+        <div
+            class="card"
+            style="padding:10px;"
+        >
+
+            <div
+                class="leader-list"
+                id="leader-list"
             >
-                ...
-            </button>
+                <div class="empty">
+                    Загружаем таблицу...
+                </div>
+            </div>
 
         </div>
 
 
-        <div class="upgrade-card">
+        <div
+            class="card"
+            style="margin-top:10px;"
+        >
 
-            <div class="upgrade-info">
+            <div
+                style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                "
+            >
 
-                <div class="upgrade-title">
-                    ⚡ Запас стамины
-                </div>
-
-                <div
-                    class="upgrade-sub"
-                    id="stamina-level-text"
+                <span
+                    style="
+                    color:rgba(255,255,255,.5);
+                    font-size:12px;
+                    "
                 >
-                    Уровень 1
-                </div>
+                    Твоё место
+                </span>
+
+                <strong
+                    id="my-rank"
+                    style="
+                    font-size:20px;
+                    color:#b978ff;
+                    "
+                >
+                    —
+                </strong>
 
             </div>
 
-            <button
-                class="upgrade-btn"
-                id="upgrade-stamina-btn"
-            >
-                ...
-            </button>
-
         </div>
 
-    </div>
-
-
-    <!-- STATUS -->
-
-    <div
-        class="status"
-        id="status"
-    >
-        Загрузка...
-    </div>
+    </section>
 
 </div>
 
 
+<!-- ======================
+     NAVIGATION
+====================== -->
+
+<nav class="bottom-nav">
+
+    <div class="nav-inner">
+
+        <button
+            class="nav-btn active"
+            data-page="game"
+        >
+            <span class="nav-icon">
+                🌌
+            </span>
+            Игра
+        </button>
+
+        <button
+            class="nav-btn"
+            data-page="rewards"
+        >
+            <span class="nav-icon">
+                🎁
+            </span>
+            Награды
+        </button>
+
+        <button
+            class="nav-btn"
+            data-page="referrals"
+        >
+            <span class="nav-icon">
+                👥
+            </span>
+            Рефералы
+        </button>
+
+        <button
+            class="nav-btn"
+            data-page="leaderboard"
+        >
+            <span class="nav-icon">
+                🏆
+            </span>
+            Топ
+        </button>
+
+    </div>
+
+</nav>
+
+
+<div
+    class="toast"
+    id="toast"
+>
+    Готово
+</div>
+
+
 <script>
-    /* =========================================================
-       TELEGRAM
-    ========================================================= */
 
-    const tg = window.Telegram?.WebApp;
+/* =========================================================
+   TELEGRAM
+========================================================= */
 
-    if (tg) {
-        tg.ready();
-        tg.expand();
+const tg = window.Telegram?.WebApp;
 
-        try {
-            tg.setHeaderColor('#070812');
-            tg.setBackgroundColor('#070812');
-        } catch (e) {}
-    }
+if (tg) {
+    tg.ready();
+    tg.expand();
 
-
-    /* =========================================================
-       USER / API
-    ========================================================= */
-
-    const userId =
-        tg?.initDataUnsafe?.user?.id || 12345;
-
-    const API_URL =
-        window.location.origin;
+    try {
+        tg.setHeaderColor("#090916");
+        tg.setBackgroundColor("#090916");
+    } catch (e) {}
+}
 
 
-    /* =========================================================
-       ELEMENTS
-    ========================================================= */
+/* =========================================================
+   CONFIG
+========================================================= */
 
-    const objectNameEl =
-        document.getElementById('object-name');
+const API_URL = window.location.origin;
 
-    const objectTypeEl =
-        document.getElementById('object-type');
+const user =
+    tg?.initDataUnsafe?.user || null;
 
-    const balanceEl =
-        document.getElementById('balance');
-
-    const objectWrapEl =
-        document.getElementById('object-wrap');
-
-    const objectImgEl =
-        document.getElementById('object-img');
-
-    const objectAuraEl =
-        document.getElementById('object-aura');
-
-    const cracksOverlayEl =
-        document.getElementById('cracks-overlay');
-
-    const statusEl =
-        document.getElementById('status');
-
-    const progressTextEl =
-        document.getElementById('progress-text');
-
-    const progressFillEl =
-        document.getElementById('progress-fill');
-
-    const staminaTextEl =
-        document.getElementById('stamina-text');
-
-    const staminaFillEl =
-        document.getElementById('stamina-fill');
-
-    const clickLevelTextEl =
-        document.getElementById('click-level-text');
-
-    const staminaLevelTextEl =
-        document.getElementById('stamina-level-text');
-
-    const upgradeClickBtn =
-        document.getElementById('upgrade-click-btn');
-
-    const upgradeStaminaBtn =
-        document.getElementById('upgrade-stamina-btn');
-
-    const prestigeBtn =
-        document.getElementById('prestige-btn');
-
-    const dailySubEl =
-        document.getElementById('daily-sub');
-
-    const dailyBtn =
-        document.getElementById('daily-btn');
+const userId =
+    user?.id || 12345;
 
 
-    /* =========================================================
-       STATE
-    ========================================================= */
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
-    let state = null;
+const loading =
+    document.getElementById("loading");
 
-    let objectsList = [];
+const objectName =
+    document.getElementById("object-name");
 
-    let pendingTaps = 0;
+const balanceEl =
+    document.getElementById("balance");
 
-    let sendTimeout = null;
+const objectWrap =
+    document.getElementById("object-wrap");
 
-    let localStamina = 0;
+const objectImg =
+    document.getElementById("object-img");
 
-    let currentObjectIndex = -1;
+const objectGlow =
+    document.getElementById("object-glow");
+
+const cracks =
+    document.getElementById("cracks-overlay");
+
+const progressFill =
+    document.getElementById("progress-fill");
+
+const progressText =
+    document.getElementById("progress-text");
+
+const staminaFill =
+    document.getElementById("stamina-fill");
+
+const staminaText =
+    document.getElementById("stamina-text");
+
+const clickLevelText =
+    document.getElementById("click-level-text");
+
+const staminaLevelText =
+    document.getElementById("stamina-level-text");
+
+const clickUpgradeBtn =
+    document.getElementById("upgrade-click-btn");
+
+const staminaUpgradeBtn =
+    document.getElementById("upgrade-stamina-btn");
+
+const prestigeBtn =
+    document.getElementById("prestige-btn");
+
+const statusEl =
+    document.getElementById("status");
+
+const dailyBtn =
+    document.getElementById("daily-btn");
+
+const dailyAmount =
+    document.getElementById("daily-amount");
+
+const dailyStreak =
+    document.getElementById("daily-streak");
+
+const dailyStatus =
+    document.getElementById("daily-status");
+
+const referralCount =
+    document.getElementById("referral-count");
+
+const referralLink =
+    document.getElementById("referral-link");
+
+const referralEarned =
+    document.getElementById("referral-earned");
+
+const referralWeekly =
+    document.getElementById("referral-weekly");
+
+const referralHistory =
+    document.getElementById("referral-history");
+
+const leaderList =
+    document.getElementById("leader-list");
+
+const myRank =
+    document.getElementById("my-rank");
+
+const toast =
+    document.getElementById("toast");
 
 
-    /* =========================================================
-       OBJECTS
-    ========================================================= */
+/* =========================================================
+   STATE
+========================================================= */
 
-    async function loadObjectsList() {
+let state = null;
 
-        try {
+let objects = [];
 
-            const res =
-                await fetch(`${API_URL}/api/objects`);
+let currentObjectIndex = -1;
 
-            if (!res.ok) {
-                throw new Error('Objects request failed');
+let localStamina = 0;
+
+let pendingTaps = 0;
+
+let sendTimeout = null;
+
+let sendingClicks = false;
+
+
+/*
+    Главная настройка задержки кликов.
+
+    Было:
+    400ms
+
+    Теперь:
+    150ms
+*/
+const CLICK_SEND_DELAY = 150;
+
+
+/* =========================================================
+   API
+========================================================= */
+
+async function api(
+    url,
+    options = {}
+) {
+
+    const response =
+        await fetch(
+            API_URL + url,
+            {
+                ...options,
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    ...(options.headers || {})
+                }
             }
+        );
 
-            objectsList =
-                await res.json();
-
-        } catch (error) {
-
-            console.error(error);
-
-            statusEl.textContent =
-                'Ошибка загрузки объектов';
-
-        }
+    if (!response.ok) {
+        throw new Error(
+            "API " +
+            response.status
+        );
     }
 
+    return response.json();
+}
 
-    /* =========================================================
-       OBJECT VISUAL
-    ========================================================= */
 
-    function updateObjectVisual() {
+/* =========================================================
+   TOAST
+========================================================= */
 
-        if (!state) {
+let toastTimer = null;
+
+function showToast(text) {
+
+    toast.textContent = text;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(
+            () => {
+                toast.classList.remove("show");
+            },
+            1800
+        );
+}
+
+
+/* =========================================================
+   HAPTIC
+========================================================= */
+
+function haptic(
+    type = "light"
+) {
+
+    try {
+
+        if (!tg?.HapticFeedback)
             return;
-        }
 
+        if (type === "success") {
 
-        if (
-            currentObjectIndex !==
-            state.object_index
-        ) {
-
-            currentObjectIndex =
-                state.object_index;
-
-            const obj =
-                objectsList[state.object_index];
-
-
-            if (obj) {
-
-                objectImgEl.src =
-                    `/images/${obj.image}`;
-
-            }
-
-
-            const category =
-                state.object_category || 'planet';
-
-
-            if (category === 'planet') {
-
-                cracksOverlayEl.style.display =
-                    'block';
-
-            } else {
-
-                cracksOverlayEl.style.display =
-                    'none';
-
-            }
-
-
-            objectTypeEl.textContent =
-                getObjectTypeName(category);
-        }
-
-
-        let progressPct = 0;
-
-
-        if (state.object_threshold) {
-
-            progressPct =
-                Math.min(
-                    100,
-                    (
-                        state.object_progress /
-                        state.object_threshold
-                    ) * 100
+            tg.HapticFeedback
+                .notificationOccurred(
+                    "success"
                 );
 
         } else {
 
-            progressPct = 100;
-
+            tg.HapticFeedback
+                .impactOccurred(
+                    type
+                );
         }
 
+    } catch (e) {}
+}
 
-        /* CRACKS */
 
-        if (
-            state.object_category ===
-            'planet'
-        ) {
+/* =========================================================
+   OBJECTS
+========================================================= */
 
-            cracksOverlayEl.style.opacity =
+async function loadObjects() {
+
+    try {
+
+        objects =
+            await api(
+                "/api/objects"
+            );
+
+    } catch (e) {
+
+        console.error(
+            "Objects:",
+            e
+        );
+
+        objects = [];
+    }
+}
+
+
+/* =========================================================
+   OBJECT VISUAL
+========================================================= */
+
+function updateObjectVisual() {
+
+    if (!state)
+        return;
+
+    const index =
+        Number(
+            state.object_index ?? 0
+        );
+
+    if (
+        currentObjectIndex !==
+        index
+    ) {
+
+        currentObjectIndex =
+            index;
+
+        const obj =
+            objects[index];
+
+        if (obj) {
+
+            const image =
+                obj.image ||
+                obj.filename ||
+                obj.image_name;
+
+            if (image) {
+
+                /*
+                    Все твои картинки PNG
+                    лежат:
+
+                    static/images/
+                */
+
+                objectImg.src =
+                    "/images/" +
+                    image;
+            }
+        }
+    }
+
+
+    const threshold =
+        Number(
+            state.object_threshold || 0
+        );
+
+    const progress =
+        Number(
+            state.object_progress || 0
+        );
+
+
+    let pct = 100;
+
+    if (threshold > 0) {
+
+        pct =
+            Math.min(
+                100,
                 Math.max(
-                    0.05,
-                    1 - (progressPct / 100) * 0.9
+                    0,
+                    progress /
+                    threshold *
+                    100
+                )
+            );
+    }
+
+
+    if (
+        state.object_category ===
+        "planet"
+    ) {
+
+        cracks.style.display =
+            "block";
+
+        cracks.style.opacity =
+            String(
+                1 -
+                (pct / 100) * .9
+            );
+
+    } else {
+
+        cracks.style.display =
+            "none";
+    }
+
+
+    if (
+        state.object_category ===
+        "star" ||
+
+        state.object_category ===
+        "blackhole"
+    ) {
+
+        const brightness =
+            .55 +
+            (pct / 100) *
+            .85;
+
+        objectImg.style.filter =
+            `brightness(${brightness})`;
+
+        objectGlow.style.filter =
+            `brightness(${brightness})`;
+
+    } else {
+
+        objectImg.style.filter =
+            "none";
+
+        objectGlow.style.filter =
+            "none";
+    }
+}
+
+
+/* =========================================================
+   RENDER STATE
+========================================================= */
+
+function renderState() {
+
+    if (!state)
+        return;
+
+
+    objectName.textContent =
+        state.object_name ||
+        "Неизвестный объект";
+
+
+    balanceEl.textContent =
+        Number(
+            state.balance || 0
+        ).toLocaleString(
+            "ru-RU"
+        );
+
+
+    /*
+        STAMINA
+    */
+
+    const staminaMax =
+        Number(
+            state.stamina_max || 0
+        );
+
+    localStamina =
+        Math.max(
+            0,
+            Math.min(
+                localStamina,
+                staminaMax
+            )
+        );
+
+    const staminaPct =
+        staminaMax > 0
+            ? localStamina /
+              staminaMax *
+              100
+            : 0;
+
+    staminaFill.style.width =
+        staminaPct + "%";
+
+    staminaText.textContent =
+        `${Math.floor(localStamina)}/${staminaMax}`;
+
+
+    /*
+        PROGRESS
+    */
+
+    const threshold =
+        Number(
+            state.object_threshold || 0
+        );
+
+    const progress =
+        Number(
+            state.object_progress || 0
+        );
+
+
+    if (threshold > 0) {
+
+        const pct =
+            Math.min(
+                100,
+                progress /
+                threshold *
+                100
+            );
+
+        progressFill.style.width =
+            pct + "%";
+
+        progressText.textContent =
+            `${progress}/${threshold}`;
+
+    } else {
+
+        progressFill.style.width =
+            "100%";
+
+        progressText.textContent =
+            "Финал";
+    }
+
+
+    /*
+        CLICK UPGRADE
+    */
+
+    const clickLevel =
+        state.click_level || 1;
+
+    const clickPower =
+        state.click_power || 1;
+
+    clickLevelText.textContent =
+        `Уровень ${clickLevel} · +${clickPower} монета`;
+
+
+    const clickCost =
+        state.click_upgrade_cost;
+
+
+    if (
+        clickCost === -1 ||
+        clickCost === null ||
+        clickCost === undefined
+    ) {
+
+        clickUpgradeBtn.textContent =
+            "MAX";
+
+        clickUpgradeBtn.disabled =
+            true;
+
+    } else {
+
+        clickUpgradeBtn.textContent =
+            Number(clickCost)
+                .toLocaleString(
+                    "ru-RU"
                 );
 
-        }
+        clickUpgradeBtn.disabled =
+            Number(state.balance || 0) <
+            Number(clickCost);
+    }
 
 
-        /* BRIGHTNESS */
+    /*
+        STAMINA UPGRADE
+    */
+
+    const staminaLevel =
+        state.stamina_level || 1;
+
+    staminaLevelText.textContent =
+        `Уровень ${staminaLevel} · макс ${staminaMax}`;
+
+
+    const staminaCost =
+        state.stamina_upgrade_cost;
+
+
+    if (
+        staminaCost === -1 ||
+        staminaCost === null ||
+        staminaCost === undefined
+    ) {
+
+        staminaUpgradeBtn.textContent =
+            "MAX";
+
+        staminaUpgradeBtn.disabled =
+            true;
+
+    } else {
+
+        staminaUpgradeBtn.textContent =
+            Number(staminaCost)
+                .toLocaleString(
+                    "ru-RU"
+                );
+
+        staminaUpgradeBtn.disabled =
+            Number(state.balance || 0) <
+            Number(staminaCost);
+    }
+
+
+    /*
+        PRESTIGE
+    */
+
+    if (
+        state.is_final_object
+    ) {
+
+        prestigeBtn.textContent =
+            "🌟 Это финальный объект!";
+
+        prestigeBtn.disabled =
+            true;
+
+    } else if (
+        state.can_prestige
+    ) {
+
+        prestigeBtn.textContent =
+            "🚀 Лететь дальше";
+
+        prestigeBtn.disabled =
+            false;
+
+    } else {
+
+        prestigeBtn.textContent =
+            "Набери прогресс для перелёта";
+
+        prestigeBtn.disabled =
+            true;
+    }
+
+
+    statusEl.textContent =
+        `ID: ${userId} · Перелётов: ${state.prestige_count || 0}`;
+
+
+    updateObjectVisual();
+
+    renderDailyFromState();
+}
+
+
+/* =========================================================
+   LOAD STATE
+========================================================= */
+
+async function loadState() {
+
+    try {
+
+        state =
+            await api(
+                `/api/state/${userId}`
+            );
+
+        localStamina =
+            Number(
+                state.stamina || 0
+            );
+
+        renderState();
+
+    } catch (e) {
+
+        console.error(
+            "State:",
+            e
+        );
+
+        statusEl.textContent =
+            "Ошибка загрузки сервера";
+
+        showToast(
+            "Не удалось загрузить игру"
+        );
+    }
+}
+
+
+/* =========================================================
+   STAMINA REGEN
+========================================================= */
+
+setInterval(
+    () => {
+
+        if (!state)
+            return;
+
+        const max =
+            Number(
+                state.stamina_max || 0
+            );
 
         if (
-            state.object_category === 'star' ||
-            state.object_category === 'blackhole'
+            localStamina <
+            max
         ) {
 
-            const brightness =
-                0.65 +
-                (progressPct / 100) * 0.75;
+            /*
+                +2 стамины в секунду
+            */
 
-            objectImgEl.style.filter =
-                `brightness(${brightness})`;
-
-            objectAuraEl.style.filter =
-                `brightness(${brightness})`;
-
-        } else {
-
-            objectImgEl.style.filter =
-                'none';
-
-            objectAuraEl.style.filter =
-                'none';
-
-        }
-
-
-        /* AURA */
-
-        const auraScale =
-            0.9 +
-            (progressPct / 100) * 0.15;
-
-        objectAuraEl.style.transform =
-            `scale(${auraScale})`;
-    }
-
-
-    function getObjectTypeName(category) {
-
-        switch (category) {
-
-            case 'planet':
-                return 'PLANET';
-
-            case 'star':
-                return 'STAR';
-
-            case 'blackhole':
-                return 'BLACK HOLE';
-
-            default:
-                return 'CELESTIAL OBJECT';
-        }
-    }
-
-
-    /* =========================================================
-       RENDER STATE
-    ========================================================= */
-
-    function renderState() {
-
-        if (!state) {
-            return;
-        }
-
-
-        objectNameEl.textContent =
-            state.object_name;
-
-
-        balanceEl.textContent =
-            state.balance;
-
-
-        /* STAMINA */
-
-        const staminaPct =
-            Math.max(
-                0,
+            localStamina =
                 Math.min(
-                    100,
-                    (
-                        localStamina /
-                        state.stamina_max
-                    ) * 100
-                )
+                    max,
+                    localStamina +
+                    .4
+                );
+
+            renderState();
+        }
+
+    },
+    200
+);
+
+
+/* =========================================================
+   CLICK SEND
+========================================================= */
+
+function scheduleClickSend() {
+
+    clearTimeout(
+        sendTimeout
+    );
+
+    sendTimeout =
+        setTimeout(
+            sendClicks,
+            CLICK_SEND_DELAY
+        );
+}
+
+
+/* =========================================================
+   SEND CLICKS
+========================================================= */
+
+async function sendClicks() {
+
+    if (sendingClicks)
+        return;
+
+    const taps =
+        pendingTaps;
+
+    if (taps <= 0)
+        return;
+
+    pendingTaps = 0;
+
+    sendingClicks = true;
+
+    try {
+
+        const result =
+            await api(
+                "/api/click",
+                {
+                    method: "POST",
+
+                    body:
+                        JSON.stringify({
+                            user_id:
+                                userId,
+
+                            taps:
+                                taps
+                        })
+                }
             );
 
 
-        staminaFillEl.style.width =
-            staminaPct + '%';
+        state = result;
+
+        localStamina =
+            Number(
+                state.stamina || 0
+            );
+
+        renderState();
+
+    } catch (e) {
+
+        console.error(
+            "Click:",
+            e
+        );
+
+        /*
+            Если сервер временно
+            недоступен — возвращаем
+            клики обратно в очередь.
+        */
+
+        pendingTaps += taps;
+
+        showToast(
+            "Ошибка синхронизации"
+        );
+
+    } finally {
+
+        sendingClicks = false;
+
+        if (
+            pendingTaps > 0
+        ) {
+            scheduleClickSend();
+        }
+    }
+}
 
 
-        staminaTextEl.textContent =
-            `${Math.floor(localStamina)}/${state.stamina_max}`;
+/* =========================================================
+   CLICK
+========================================================= */
+
+objectWrap.addEventListener(
+    "click",
+    (event) => {
+
+        if (!state)
+            return;
+
+        if (
+            localStamina < 1
+        ) {
+
+            showToast(
+                "⚡ Нет стамины"
+            );
+
+            return;
+        }
 
 
-        /* PROGRESS */
+        localStamina -= 1;
 
-        if (state.object_threshold) {
+        pendingTaps += 1;
 
-            const progressPct =
-                Math.min(
-                    100,
-                    (
-                        state.object_progress /
-                        state.object_threshold
-                    ) * 100
+
+        const multiplier =
+            Number(
+                state.prestige_multiplier ||
+                1
+            );
+
+        const power =
+            Number(
+                state.click_power ||
+                1
+            );
+
+        const earned =
+            Math.round(
+                power *
+                multiplier
+            );
+
+
+        /*
+            Локально показываем
+            баланс сразу.
+        */
+
+        const displayedBalance =
+            Number(
+                state.balance || 0
+            ) +
+            pendingTaps *
+            earned;
+
+        balanceEl.textContent =
+            displayedBalance
+                .toLocaleString(
+                    "ru-RU"
                 );
 
 
-            progressFillEl.style.width =
-                progressPct + '%';
+        showFloatText(
+            event.clientX,
+            event.clientY,
+            earned
+        );
 
 
-            progressTextEl.textContent =
-                `${state.object_progress}/${state.object_threshold}`;
+        haptic("light");
 
-        } else {
+        renderState();
 
-            progressFillEl.style.width =
-                '100%';
-
-            progressTextEl.textContent =
-                'Финал';
-
-        }
-
-
-        /* CLICK UPGRADE */
-
-        clickLevelTextEl.textContent =
-            `Уровень ${state.click_level} · +${state.click_power} монета`;
-
-
-        if (
-            state.click_upgrade_cost === -1
-        ) {
-
-            upgradeClickBtn.textContent =
-                'MAX';
-
-            upgradeClickBtn.disabled =
-                true;
-
-        } else {
-
-            upgradeClickBtn.textContent =
-                state.click_upgrade_cost;
-
-            upgradeClickBtn.disabled =
-                state.balance <
-                state.click_upgrade_cost;
-        }
-
-
-        /* STAMINA UPGRADE */
-
-        staminaLevelTextEl.textContent =
-            `Уровень ${state.stamina_level} · макс ${state.stamina_max}`;
-
-
-        if (
-            state.stamina_upgrade_cost === -1
-        ) {
-
-            upgradeStaminaBtn.textContent =
-                'MAX';
-
-            upgradeStaminaBtn.disabled =
-                true;
-
-        } else {
-
-            upgradeStaminaBtn.textContent =
-                state.stamina_upgrade_cost;
-
-            upgradeStaminaBtn.disabled =
-                state.balance <
-                state.stamina_upgrade_cost;
-        }
-
-
-        /* PRESTIGE */
-
-        if (state.is_final_object) {
-
-            prestigeBtn.textContent =
-                '🌟 Это финальный объект!';
-
-            prestigeBtn.disabled =
-                true;
-
-        } else if (state.can_prestige) {
-
-            prestigeBtn.textContent =
-                '🚀 Лететь дальше (+60% навсегда)';
-
-            prestigeBtn.disabled =
-                false;
-
-        } else {
-
-            prestigeBtn.textContent =
-                'Набери прогресс для перелёта';
-
-            prestigeBtn.disabled =
-                true;
-        }
-
-
-        /* DAILY */
-
-        const daily =
-            state.daily_status;
-
-
-        dailySubEl.textContent =
-            `Стрик: ${state.daily_streak} дн. · +${state.daily_next_amount} монет`;
-
-
-        if (daily.can_claim) {
-
-            dailyBtn.textContent =
-                'Забрать';
-
-            dailyBtn.disabled =
-                false;
-
-        } else {
-
-            dailyBtn.textContent =
-                `${daily.hours_until_next}ч`;
-
-            dailyBtn.disabled =
-                true;
-        }
-
-
-        updateObjectVisual();
+        scheduleClickSend();
     }
+);
 
 
-    /* =========================================================
-       LOAD STATE
-    ========================================================= */
+/* =========================================================
+   FLOAT TEXT
+========================================================= */
 
-    async function loadState() {
+function showFloatText(
+    x,
+    y,
+    amount
+) {
+
+    const el =
+        document.createElement(
+            "div"
+        );
+
+    el.className =
+        "float-text";
+
+    el.textContent =
+        "+" + amount;
+
+
+    el.style.left =
+        (x - 10) + "px";
+
+    el.style.top =
+        (y - 20) + "px";
+
+
+    document.body.appendChild(
+        el
+    );
+
+
+    setTimeout(
+        () => {
+            el.remove();
+        },
+        750
+    );
+}
+
+
+/* =========================================================
+   CLICK UPGRADE
+========================================================= */
+
+clickUpgradeBtn.addEventListener(
+    "click",
+    async () => {
 
         try {
 
-            const res =
-                await fetch(
-                    `${API_URL}/api/state/${userId}`
+            const result =
+                await api(
+                    "/api/upgrade/click",
+                    {
+                        method: "POST",
+
+                        body:
+                            JSON.stringify({
+                                user_id:
+                                    userId
+                            })
+                    }
                 );
 
-
-            if (!res.ok) {
-                throw new Error('State request failed');
-            }
-
-
-            state =
-                await res.json();
-
+            state = result;
 
             localStamina =
-                state.stamina;
-
-
-            statusEl.textContent =
-                `ID: ${userId} · Перелётов: ${state.prestige_count}`;
-
+                Number(
+                    state.stamina || 0
+                );
 
             renderState();
 
-        } catch (error) {
+            haptic("success");
 
-            console.error(error);
+            showToast(
+                "👆 Сила клика улучшена!"
+            );
 
-            statusEl.textContent =
-                'Ошибка загрузки сервера';
+        } catch (e) {
+
+            showToast(
+                "Не хватает монет"
+            );
         }
+    }
+);
+
+
+/* =========================================================
+   STAMINA UPGRADE
+========================================================= */
+
+staminaUpgradeBtn.addEventListener(
+    "click",
+    async () => {
+
+        try {
+
+            const result =
+                await api(
+                    "/api/upgrade/stamina",
+                    {
+                        method: "POST",
+
+                        body:
+                            JSON.stringify({
+                                user_id:
+                                    userId
+                            })
+                    }
+                );
+
+            state = result;
+
+            localStamina =
+                Number(
+                    state.stamina || 0
+                );
+
+            renderState();
+
+            haptic("success");
+
+            showToast(
+                "⚡ Стамина улучшена!"
+            );
+
+        } catch (e) {
+
+            showToast(
+                "Не хватает монет"
+            );
+        }
+    }
+);
+
+
+/* =========================================================
+   PRESTIGE
+========================================================= */
+
+prestigeBtn.addEventListener(
+    "click",
+    async () => {
+
+        if (
+            !state?.can_prestige
+        )
+            return;
+
+
+        try {
+
+            const result =
+                await api(
+                    "/api/prestige",
+                    {
+                        method: "POST",
+
+                        body:
+                            JSON.stringify({
+                                user_id:
+                                    userId
+                            })
+                    }
+                );
+
+
+            state = result;
+
+            currentObjectIndex = -1;
+
+            localStamina =
+                Number(
+                    state.stamina || 0
+                );
+
+            renderState();
+
+            haptic("success");
+
+            showToast(
+                "🚀 Новый объект!"
+            );
+
+        } catch (e) {
+
+            showToast(
+                "Перелёт пока недоступен"
+            );
+        }
+    }
+);
+
+
+/* =========================================================
+   DAILY
+========================================================= */
+
+function renderDailyFromState() {
+
+    if (!state)
+        return;
+
+
+    const daily =
+        state.daily_status ||
+        {};
+
+
+    const amount =
+        state.daily_next_amount ||
+        daily.next_amount ||
+        100;
+
+
+    dailyAmount.textContent =
+        "+" +
+        Number(amount)
+            .toLocaleString(
+                "ru-RU"
+            );
+
+
+    dailyStreak.textContent =
+        state.daily_streak ||
+        daily.streak ||
+        0;
+
+
+    if (
+        daily.can_claim
+    ) {
+
+        dailyBtn.textContent =
+            "Забрать";
+
+        dailyBtn.disabled =
+            false;
+
+        dailyStatus.textContent =
+            "🎁 Награда уже готова!";
+
+    } else {
+
+        const hours =
+            daily.hours_until_next ||
+            0;
+
+        dailyBtn.textContent =
+            `${hours}ч`;
+
+        dailyBtn.disabled =
+            true;
+
+        dailyStatus.textContent =
+            `Следующая награда через примерно ${hours} ч.`;
+    }
+}
+
+
+dailyBtn.addEventListener(
+    "click",
+    async () => {
+
+        if (
+            dailyBtn.disabled
+        )
+            return;
+
+
+        try {
+
+            const result =
+                await api(
+                    "/api/daily/claim",
+                    {
+                        method: "POST",
+
+                        body:
+                            JSON.stringify({
+                                user_id:
+                                    userId
+                            })
+                    }
+                );
+
+
+            state = result;
+
+            localStamina =
+                Number(
+                    state.stamina || 0
+                );
+
+            renderState();
+
+            haptic("success");
+
+            showToast(
+                "🎁 Награда получена!"
+            );
+
+        } catch (e) {
+
+            showToast(
+                "Награда пока недоступна"
+            );
+        }
+    }
+);
+
+
+/* =========================================================
+   REFERRALS
+========================================================= */
+
+function getStartParam() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    return (
+        params.get("startapp") ||
+        params.get("start") ||
+        tg?.initDataUnsafe
+            ?.start_param ||
+        null
+    );
+}
+
+
+async function registerReferral() {
+
+    const ref =
+        getStartParam();
+
+    if (!ref)
+        return;
+
+
+    /*
+        Backend сам проверит,
+        можно ли засчитать
+        приглашение.
+    */
+
+    try {
+
+        await api(
+            "/api/referral/register",
+            {
+                method: "POST",
+
+                body:
+                    JSON.stringify({
+                        user_id:
+                            userId,
+
+                        referrer_id:
+                            Number(ref) ||
+                            ref
+                    })
+            }
+        );
+
+    } catch (e) {
+
+        console.log(
+            "Referral registration:",
+            e
+        );
+    }
+}
+
+
+/* =========================================================
+   LOAD REFERRALS
+========================================================= */
+
+async function loadReferrals() {
+
+    try {
+
+        const data =
+            await api(
+                `/api/referral/${userId}`
+            );
+
+
+        const count =
+            data.referral_count ??
+            data.referrals_count ??
+            data.count ??
+            0;
+
+
+        referralCount.textContent =
+            Number(count)
+                .toLocaleString(
+                    "ru-RU"
+                );
+
+
+        const earned =
+            data.total_earned ??
+            data.referral_earnings ??
+            data.earned ??
+            0;
+
+
+        const weekly =
+            data.weekly_earned ??
+            data.weekly_income ??
+            0;
+
+
+        referralEarned.textContent =
+            Number(earned)
+                .toLocaleString(
+                    "ru-RU"
+                );
+
+
+        referralWeekly.textContent =
+            Number(weekly)
+                .toLocaleString(
+                    "ru-RU"
+                );
+
+
+        /*
+            Если backend отдаёт
+            готовую ссылку.
+        */
+
+        const link =
+            data.referral_link ||
+            data.link ||
+            data.invite_link;
+
+
+        if (link) {
+
+            referralLink.textContent =
+                link;
+
+        } else {
+
+            /*
+                Если backend отдаёт
+                referral_code.
+            */
+
+            const code =
+                data.referral_code ||
+                userId;
+
+            referralLink.textContent =
+                `Код приглашения: ${code}`;
+        }
+
+
+    } catch (e) {
+
+        console.error(
+            "Referral:",
+            e
+        );
+
+        referralCount.textContent =
+            "0";
+
+        referralLink.textContent =
+            "Ссылка будет доступна после загрузки";
     }
 
 
-    /* =========================================================
-       STAMINA REGEN
-    ========================================================= */
+    await loadReferralHistory();
+}
 
-    setInterval(() => {
 
-        if (
-            state &&
-            localStamina <
-            state.stamina_max
-        ) {
+/* =========================================================
+   REFERRAL HISTORY
+========================================================= */
 
-            localStamina =
-                Math.min(
-                    state.stamina_max,
-                    localStamina + 2 * 0.2
+async function loadReferralHistory() {
+
+    try {
+
+        const data =
+            await api(
+                `/api/referral/${userId}/history`
+            );
+
+
+        const list =
+            Array.isArray(data)
+                ? data
+                : (
+                    data.history ||
+                    data.referrals ||
+                    []
                 );
 
-            renderState();
+
+        if (!list.length) {
+
+            referralHistory.innerHTML =
+                `
+                <div class="empty">
+                    Пока никто не приглашён
+                </div>
+                `;
+
+            return;
         }
 
-    }, 200);
+
+        referralHistory.innerHTML =
+            list
+                .slice(0, 10)
+                .map(
+                    (item, index) => {
+
+                        const name =
+                            item.display_name ||
+                            item.username ||
+                            item.first_name ||
+                            `Игрок ${index + 1}`;
 
 
-    /* =========================================================
-       SEND CLICKS
-    ========================================================= */
-
-    function scheduleSend() {
-
-        clearTimeout(sendTimeout);
+                        const earned =
+                            item.earned ??
+                            item.total_earned ??
+                            0;
 
 
-        sendTimeout =
-            setTimeout(async () => {
+                        return `
+                        <div
+                            style="
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:center;
+                            padding:10px 0;
+                            border-bottom:
+                            1px solid
+                            rgba(255,255,255,.06);
+                            "
+                        >
 
-                const taps =
-                    pendingTaps;
+                            <div>
+
+                                <div
+                                    style="
+                                    font-size:12px;
+                                    font-weight:700;
+                                    "
+                                >
+                                    ${escapeHtml(name)}
+                                </div>
+
+                                <div
+                                    style="
+                                    margin-top:2px;
+                                    color:
+                                    rgba(255,255,255,.4);
+                                    font-size:10px;
+                                    "
+                                >
+                                    Реферал
+                                </div>
+
+                            </div>
+
+                            <strong
+                                style="
+                                color:#ffc15a;
+                                font-size:12px;
+                                "
+                            >
+                                +${Number(earned)
+                                    .toLocaleString("ru-RU")}
+                            </strong>
+
+                        </div>
+                        `;
+                    }
+                )
+                .join("");
 
 
-                pendingTaps = 0;
+    } catch (e) {
+
+        referralHistory.innerHTML =
+            `
+            <div class="empty">
+                История пока пуста
+            </div>
+            `;
+    }
+}
 
 
-                if (taps === 0) {
-                    return;
-                }
+/* =========================================================
+   LEADERBOARD
+========================================================= */
+
+async function loadLeaderboard() {
+
+    leaderList.innerHTML =
+        `
+        <div class="empty">
+            Загружаем таблицу...
+        </div>
+        `;
 
 
-                try {
+    try {
 
-                    const res =
-                        await fetch(
-                            `${API_URL}/api/click`,
-                            {
-                                method: 'POST',
+        const data =
+            await api(
+                "/api/leaderboard"
+            );
 
-                                headers: {
-                                    'Content-Type':
-                                        'application/json'
-                                },
 
-                                body:
-                                    JSON.stringify({
-                                        user_id: userId,
-                                        taps: taps
-                                    })
-                            }
+        const list =
+            Array.isArray(data)
+                ? data
+                : (
+                    data.leaderboard ||
+                    data.players ||
+                    data.items ||
+                    []
+                );
+
+
+        if (!list.length) {
+
+            leaderList.innerHTML =
+                `
+                <div class="empty">
+                    Лидерборд пока пуст
+                </div>
+                `;
+
+            return;
+        }
+
+
+        leaderList.innerHTML =
+            list
+                .slice(0, 50)
+                .map(
+                    (player, index) => {
+
+                        const id =
+                            player.user_id ??
+                            player.id;
+
+
+                        const name =
+                            player.display_name ||
+                            player.username ||
+                            player.first_name ||
+                            `Игрок ${index + 1}`;
+
+
+                        const score =
+                            player.balance ??
+                            player.coins ??
+                            player.score ??
+                            0;
+
+
+                        const rank =
+                            player.rank ??
+                            index + 1;
+
+
+                        const isMe =
+                            Number(id) ===
+                            Number(userId);
+
+
+                        let medal =
+                            rank === 1
+                                ? "🥇"
+                                : rank === 2
+                                ? "🥈"
+                                : rank === 3
+                                ? "🥉"
+                                : rank;
+
+
+                        return `
+                        <div
+                            class="
+                            leader-row
+                            ${isMe ? "me" : ""}
+                            "
+                        >
+
+                            <div class="rank">
+                                ${medal}
+                            </div>
+
+                            <div>
+
+                                <div
+                                    class="player-name"
+                                >
+                                    ${escapeHtml(name)}
+                                </div>
+
+                                <div
+                                    class="player-small"
+                                >
+                                    ${isMe ? "Это ты" : "Игрок"}
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="player-score"
+                            >
+                                ${Number(score)
+                                    .toLocaleString("ru-RU")}
+                            </div>
+
+                        </div>
+                        `;
+                    }
+                )
+                .join("");
+
+
+    } catch (e) {
+
+        console.error(
+            "Leaderboard:",
+            e
+        );
+
+        leaderList.innerHTML =
+            `
+            <div class="empty">
+                Не удалось загрузить лидерборд
+            </div>
+            `;
+    }
+
+
+    await loadMyRank();
+}
+
+
+/* =========================================================
+   MY RANK
+========================================================= */
+
+async function loadMyRank() {
+
+    try {
+
+        const data =
+            await api(
+                `/api/leaderboard/${userId}/rank`
+            );
+
+
+        const rank =
+            data.rank ??
+            data.position ??
+            data.place ??
+            "—";
+
+
+        myRank.textContent =
+            rank === "—"
+                ? "—"
+                : "#" + rank;
+
+
+    } catch (e) {
+
+        myRank.textContent =
+            "—";
+    }
+}
+
+
+/* =========================================================
+   COPY REFERRAL
+========================================================= */
+
+document
+    .getElementById(
+        "copy-referral-btn"
+    )
+    .addEventListener(
+        "click",
+        async () => {
+
+            const text =
+                referralLink.textContent
+                    .trim();
+
+
+            try {
+
+                await navigator
+                    .clipboard
+                    .writeText(text);
+
+                haptic("light");
+
+                showToast(
+                    "📋 Ссылка скопирована"
+                );
+
+            } catch (e) {
+
+                showToast(
+                    "Не удалось скопировать"
+                );
+            }
+        }
+    );
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".nav-btn"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const page =
+                        button.dataset.page;
+
+
+                    document
+                        .querySelectorAll(
+                            ".nav-btn"
+                        )
+                        .forEach(
+                            x =>
+                                x.classList
+                                    .remove(
+                                        "active"
+                                    )
                         );
 
 
-                    if (res.ok) {
-
-                        state =
-                            await res.json();
+                    button.classList
+                        .add("active");
 
 
-                        localStamina =
-                            state.stamina;
+                    document
+                        .querySelectorAll(
+                            ".page"
+                        )
+                        .forEach(
+                            x =>
+                                x.classList
+                                    .remove(
+                                        "active"
+                                    )
+                        );
 
 
-                        renderState();
+                    const target =
+                        document.getElementById(
+                            "page-" + page
+                        );
 
-                    } else {
 
-                        statusEl.textContent =
-                            'Ошибка клика';
+                    if (target) {
 
+                        target.classList
+                            .add("active");
                     }
 
-                } catch (error) {
 
-                    console.error(error);
+                    haptic("light");
 
-                    statusEl.textContent =
-                        'Ошибка синхронизации';
+
+                    /*
+                        Загружаем данные
+                        только когда
+                        открываем страницу.
+                    */
+
+                    if (
+                        page ===
+                        "referrals"
+                    ) {
+
+                        await loadReferrals();
+
+                    } else if (
+                        page ===
+                        "leaderboard"
+                    ) {
+
+                        await loadLeaderboard();
+
+                    } else if (
+                        page ===
+                        "rewards"
+                    ) {
+
+                        renderDailyFromState();
+                    }
                 }
-
-            }, 400);
-    }
-
-
-    /* =========================================================
-       FLOAT TEXT
-    ========================================================= */
-
-    function showFloatText(
-        x,
-        y,
-        amount
-    ) {
-
-        const el =
-            document.createElement('div');
-
-
-        el.className =
-            'float-text';
-
-
-        el.textContent =
-            '+' + amount;
-
-
-        el.style.left =
-            x + 'px';
-
-
-        el.style.top =
-            y + 'px';
-
-
-        document.body.appendChild(el);
-
-
-        setTimeout(() => {
-
-            el.remove();
-
-        }, 800);
-    }
-
-
-    /* =========================================================
-       PARTICLES
-    ========================================================= */
-
-    function createParticles(
-        x,
-        y
-    ) {
-
-        for (
-            let i = 0;
-            i < 5;
-            i++
-        ) {
-
-            const particle =
-                document.createElement('div');
-
-
-            particle.className =
-                'click-particle';
-
-
-            particle.style.left =
-                x + 'px';
-
-
-            particle.style.top =
-                y + 'px';
-
-
-            const angle =
-                Math.random() *
-                Math.PI *
-                2;
-
-
-            const distance =
-                20 +
-                Math.random() * 35;
-
-
-            particle.style.setProperty(
-                '--x',
-                `${Math.cos(angle) * distance}px`
             );
-
-
-            particle.style.setProperty(
-                '--y',
-                `${Math.sin(angle) * distance}px`
-            );
-
-
-            document.body.appendChild(
-                particle
-            );
-
-
-            setTimeout(() => {
-
-                particle.remove();
-
-            }, 500);
-        }
-    }
-
-
-    /* =========================================================
-       CLICK OBJECT
-    ========================================================= */
-
-    objectWrapEl.addEventListener(
-        'click',
-        (e) => {
-
-            if (
-                !state ||
-                localStamina < 1
-            ) {
-                return;
-            }
-
-
-            localStamina -= 1;
-
-
-            pendingTaps += 1;
-
-
-            const prestigeMult =
-                state.prestige_multiplier ||
-                1;
-
-
-            const earnedThisClick =
-                Math.round(
-                    state.click_power *
-                    prestigeMult
-                );
-
-
-            /*
-             * Локально показываем ожидаемый баланс.
-             * Сервер всё равно остаётся главным источником данных.
-             */
-
-            const temporaryBalance =
-                state.balance +
-                Math.round(
-                    pendingTaps *
-                    state.click_power *
-                    prestigeMult
-                );
-
-
-            balanceEl.textContent =
-                temporaryBalance;
-
-
-            /* ANIMATION */
-
-            objectWrapEl.classList.remove(
-                'hit'
-            );
-
-
-            void objectWrapEl.offsetWidth;
-
-
-            objectWrapEl.classList.add(
-                'hit'
-            );
-
-
-            balanceEl.classList.remove(
-                'bump'
-            );
-
-
-            void balanceEl.offsetWidth;
-
-
-            balanceEl.classList.add(
-                'bump'
-            );
-
-
-            setTimeout(() => {
-
-                balanceEl.classList.remove(
-                    'bump'
-                );
-
-            }, 130);
-
-
-            /* FLOAT TEXT */
-
-            showFloatText(
-                e.clientX - 10,
-                e.clientY - 20,
-                earnedThisClick
-            );
-
-
-            /* PARTICLES */
-
-            createParticles(
-                e.clientX,
-                e.clientY
-            );
-
-
-            renderState();
-
-
-            scheduleSend();
-
-
-            /* TELEGRAM HAPTIC */
-
-            try {
-
-                tg?.HapticFeedback?.impactOccurred(
-                    'light'
-                );
-
-            } catch (error) {}
         }
     );
 
 
-    /* =========================================================
-       CLICK UPGRADE
-    ========================================================= */
-
-    upgradeClickBtn.addEventListener(
-        'click',
-        async () => {
-
-            try {
-
-                upgradeClickBtn.disabled =
-                    true;
-
-
-                const res =
-                    await fetch(
-                        `${API_URL}/api/upgrade/click`,
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify({
-                                    user_id: userId
-                                })
-                        }
-                    );
-
-
-                if (res.ok) {
-
-                    state =
-                        await res.json();
-
-
-                    localStamina =
-                        state.stamina;
-
-
-                    renderState();
-
-
-                    tg?.HapticFeedback?.notificationOccurred(
-                        'success'
-                    );
-
-                } else {
-
-                    renderState();
-                }
-
-            } catch (error) {
-
-                console.error(error);
-
-                statusEl.textContent =
-                    'Ошибка улучшения';
-
-                renderState();
-            }
-        }
-    );
-
-
-    /* =========================================================
-       STAMINA UPGRADE
-    ========================================================= */
-
-    upgradeStaminaBtn.addEventListener(
-        'click',
-        async () => {
-
-            try {
-
-                upgradeStaminaBtn.disabled =
-                    true;
-
-
-                const res =
-                    await fetch(
-                        `${API_URL}/api/upgrade/stamina`,
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify({
-                                    user_id: userId
-                                })
-                        }
-                    );
-
-
-                if (res.ok) {
-
-                    state =
-                        await res.json();
-
-
-                    localStamina =
-                        state.stamina;
-
-
-                    renderState();
-
-
-                    tg?.HapticFeedback?.notificationOccurred(
-                        'success'
-                    );
-
-                } else {
-
-                    renderState();
-                }
-
-            } catch (error) {
-
-                console.error(error);
-
-                statusEl.textContent =
-                    'Ошибка улучшения';
-
-                renderState();
-            }
-        }
-    );
-
-
-    /* =========================================================
-       PRESTIGE
-    ========================================================= */
-
-    prestigeBtn.addEventListener(
-        'click',
-        async () => {
-
-            if (
-                !state ||
-                !state.can_prestige
-            ) {
-                return;
-            }
-
-
-            try {
-
-                prestigeBtn.disabled =
-                    true;
-
-
-                const res =
-                    await fetch(
-                        `${API_URL}/api/prestige`,
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify({
-                                    user_id: userId
-                                })
-                        }
-                    );
-
-
-                if (res.ok) {
-
-                    state =
-                        await res.json();
-
-
-                    localStamina =
-                        state.stamina;
-
-
-                    statusEl.textContent =
-                        `ID: ${userId} · Перелётов: ${state.prestige_count}`;
-
-
-                    renderState();
-
-
-                    tg?.HapticFeedback?.notificationOccurred(
-                        'success'
-                    );
-
-                } else {
-
-                    renderState();
-                }
-
-            } catch (error) {
-
-                console.error(error);
-
-                statusEl.textContent =
-                    'Ошибка перелёта';
-
-                renderState();
-            }
-        }
-    );
-
-
-    /* =========================================================
-       DAILY BONUS
-    ========================================================= */
-
-    dailyBtn.addEventListener(
-        'click',
-        async () => {
-
-            try {
-
-                dailyBtn.disabled =
-                    true;
-
-
-                const res =
-                    await fetch(
-                        `${API_URL}/api/daily/claim`,
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify({
-                                    user_id: userId
-                                })
-                        }
-                    );
-
-
-                if (res.ok) {
-
-                    state =
-                        await res.json();
-
-
-                    localStamina =
-                        state.stamina;
-
-
-                    renderState();
-
-
-                    tg?.HapticFeedback?.notificationOccurred(
-                        'success'
-                    );
-
-                } else {
-
-                    renderState();
-                }
-
-            } catch (error) {
-
-                console.error(error);
-
-                statusEl.textContent =
-                    'Ошибка получения бонуса';
-
-                renderState();
-            }
-        }
-    );
-
-
-    /* =========================================================
-       INIT
-    ========================================================= */
-
-    async function init() {
-
-        statusEl.textContent =
-            'Подключение к Sundered Star...';
-
-
-        await loadObjectsList();
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+async function init() {
+
+    try {
+
+        await loadObjects();
+
+        /*
+            Сначала регистрируем
+            реферала, если игрок
+            пришёл по ссылке.
+        */
+
+        await registerReferral();
+
+        /*
+            Потом получаем
+            актуальное состояние.
+        */
 
         await loadState();
 
+        /*
+            Начальные данные
+            для наград.
+        */
+
+        renderDailyFromState();
+
+        /*
+            Генерируем базовый
+            текст ссылки.
+            Backend при открытии
+            раздела попробует
+            заменить её готовой.
+        */
+
+        referralLink.textContent =
+            `ID приглашения: ${userId}`;
+
+    } catch (e) {
+
+        console.error(
+            "INIT:",
+            e
+        );
+
+    } finally {
+
+        loading.style.display =
+            "none";
     }
+}
 
 
-    init();
+init();
 
 </script>
 
 </body>
-</html>
+                           </html>
