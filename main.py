@@ -38,7 +38,6 @@ def get_db():
     conn.row_factory = sqlite3.Row
 
     try:
-        # Немного безопаснее при одновременных запросах.
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA busy_timeout=10000")
         yield conn
@@ -102,6 +101,18 @@ REFERRAL_PERCENT = 0.10
 
 # Выплата раз в 7 суток.
 REFERRAL_PERIOD = 7 * SECONDS_IN_DAY
+
+
+# -------------------------
+# LANGUAGES
+# -------------------------
+
+SUPPORTED_LANGUAGES = {
+    "ru",
+    "en",
+}
+
+DEFAULT_LANGUAGE = "ru"
 
 
 # ============================================================
@@ -236,9 +247,14 @@ CELESTIAL_OBJECTS = [
 # ============================================================
 
 def column_exists(conn, table_name: str, column_name: str) -> bool:
-    rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+    rows = conn.execute(
+        f"PRAGMA table_info({table_name})"
+    ).fetchall()
 
-    return any(row["name"] == column_name for row in rows)
+    return any(
+        row["name"] == column_name
+        for row in rows
+    )
 
 
 def add_column_if_missing(
@@ -247,7 +263,11 @@ def add_column_if_missing(
     column_name: str,
     column_definition: str,
 ):
-    if not column_exists(conn, table_name, column_name):
+    if not column_exists(
+        conn,
+        table_name,
+        column_name,
+    ):
         conn.execute(
             f"ALTER TABLE {table_name} "
             f"ADD COLUMN {column_name} {column_definition}"
@@ -294,7 +314,9 @@ def init_db():
 
                 total_click_earnings INTEGER NOT NULL DEFAULT 0,
 
-                created_at REAL NOT NULL DEFAULT 0
+                created_at REAL NOT NULL DEFAULT 0,
+
+                language TEXT NOT NULL DEFAULT 'ru'
             )
             """
         )
@@ -338,6 +360,24 @@ def init_db():
             "REAL NOT NULL DEFAULT 0",
         )
 
+        add_column_if_missing(
+            conn,
+            "users",
+            "language",
+            "TEXT NOT NULL DEFAULT 'ru'",
+        )
+
+        # На случай старой БД, где language мог оказаться NULL.
+        conn.execute(
+            """
+            UPDATE users
+            SET language = ?
+            WHERE language IS NULL
+               OR language NOT IN ('ru', 'en')
+            """,
+            (DEFAULT_LANGUAGE,),
+        )
+
         # ----------------------------------------------------
         # REFERRALS
         # ----------------------------------------------------
@@ -370,8 +410,6 @@ def init_db():
 
         # ----------------------------------------------------
         # REFERRAL PAYMENTS
-        #
-        # Нужна история выплат.
         # ----------------------------------------------------
 
         conn.execute(
@@ -450,30 +488,47 @@ def get_click_power(click_level: int) -> int:
     return click_level
 
 
-def get_click_upgrade_cost(current_level: int) -> int:
+def get_click_upgrade_cost(
+    current_level: int,
+) -> int:
+
     if current_level >= MAX_CLICK_LEVEL:
         return -1
 
     return math.ceil(
         BASE_CLICK_UPGRADE_COST
-        * (CLICK_UPGRADE_MULTIPLIER ** (current_level - 1))
+        * (
+            CLICK_UPGRADE_MULTIPLIER
+            ** (current_level - 1)
+        )
     )
 
 
-def get_stamina_max(stamina_level: int) -> int:
+def get_stamina_max(
+    stamina_level: int,
+) -> int:
+
     return (
         BASE_STAMINA_MAX
-        + (stamina_level - 1) * STAMINA_MAX_PER_LEVEL
+        + (
+            stamina_level - 1
+        ) * STAMINA_MAX_PER_LEVEL
     )
 
 
-def get_stamina_upgrade_cost(current_level: int) -> int:
+def get_stamina_upgrade_cost(
+    current_level: int,
+) -> int:
+
     if current_level >= MAX_STAMINA_LEVEL:
         return -1
 
     return math.ceil(
         BASE_STAMINA_UPGRADE_COST
-        * (STAMINA_UPGRADE_MULTIPLIER ** (current_level - 1))
+        * (
+            STAMINA_UPGRADE_MULTIPLIER
+            ** (current_level - 1)
+        )
     )
 
 
@@ -486,9 +541,15 @@ def calculate_current_stamina(
     if last_update <= 0:
         return float(stamina_max)
 
-    elapsed = max(0, time.time() - last_update)
+    elapsed = max(
+        0,
+        time.time() - last_update,
+    )
 
-    regenerated = elapsed * STAMINA_REGEN_PER_SEC
+    regenerated = (
+        elapsed
+        * STAMINA_REGEN_PER_SEC
+    )
 
     return min(
         float(stamina_max),
@@ -496,11 +557,21 @@ def calculate_current_stamina(
     )
 
 
-def get_prestige_multiplier(prestige_count: int) -> float:
-    return 1 + prestige_count * PRESTIGE_BOOST_PER_LEVEL
+def get_prestige_multiplier(
+    prestige_count: int,
+) -> float:
+
+    return (
+        1
+        + prestige_count
+        * PRESTIGE_BOOST_PER_LEVEL
+    )
 
 
-def get_daily_bonus_amount(streak: int) -> int:
+def get_daily_bonus_amount(
+    streak: int,
+) -> int:
+
     effective_day = min(
         max(streak, 1),
         DAILY_BONUS_MAX_STREAK_DAY,
@@ -508,7 +579,9 @@ def get_daily_bonus_amount(streak: int) -> int:
 
     return (
         DAILY_BONUS_BASE
-        + (effective_day - 1) * DAILY_BONUS_PER_DAY
+        + (
+            effective_day - 1
+        ) * DAILY_BONUS_PER_DAY
     )
 
 
@@ -535,7 +608,10 @@ def get_daily_status(
     if elapsed < SECONDS_IN_DAY:
 
         hours_left = math.ceil(
-            (SECONDS_IN_DAY - elapsed) / 3600
+            (
+                SECONDS_IN_DAY
+                - elapsed
+            ) / 3600
         )
 
         return {
@@ -567,6 +643,7 @@ def get_or_create_user(
     conn,
     user_id: int,
 ):
+
     row = conn.execute(
         """
         SELECT *
@@ -600,7 +677,8 @@ def get_or_create_user(
                 telegram_first_name,
                 telegram_last_name,
                 total_click_earnings,
-                created_at
+                created_at,
+                language
             )
             VALUES (
                 ?,
@@ -618,6 +696,7 @@ def get_or_create_user(
                 NULL,
                 NULL,
                 0,
+                ?,
                 ?
             )
             """,
@@ -626,6 +705,7 @@ def get_or_create_user(
                 stamina_max,
                 now,
                 now,
+                DEFAULT_LANGUAGE,
             ),
         )
 
@@ -642,13 +722,47 @@ def get_or_create_user(
 
     # Старые пользователи могли иметь created_at = 0.
     if row["created_at"] == 0:
+
         conn.execute(
             """
             UPDATE users
             SET created_at = ?
             WHERE user_id = ?
             """,
-            (time.time(), user_id),
+            (
+                time.time(),
+                user_id,
+            ),
+        )
+
+        conn.commit()
+
+        row = conn.execute(
+            """
+            SELECT *
+            FROM users
+            WHERE user_id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+
+    # Защита от некорректного языка.
+    if (
+        row["language"] is None
+        or row["language"]
+        not in SUPPORTED_LANGUAGES
+    ):
+
+        conn.execute(
+            """
+            UPDATE users
+            SET language = ?
+            WHERE user_id = ?
+            """,
+            (
+                DEFAULT_LANGUAGE,
+                user_id,
+            ),
         )
 
         conn.commit()
@@ -673,15 +787,6 @@ def settle_referral_for_referred(
     conn,
     referred_id: int,
 ):
-    """
-    Проверяет, прошло ли 7 суток с момента последней
-    реферальной выплаты.
-
-    Если прошло:
-        заработок реферала за период
-        × 10%
-        = награда пригласившему.
-    """
 
     referral = conn.execute(
         """
@@ -697,14 +802,19 @@ def settle_referral_for_referred(
 
     now = time.time()
 
-    last_payout_at = referral["last_payout_at"]
+    last_payout_at = (
+        referral["last_payout_at"]
+    )
 
-    # Для новой рефералки отсчёт начинается с момента
-    # регистрации реферала.
     if last_payout_at <= 0:
-        last_payout_at = referral["created_at"]
+        last_payout_at = (
+            referral["created_at"]
+        )
 
-    if now - last_payout_at < REFERRAL_PERIOD:
+    if (
+        now - last_payout_at
+        < REFERRAL_PERIOD
+    ):
         return 0
 
     referred = conn.execute(
@@ -719,9 +829,13 @@ def settle_referral_for_referred(
     if referred is None:
         return 0
 
-    total_earned = referred["total_click_earnings"]
+    total_earned = (
+        referred["total_click_earnings"]
+    )
 
-    baseline = referral["weekly_click_baseline"]
+    baseline = (
+        referral["weekly_click_baseline"]
+    )
 
     delta = max(
         0,
@@ -735,8 +849,6 @@ def settle_referral_for_referred(
     period_start = last_payout_at
     period_end = now
 
-    # Записываем выплату только если действительно
-    # есть что выплачивать.
     if reward > 0:
 
         conn.execute(
@@ -775,7 +887,6 @@ def settle_referral_for_referred(
             ),
         )
 
-    # В любом случае фиксируем новый baseline.
     conn.execute(
         """
         UPDATE referrals
@@ -802,9 +913,6 @@ def settle_all_referrals_for_referrer(
     conn,
     referrer_id: int,
 ):
-    """
-    Проверяем всех рефералов пользователя.
-    """
 
     referrals = conn.execute(
         """
@@ -818,9 +926,12 @@ def settle_all_referrals_for_referrer(
     total_reward = 0
 
     for referral in referrals:
-        total_reward += settle_referral_for_referred(
-            conn,
-            referral["referred_id"],
+
+        total_reward += (
+            settle_referral_for_referred(
+                conn,
+                referral["referred_id"],
+            )
         )
 
     return total_reward
@@ -865,17 +976,24 @@ def user_to_dict(
 ) -> dict:
 
     if conn is None:
+
         with get_db() as local_conn:
-            return user_to_dict(row, local_conn)
+
+            return user_to_dict(
+                row,
+                local_conn,
+            )
 
     stamina_max = get_stamina_max(
         row["stamina_level"]
     )
 
-    current_stamina = calculate_current_stamina(
-        row["stamina"],
-        row["last_stamina_update"],
-        stamina_max,
+    current_stamina = (
+        calculate_current_stamina(
+            row["stamina"],
+            row["last_stamina_update"],
+            stamina_max,
+        )
     )
 
     obj_index = max(
@@ -886,7 +1004,9 @@ def user_to_dict(
         ),
     )
 
-    current_object = CELESTIAL_OBJECTS[obj_index]
+    current_object = (
+        CELESTIAL_OBJECTS[obj_index]
+    )
 
     daily_status = get_daily_status(
         row["last_daily_claim"],
@@ -898,15 +1018,27 @@ def user_to_dict(
         row["user_id"],
     )
 
-    # Имя для лидерборда.
     if row["telegram_username"]:
-        display_name = "@" + row["telegram_username"]
+
+        display_name = (
+            "@"
+            + row["telegram_username"]
+        )
+
     elif row["telegram_first_name"]:
-        display_name = row["telegram_first_name"]
+
+        display_name = (
+            row["telegram_first_name"]
+        )
+
     else:
-        display_name = f"Исследователь #{row['user_id']}"
+
+        display_name = (
+            f"Исследователь #{row['user_id']}"
+        )
 
     return {
+
         # --------------------------------------------
         # USER
         # --------------------------------------------
@@ -915,11 +1047,27 @@ def user_to_dict(
 
         "username": row["telegram_username"],
 
-        "first_name": row["telegram_first_name"],
+        "first_name": row[
+            "telegram_first_name"
+        ],
 
-        "last_name": row["telegram_last_name"],
+        "last_name": row[
+            "telegram_last_name"
+        ],
 
         "display_name": display_name,
+
+        "language": (
+            row["language"]
+            if row["language"]
+            in SUPPORTED_LANGUAGES
+            else DEFAULT_LANGUAGE
+        ),
+
+        "supported_languages": [
+            "ru",
+            "en",
+        ],
 
         # --------------------------------------------
         # ECONOMY
@@ -931,31 +1079,43 @@ def user_to_dict(
         # CLICK
         # --------------------------------------------
 
-        "click_level": row["click_level"],
+        "click_level": row[
+            "click_level"
+        ],
 
         "click_power": get_click_power(
             row["click_level"]
         ),
 
-        "click_upgrade_cost": get_click_upgrade_cost(
-            row["click_level"]
+        "click_upgrade_cost": (
+            get_click_upgrade_cost(
+                row["click_level"]
+            )
         ),
 
         # --------------------------------------------
         # STAMINA
         # --------------------------------------------
 
-        "stamina": round(current_stamina),
+        "stamina": round(
+            current_stamina
+        ),
 
         "stamina_max": stamina_max,
 
-        "stamina_level": row["stamina_level"],
+        "stamina_level": row[
+            "stamina_level"
+        ],
 
-        "stamina_upgrade_cost": get_stamina_upgrade_cost(
-            row["stamina_level"]
+        "stamina_upgrade_cost": (
+            get_stamina_upgrade_cost(
+                row["stamina_level"]
+            )
         ),
 
-        "stamina_regen_per_sec": STAMINA_REGEN_PER_SEC,
+        "stamina_regen_per_sec": (
+            STAMINA_REGEN_PER_SEC
+        ),
 
         # --------------------------------------------
         # OBJECT
@@ -963,59 +1123,85 @@ def user_to_dict(
 
         "object_index": obj_index,
 
-        "object_name": current_object["name"],
+        "object_name": current_object[
+            "name"
+        ],
 
-        "object_category": current_object["category"],
+        "object_category": current_object[
+            "category"
+        ],
 
-        "object_image": current_object["image"],
+        "object_image": current_object[
+            "image"
+        ],
 
-        "object_progress": row["object_progress"],
+        "object_progress": row[
+            "object_progress"
+        ],
 
-        "object_threshold": current_object["threshold"],
+        "object_threshold": current_object[
+            "threshold"
+        ],
 
         # --------------------------------------------
         # PRESTIGE
         # --------------------------------------------
 
-        "prestige_count": row["prestige_count"],
+        "prestige_count": row[
+            "prestige_count"
+        ],
 
-        "prestige_multiplier": get_prestige_multiplier(
-            row["prestige_count"]
+        "prestige_multiplier": (
+            get_prestige_multiplier(
+                row["prestige_count"]
+            )
         ),
 
         "can_prestige": (
-            current_object["threshold"] is not None
+            current_object["threshold"]
+            is not None
             and row["object_progress"]
             >= current_object["threshold"]
         ),
 
         "is_final_object": (
-            current_object["threshold"] is None
+            current_object["threshold"]
+            is None
         ),
 
         # --------------------------------------------
         # DAILY
         # --------------------------------------------
 
-        "daily_streak": row["daily_streak"],
+        "daily_streak": row[
+            "daily_streak"
+        ],
 
         "daily_status": daily_status,
 
-        "daily_next_amount": get_daily_bonus_amount(
-            daily_status["next_streak"]
+        "daily_next_amount": (
+            get_daily_bonus_amount(
+                daily_status["next_streak"]
+            )
         ),
 
         # --------------------------------------------
         # REFERRALS
         # --------------------------------------------
 
-        "referral_count": referral_stats["count"],
+        "referral_count": (
+            referral_stats["count"]
+        ),
 
-        "referral_total_earned": referral_stats[
-            "total_earned"
-        ],
+        "referral_total_earned": (
+            referral_stats[
+                "total_earned"
+            ]
+        ),
 
-        "referral_bonus": REFERRAL_START_BONUS,
+        "referral_bonus": (
+            REFERRAL_START_BONUS
+        ),
 
         "referral_percent": int(
             REFERRAL_PERCENT * 100
@@ -1028,6 +1214,7 @@ def user_to_dict(
 # ============================================================
 
 class ClickRequest(BaseModel):
+
     user_id: int = Field(gt=0)
 
     taps: int = Field(
@@ -1038,10 +1225,12 @@ class ClickRequest(BaseModel):
 
 
 class UpgradeRequest(BaseModel):
+
     user_id: int = Field(gt=0)
 
 
 class UserProfileRequest(BaseModel):
+
     user_id: int = Field(gt=0)
 
     username: Optional[str] = None
@@ -1051,7 +1240,15 @@ class UserProfileRequest(BaseModel):
     last_name: Optional[str] = None
 
 
+class LanguageRequest(BaseModel):
+
+    user_id: int = Field(gt=0)
+
+    language: str
+
+
 class ReferralRegisterRequest(BaseModel):
+
     user_id: int = Field(gt=0)
 
     referrer_id: int = Field(gt=0)
@@ -1062,7 +1259,9 @@ class ReferralRegisterRequest(BaseModel):
 # ============================================================
 
 @app.get("/api/state/{user_id}")
-def get_state(user_id: int):
+def get_state(
+    user_id: int,
+):
 
     with get_db() as conn:
 
@@ -1071,8 +1270,6 @@ def get_state(user_id: int):
             user_id,
         )
 
-        # Если пользователю пора выплатить
-        # реферальные проценты — делаем это сейчас.
         settle_referral_for_referred(
             conn,
             user_id,
@@ -1149,6 +1346,66 @@ def update_profile(
 
 
 # ============================================================
+# API: LANGUAGE
+# ============================================================
+
+@app.post("/api/language")
+def update_language(
+    data: LanguageRequest,
+):
+
+    language = (
+        data.language
+        or ""
+    ).strip().lower()
+
+    if language not in SUPPORTED_LANGUAGES:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Неподдерживаемый язык. "
+                "Доступны: ru, en"
+            ),
+        )
+
+    with get_db() as conn:
+
+        get_or_create_user(
+            conn,
+            data.user_id,
+        )
+
+        conn.execute(
+            """
+            UPDATE users
+            SET language = ?
+            WHERE user_id = ?
+            """,
+            (
+                language,
+                data.user_id,
+            ),
+        )
+
+        conn.commit()
+
+        row = conn.execute(
+            """
+            SELECT *
+            FROM users
+            WHERE user_id = ?
+            """,
+            (data.user_id,),
+        ).fetchone()
+
+        return user_to_dict(
+            row,
+            conn,
+        )
+
+
+# ============================================================
 # API: CLICK
 # ============================================================
 
@@ -1168,18 +1425,23 @@ def click(
             row["stamina_level"]
         )
 
-        current_stamina = calculate_current_stamina(
-            row["stamina"],
-            row["last_stamina_update"],
-            stamina_max,
+        current_stamina = (
+            calculate_current_stamina(
+                row["stamina"],
+                row["last_stamina_update"],
+                stamina_max,
+            )
         )
 
         actual_taps = min(
             data.taps,
-            math.floor(current_stamina),
+            math.floor(
+                current_stamina
+            ),
         )
 
         if actual_taps <= 0:
+
             raise HTTPException(
                 status_code=400,
                 detail="Недостаточно стамины",
@@ -1189,8 +1451,10 @@ def click(
             row["click_level"]
         )
 
-        prestige_mult = get_prestige_multiplier(
-            row["prestige_count"]
+        prestige_mult = (
+            get_prestige_multiplier(
+                row["prestige_count"]
+            )
         )
 
         earned = round(
@@ -1200,21 +1464,9 @@ def click(
         )
 
         new_stamina = (
-            current_stamina - actual_taps
+            current_stamina
+            - actual_taps
         )
-
-        new_progress = (
-            row["object_progress"]
-            + actual_taps
-        )
-
-        # ----------------------------------------------------
-        # Основное обновление пользователя.
-        #
-        # total_click_earnings — это сумма именно заработка
-        # через клики. Именно от неё потом считается 10%
-        # реферальной награды.
-        # ----------------------------------------------------
 
         conn.execute(
             """
@@ -1253,7 +1505,9 @@ def click(
             conn,
         )
 
-        result["accepted_taps"] = actual_taps
+        result["accepted_taps"] = (
+            actual_taps
+        )
 
         result["earned"] = earned
 
@@ -1281,12 +1535,17 @@ def upgrade_click(
         )
 
         if cost == -1:
+
             raise HTTPException(
                 status_code=400,
-                detail="Достигнут максимальный уровень",
+                detail=(
+                    "Достигнут максимальный "
+                    "уровень"
+                ),
             )
 
         if row["balance"] < cost:
+
             raise HTTPException(
                 status_code=400,
                 detail="Недостаточно монет",
@@ -1344,12 +1603,17 @@ def upgrade_stamina(
         )
 
         if cost == -1:
+
             raise HTTPException(
                 status_code=400,
-                detail="Достигнут максимальный уровень",
+                detail=(
+                    "Достигнут максимальный "
+                    "уровень"
+                ),
             )
 
         if row["balance"] < cost:
+
             raise HTTPException(
                 status_code=400,
                 detail="Недостаточно монет",
@@ -1359,10 +1623,12 @@ def upgrade_stamina(
             row["stamina_level"]
         )
 
-        current_stamina = calculate_current_stamina(
-            row["stamina"],
-            row["last_stamina_update"],
-            old_max,
+        current_stamina = (
+            calculate_current_stamina(
+                row["stamina"],
+                row["last_stamina_update"],
+                old_max,
+            )
         )
 
         conn.execute(
@@ -1416,40 +1682,64 @@ def prestige(
             data.user_id,
         )
 
-        current_index = row["object_index"]
+        current_index = (
+            row["object_index"]
+        )
 
-        current_object = CELESTIAL_OBJECTS[
-            current_index
-        ]
+        current_object = (
+            CELESTIAL_OBJECTS[
+                current_index
+            ]
+        )
 
-        if current_object["threshold"] is None:
+        if current_object[
+            "threshold"
+        ] is None:
+
             raise HTTPException(
                 status_code=400,
-                detail="Это финальный объект, дальше лететь некуда",
+                detail=(
+                    "Это финальный объект, "
+                    "дальше лететь некуда"
+                ),
             )
 
         if (
             row["object_progress"]
             < current_object["threshold"]
         ):
+
             raise HTTPException(
                 status_code=400,
-                detail="Ещё не набран порог для перехода",
+                detail=(
+                    "Ещё не набран порог "
+                    "для перехода"
+                ),
             )
 
-        next_index = current_index + 1
+        next_index = (
+            current_index + 1
+        )
 
-        if next_index >= len(CELESTIAL_OBJECTS):
+        if next_index >= len(
+            CELESTIAL_OBJECTS
+        ):
+
             raise HTTPException(
                 status_code=400,
-                detail="Следующего объекта не существует",
+                detail=(
+                    "Следующего объекта "
+                    "не существует"
+                ),
             )
 
         new_prestige_count = (
             row["prestige_count"] + 1
         )
 
-        new_stamina = get_stamina_max(1)
+        new_stamina = (
+            get_stamina_max(1)
+        )
 
         conn.execute(
             """
@@ -1512,15 +1802,22 @@ def claim_daily(
         )
 
         if not status["can_claim"]:
+
             raise HTTPException(
                 status_code=400,
-                detail="Бонус уже забран сегодня",
+                detail=(
+                    "Бонус уже забран сегодня"
+                ),
             )
 
-        new_streak = status["next_streak"]
+        new_streak = (
+            status["next_streak"]
+        )
 
-        amount = get_daily_bonus_amount(
-            new_streak
+        amount = (
+            get_daily_bonus_amount(
+                new_streak
+            )
         )
 
         conn.execute(
@@ -1556,7 +1853,9 @@ def claim_daily(
             conn,
         )
 
-        result["claimed_amount"] = amount
+        result["claimed_amount"] = (
+            amount
+        )
 
         return result
 
@@ -1579,16 +1878,21 @@ def register_referral(
     data: ReferralRegisterRequest,
 ):
 
-    if data.user_id == data.referrer_id:
+    if (
+        data.user_id
+        == data.referrer_id
+    ):
+
         raise HTTPException(
             status_code=400,
-            detail="Нельзя пригласить самого себя",
+            detail=(
+                "Нельзя пригласить "
+                "самого себя"
+            ),
         )
 
     with get_db() as conn:
 
-        # Создаём обоих пользователей,
-        # если их ещё нет.
         get_or_create_user(
             conn,
             data.user_id,
@@ -1599,7 +1903,6 @@ def register_referral(
             data.referrer_id,
         )
 
-        # Проверяем, не существует ли уже реферал.
         existing = conn.execute(
             """
             SELECT *
@@ -1611,7 +1914,6 @@ def register_referral(
 
         if existing is not None:
 
-            # Реферал уже привязан.
             row = conn.execute(
                 """
                 SELECT *
@@ -1624,7 +1926,9 @@ def register_referral(
             return {
                 "success": True,
                 "already_registered": True,
-                "referrer_id": existing["referrer_id"],
+                "referrer_id": (
+                    existing["referrer_id"]
+                ),
                 "state": user_to_dict(
                     row,
                     conn,
@@ -1632,20 +1936,6 @@ def register_referral(
             }
 
         now = time.time()
-
-        # ----------------------------------------------------
-        # Важная защита:
-        # нельзя создавать реферала, если user_id
-        # уже является referrer'ом кого-то.
-        #
-        # Это не мешает обычной цепочке:
-        #
-        # A пригласил B
-        # B пригласил C
-        #
-        # B одновременно является рефералом A
-        # и реферером C.
-        # ----------------------------------------------------
 
         referrer = conn.execute(
             """
@@ -1657,14 +1947,14 @@ def register_referral(
         ).fetchone()
 
         if referrer is None:
+
             raise HTTPException(
                 status_code=404,
-                detail="Пригласивший пользователь не найден",
+                detail=(
+                    "Пригласивший "
+                    "пользователь не найден"
+                ),
             )
-
-        # ----------------------------------------------------
-        # Начальный бонус.
-        # ----------------------------------------------------
 
         conn.execute(
             """
@@ -1678,15 +1968,6 @@ def register_referral(
             ),
         )
 
-        # ----------------------------------------------------
-        # Создаём связь.
-        #
-        # baseline = сколько реферал уже заработал
-        # на момент регистрации.
-        #
-        # Обычно это 0.
-        # ----------------------------------------------------
-
         referred_row = conn.execute(
             """
             SELECT total_click_earnings
@@ -1696,7 +1977,11 @@ def register_referral(
             (data.user_id,),
         ).fetchone()
 
-        baseline = referred_row["total_click_earnings"]
+        baseline = (
+            referred_row[
+                "total_click_earnings"
+            ]
+        )
 
         conn.execute(
             """
@@ -1735,8 +2020,12 @@ def register_referral(
         return {
             "success": True,
             "already_registered": False,
-            "referrer_id": data.referrer_id,
-            "signup_bonus": REFERRAL_START_BONUS,
+            "referrer_id": (
+                data.referrer_id
+            ),
+            "signup_bonus": (
+                REFERRAL_START_BONUS
+            ),
             "state": user_to_dict(
                 row,
                 conn,
@@ -1760,7 +2049,6 @@ def referral_info(
             user_id,
         )
 
-        # Сначала пробуем провести выплаты.
         settle_referral_for_referred(
             conn,
             user_id,
@@ -1770,10 +2058,6 @@ def referral_info(
             conn,
             user_id,
         )
-
-        # ----------------------------------------------------
-        # Общая статистика
-        # ----------------------------------------------------
 
         referrals = conn.execute(
             """
@@ -1799,7 +2083,8 @@ def referral_info(
 
         total_earned = conn.execute(
             """
-            SELECT COALESCE(SUM(reward), 0) AS total
+            SELECT COALESCE(SUM(reward), 0)
+                AS total
             FROM referral_payments
             WHERE referrer_id = ?
             """,
@@ -1812,48 +2097,81 @@ def referral_info(
 
         for r in referrals:
 
-            last_payout = r["last_payout_at"]
+            last_payout = (
+                r["last_payout_at"]
+            )
 
             if last_payout <= 0:
-                last_payout = r["created_at"]
+                last_payout = (
+                    r["created_at"]
+                )
 
-            elapsed = now - last_payout
+            elapsed = (
+                now - last_payout
+            )
 
             seconds_until_payout = max(
                 0,
-                REFERRAL_PERIOD - elapsed,
+                REFERRAL_PERIOD
+                - elapsed,
             )
 
             days_until_payout = math.ceil(
-                seconds_until_payout / SECONDS_IN_DAY
+                seconds_until_payout
+                / SECONDS_IN_DAY
             )
 
             if r["telegram_username"]:
-                name = "@" + r["telegram_username"]
+
+                name = (
+                    "@"
+                    + r["telegram_username"]
+                )
+
             elif r["telegram_first_name"]:
-                name = r["telegram_first_name"]
+
+                name = (
+                    r["telegram_first_name"]
+                )
+
             else:
-                name = f"Исследователь #{r['referred_id']}"
+
+                name = (
+                    f"Исследователь "
+                    f"#{r['referred_id']}"
+                )
 
             result_referrals.append(
                 {
-                    "user_id": r["referred_id"],
+                    "user_id": r[
+                        "referred_id"
+                    ],
                     "name": name,
-                    "created_at": r["created_at"],
-                    "total_paid": r["total_paid"],
+                    "created_at": r[
+                        "created_at"
+                    ],
+                    "total_paid": r[
+                        "total_paid"
+                    ],
                     "total_click_earnings": r[
                         "total_click_earnings"
                     ],
-                    "object_index": r["object_index"],
+                    "object_index": r[
+                        "object_index"
+                    ],
                     "prestige_count": r[
                         "prestige_count"
                     ],
-                    "days_until_payout": days_until_payout,
+                    "days_until_payout": (
+                        days_until_payout
+                    ),
                 }
             )
 
         return {
-            "referral_bonus": REFERRAL_START_BONUS,
+            "referral_bonus": (
+                REFERRAL_START_BONUS
+            ),
             "referral_percent": int(
                 REFERRAL_PERCENT * 100
             ),
@@ -1862,7 +2180,9 @@ def referral_info(
                 result_referrals
             ),
             "total_earned": total_earned,
-            "referrals": result_referrals,
+            "referrals": (
+                result_referrals
+            ),
         }
 
 
@@ -1870,7 +2190,9 @@ def referral_info(
 # API: REFERRAL PAYMENTS HISTORY
 # ============================================================
 
-@app.get("/api/referral/{user_id}/history")
+@app.get(
+    "/api/referral/{user_id}/history"
+)
 def referral_history(
     user_id: int,
 ):
@@ -1904,11 +2226,24 @@ def referral_history(
         for row in rows:
 
             if row["telegram_username"]:
-                name = "@" + row["telegram_username"]
+
+                name = (
+                    "@"
+                    + row["telegram_username"]
+                )
+
             elif row["telegram_first_name"]:
-                name = row["telegram_first_name"]
+
+                name = (
+                    row["telegram_first_name"]
+                )
+
             else:
-                name = f"Исследователь #{row['referred_id']}"
+
+                name = (
+                    f"Исследователь "
+                    f"#{row['referred_id']}"
+                )
 
             result.append(
                 {
@@ -1920,7 +2255,9 @@ def referral_history(
                     "click_earnings": row[
                         "click_earnings"
                     ],
-                    "reward": row["reward"],
+                    "reward": row[
+                        "reward"
+                    ],
                     "created_at": row[
                         "created_at"
                     ],
@@ -2015,12 +2352,24 @@ def leaderboard(
         def format_name(row):
 
             if row["telegram_username"]:
-                return "@" + row["telegram_username"]
+
+                return (
+                    "@"
+                    + row[
+                        "telegram_username"
+                    ]
+                )
 
             if row["telegram_first_name"]:
-                return row["telegram_first_name"]
 
-            return f"Исследователь #{row['user_id']}"
+                return row[
+                    "telegram_first_name"
+                ]
+
+            return (
+                f"Исследователь "
+                f"#{row['user_id']}"
+            )
 
         def format_balance(rows):
 
@@ -2037,21 +2386,27 @@ def leaderboard(
                         "user_id": row[
                             "user_id"
                         ],
-                        "name": format_name(row),
+                        "name": format_name(
+                            row
+                        ),
                         "balance": row[
                             "balance"
                         ],
                         "object_index": row[
                             "object_index"
                         ],
-                        "object_name": CELESTIAL_OBJECTS[
-                            min(
-                                row["object_index"],
-                                len(
-                                    CELESTIAL_OBJECTS
-                                ) - 1,
-                            )
-                        ]["name"],
+                        "object_name": (
+                            CELESTIAL_OBJECTS[
+                                min(
+                                    row[
+                                        "object_index"
+                                    ],
+                                    len(
+                                        CELESTIAL_OBJECTS
+                                    ) - 1,
+                                )
+                            ]["name"]
+                        ),
                         "prestige_count": row[
                             "prestige_count"
                         ],
@@ -2076,15 +2431,18 @@ def leaderboard(
                     ) - 1,
                 )
 
-                obj = CELESTIAL_OBJECTS[
-                    object_index
-                ]
+                obj = (
+                    CELESTIAL_OBJECTS[
+                        object_index
+                    ]
+                )
 
                 threshold = obj[
                     "threshold"
                 ]
 
                 if threshold:
+
                     percent = min(
                         100,
                         round(
@@ -2097,7 +2455,9 @@ def leaderboard(
                             * 100
                         ),
                     )
+
                 else:
+
                     percent = 100
 
                 result.append(
@@ -2106,16 +2466,24 @@ def leaderboard(
                         "user_id": row[
                             "user_id"
                         ],
-                        "name": format_name(row),
-                        "object_index": object_index,
+                        "name": format_name(
+                            row
+                        ),
+                        "object_index": (
+                            object_index
+                        ),
                         "object_name": obj[
                             "name"
                         ],
                         "object_progress": row[
                             "object_progress"
                         ],
-                        "object_threshold": threshold,
-                        "progress_percent": percent,
+                        "object_threshold": (
+                            threshold
+                        ),
+                        "progress_percent": (
+                            percent
+                        ),
                         "prestige_count": row[
                             "prestige_count"
                         ],
@@ -2146,14 +2514,20 @@ def leaderboard(
                         "user_id": row[
                             "user_id"
                         ],
-                        "name": format_name(row),
+                        "name": format_name(
+                            row
+                        ),
                         "prestige_count": row[
                             "prestige_count"
                         ],
-                        "object_index": object_index,
-                        "object_name": CELESTIAL_OBJECTS[
+                        "object_index": (
                             object_index
-                        ]["name"],
+                        ),
+                        "object_name": (
+                            CELESTIAL_OBJECTS[
+                                object_index
+                            ]["name"]
+                        ),
                     }
                 )
 
@@ -2176,7 +2550,9 @@ def leaderboard(
 # API: MY RANK
 # ============================================================
 
-@app.get("/api/leaderboard/{user_id}/rank")
+@app.get(
+    "/api/leaderboard/{user_id}/rank"
+)
 def my_leaderboard_rank(
     user_id: int,
 ):
@@ -2188,7 +2564,6 @@ def my_leaderboard_rank(
             user_id,
         )
 
-        # Баланс.
         balance_rank = (
             conn.execute(
                 """
@@ -2200,7 +2575,6 @@ def my_leaderboard_rank(
             ).fetchone()["rank"]
         )
 
-        # Престиж.
         prestige_rank = (
             conn.execute(
                 """
@@ -2208,11 +2582,12 @@ def my_leaderboard_rank(
                 FROM users
                 WHERE prestige_count > ?
                 """,
-                (user["prestige_count"],),
+                (
+                    user["prestige_count"],
+                ),
             ).fetchone()["rank"]
         )
 
-        # Объект + прогресс.
         progress_rank = (
             conn.execute(
                 """
@@ -2242,9 +2617,15 @@ def my_leaderboard_rank(
         )
 
         return {
-            "balance_rank": balance_rank,
-            "progress_rank": progress_rank,
-            "prestige_rank": prestige_rank,
+            "balance_rank": (
+                balance_rank
+            ),
+            "progress_rank": (
+                progress_rank
+            ),
+            "prestige_rank": (
+                prestige_rank
+            ),
         }
 
 
@@ -2254,13 +2635,16 @@ def my_leaderboard_rank(
 
 @app.get("/api/health")
 def health():
+
     return {
         "status": "ok",
         "service": "sundered-star",
         "objects": len(
             CELESTIAL_OBJECTS
         ),
-        "time": int(time.time()),
+        "time": int(
+            time.time()
+        ),
     }
 
 
@@ -2275,4 +2659,4 @@ app.mount(
         html=True,
     ),
     name="static",
-        )
+    )
