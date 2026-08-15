@@ -8,590 +8,732 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:#090812;color:#fff;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-body{overflow-x:hidden;padding-bottom:calc(82px + env(safe-area-inset-bottom))}
-button{font:inherit}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:#090812;
+  color:#fff;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif
+}
+
+body{
+  overflow-x:hidden;
+  padding-bottom:calc(82px + env(safe-area-inset-bottom))
+}
+
+button{
+  font:inherit
+}
 
 .app{
- width:100%;
- max-width:720px;
- margin:auto;
- min-height:100vh;
- padding:calc(10px + env(safe-area-inset-top)) 16px 24px
+  width:100%;
+  max-width:720px;
+  margin:auto;
+  min-height:100vh;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 24px
 }
 
 .topbar{
- display:flex;
- align-items:center;
- justify-content:space-between;
- margin-bottom:8px
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px
 }
 
 .brand{
- display:flex;
- align-items:center;
- gap:10px
+  display:flex;
+  align-items:center;
+  gap:10px
 }
 
 .topbar-actions{
- display:flex;
- align-items:center;
- gap:9px
+  display:flex;
+  align-items:center;
+  gap:9px
 }
 
 .settings-button{
- width:38px;
- height:38px;
- border:1px solid #ffffff12;
- border-radius:13px;
- background:#191827;
- color:#fff;
- font-size:17px;
- cursor:pointer
+  width:38px;
+  height:38px;
+  border:1px solid #ffffff12;
+  border-radius:13px;
+  background:#191827;
+  color:#fff;
+  font-size:17px;
+  cursor:pointer
 }
 
 .brand-icon{
- width:38px;
- height:38px;
- border-radius:13px;
- display:flex;
- align-items:center;
- justify-content:center;
- background:linear-gradient(135deg,#795cff,#b832ff);
- box-shadow:0 8px 28px #7b4bff59;
- font-size:20px
+  width:38px;
+  height:38px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#795cff,#b832ff);
+  box-shadow:0 8px 28px #7b4bff59;
+  font-size:20px
 }
 
-.brand-title{font-size:17px;font-weight:800}
-.brand-subtitle,.balance-label{color:#77758a}
-.brand-subtitle{margin-top:2px;font-size:11px}
-.balance-box{text-align:right}
-.balance-label{font-size:10px;text-transform:uppercase;letter-spacing:1.4px}
-.balance{margin-top:2px;font-size:22px;font-weight:900}
+.brand-title{
+  font-size:17px;
+  font-weight:800
+}
 
-.page{display:none;animation:pageIn .2s ease}
-.page.active{display:block}
+.brand-subtitle,
+.balance-label{
+  color:#77758a
+}
+
+.brand-subtitle{
+  margin-top:2px;
+  font-size:11px
+}
+
+.balance-box{
+  text-align:right
+}
+
+.balance-label{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1.4px
+}
+
+.balance{
+  margin-top:2px;
+  font-size:22px;
+  font-weight:900
+}
+
+.page{
+  display:none;
+  animation:pageIn .2s ease
+}
+
+.page.active{
+  display:block
+}
 
 @keyframes pageIn{
- from{opacity:0;transform:translateY(5px)}
- to{opacity:1;transform:none}
+  from{
+    opacity:0;
+    transform:translateY(5px)
+  }
+  to{
+    opacity:1;
+    transform:none
+  }
 }
 
-.object-title{text-align:center;margin-top:10px}
-.object-name{font-size:26px;font-weight:900}
+.object-title{
+  text-align:center;
+  margin-top:10px
+}
+
+.object-name{
+  font-size:26px;
+  font-weight:900
+}
+
 .object-category{
- margin-top:4px;
- color:#77758a;
- font-size:11px;
- text-transform:uppercase;
- letter-spacing:2px
+  margin-top:4px;
+  color:#77758a;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:2px
 }
 
 .click-zone{
- position:relative;
- width:min(84vw,410px);
- aspect-ratio:1;
- margin:20px auto 16px;
- display:flex;
- align-items:center;
- justify-content:center;
- cursor:pointer;
- touch-action:manipulation;
- user-select:none
+  position:relative;
+  width:min(84vw,410px);
+  aspect-ratio:1;
+  margin:20px auto 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  touch-action:manipulation;
+  user-select:none
 }
 
 .click-zone:before{
- content:"";
- position:absolute;
- inset:5%;
- border-radius:50%;
- background:radial-gradient(circle,#7753ff38,transparent 68%);
- filter:blur(12px)
+  content:"";
+  position:absolute;
+  inset:5%;
+  border-radius:50%;
+  background:radial-gradient(circle,#7753ff38,transparent 68%);
+  filter:blur(12px)
 }
 
 .planet{
- position:relative;
- width:82%;
- height:82%;
- object-fit:contain;
- z-index:2;
- pointer-events:none;
- filter:drop-shadow(0 20px 35px #00000073);
- transition:transform .06s
+  position:relative;
+  width:82%;
+  height:82%;
+  object-fit:contain;
+  z-index:2;
+  pointer-events:none;
+  filter:drop-shadow(0 20px 35px #00000073);
+  transition:transform .06s
 }
 
-.click-zone.pressed .planet{transform:scale(.96)}
+.click-zone.pressed .planet{
+  transform:scale(.96)
+}
 
 .tap-number{
- position:absolute;
- z-index:10;
- pointer-events:none;
- font-size:24px;
- font-weight:900;
- color:#fff;
- text-shadow:0 3px 15px #7856ffe6;
- animation:tapFloat .65s ease-out forwards
+  position:absolute;
+  z-index:10;
+  pointer-events:none;
+  font-size:24px;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 3px 15px #7856ffe6;
+  animation:tapFloat .65s ease-out forwards
 }
 
 @keyframes tapFloat{
- 0%{opacity:1;transform:translateY(0) scale(.85)}
- 100%{opacity:0;transform:translateY(-70px) scale(1.1)}
+  0%{
+    opacity:1;
+    transform:translateY(0) scale(.85)
+  }
+  100%{
+    opacity:0;
+    transform:translateY(-70px) scale(1.1)
+  }
 }
 
 .stat-card{
- background:linear-gradient(145deg,#1f1d33f2,#131222f2);
- border:1px solid #ffffff12;
- border-radius:20px;
- padding:15px;
- margin-bottom:12px
+  background:linear-gradient(145deg,#1f1d33f2,#131222f2);
+  border:1px solid #ffffff12;
+  border-radius:20px;
+  padding:15px;
+  margin-bottom:12px
 }
 
 .stat-row{
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:10px
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px
 }
 
-.stat-label{color:#aaa7ba;font-size:13px}
-.stat-value{font-size:13px;font-weight:800}
+.stat-label{
+  color:#aaa7ba;
+  font-size:13px
+}
+
+.stat-value{
+  font-size:13px;
+  font-weight:800
+}
 
 .progress-bar{
- height:8px;
- background:#29273b;
- border-radius:999px;
- overflow:hidden;
- margin-top:10px
+  height:8px;
+  background:#29273b;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:10px
 }
 
 .progress-fill{
- height:100%;
- width:0;
- border-radius:inherit;
- background:linear-gradient(90deg,#7255ff,#bb55ff);
- transition:width .2s
+  height:100%;
+  width:0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#7255ff,#bb55ff);
+  transition:width .2s
 }
 
 .stamina-fill{
- background:linear-gradient(90deg,#46a7ff,#69d0ff)
+  background:linear-gradient(90deg,#46a7ff,#69d0ff)
 }
 
-.primary-button,.secondary-button,.danger-button{
- width:100%;
- border:0;
- border-radius:16px;
- min-height:54px;
- padding:0 18px;
- font-weight:850;
- cursor:pointer;
- transition:transform .12s,opacity .12s
+.primary-button,
+.secondary-button,
+.danger-button{
+  width:100%;
+  border:0;
+  border-radius:16px;
+  min-height:54px;
+  padding:0 18px;
+  font-weight:850;
+  cursor:pointer;
+  transition:transform .12s,opacity .12s
 }
 
 .primary-button{
- color:#fff;
- background:linear-gradient(135deg,#7654ff,#ad38ff);
- box-shadow:0 10px 28px #7846ff38
+  color:#fff;
+  background:linear-gradient(135deg,#7654ff,#ad38ff);
+  box-shadow:0 10px 28px #7846ff38
 }
 
 .secondary-button{
- color:#fff;
- background:#29273b;
- border:1px solid #ffffff0f
+  color:#fff;
+  background:#29273b;
+  border:1px solid #ffffff0f
 }
 
 .danger-button{
- color:#fff;
- background:linear-gradient(135deg,#ff655f,#ff3e87)
+  color:#fff;
+  background:linear-gradient(135deg,#ff655f,#ff3e87)
 }
 
-button:active{transform:scale(.97)}
+button:active{
+  transform:scale(.97)
+}
+
 button:disabled{
- opacity:.45;
- cursor:default;
- transform:none
+  opacity:.45;
+  cursor:default;
+  transform:none
 }
 
 .section-title{
- margin:22px 3px 10px;
- color:#aaa7ba;
- font-size:12px;
- text-transform:uppercase;
- letter-spacing:1.4px;
- font-weight:800
+  margin:22px 3px 10px;
+  color:#aaa7ba;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1.4px;
+  font-weight:800
 }
 
-.daily-card,.hero-card{
- padding:18px;
- border-radius:21px;
- margin-bottom:12px
+.daily-card,
+.hero-card{
+  padding:18px;
+  border-radius:21px;
+  margin-bottom:12px
 }
 
 .daily-card{
- background:linear-gradient(145deg,#33251d,#241c1d);
- border:1px solid #ffb43c40
+  background:linear-gradient(145deg,#33251d,#241c1d);
+  border:1px solid #ffb43c40
 }
 
 .daily-head{
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:12px
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px
 }
 
-.daily-title{font-size:17px;font-weight:850}
-.daily-streak{color:#ffb340;font-size:12px;margin-top:4px}
-.daily-amount{font-size:23px;font-weight:950}
+.daily-title{
+  font-size:17px;
+  font-weight:850
+}
+
+.daily-streak{
+  color:#ffb340;
+  font-size:12px;
+  margin-top:4px
+}
+
+.daily-amount{
+  font-size:23px;
+  font-weight:950
+}
 
 .upgrade-card{
- display:flex;
- align-items:center;
- gap:13px;
- padding:15px;
- margin-bottom:10px;
- border-radius:19px;
- background:#191827;
- border:1px solid #ffffff12
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:19px;
+  background:#191827;
+  border:1px solid #ffffff12
 }
 
 .upgrade-icon{
- width:48px;
- height:48px;
- flex:0 0 48px;
- border-radius:15px;
- display:flex;
- align-items:center;
- justify-content:center;
- background:#27253a;
- font-size:23px
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#27253a;
+  font-size:23px
 }
 
-.upgrade-info{flex:1;min-width:0}
-.upgrade-name{font-weight:850;font-size:15px}
-.upgrade-desc{color:#888598;font-size:11px;margin-top:4px}
+.upgrade-info{
+  flex:1;
+  min-width:0
+}
+
+.upgrade-name{
+  font-weight:850;
+  font-size:15px
+}
+
+.upgrade-desc{
+  color:#888598;
+  font-size:11px;
+  margin-top:4px
+}
 
 .upgrade-button{
- min-width:76px;
- height:43px;
- border:0;
- border-radius:13px;
- background:#302e43;
- color:#fff;
- font-weight:850
+  min-width:76px;
+  height:43px;
+  border:0;
+  border-radius:13px;
+  background:#302e43;
+  color:#fff;
+  font-weight:850
 }
 
 .upgrade-button.can-buy{
- background:linear-gradient(135deg,#7654ff,#ad38ff);
- box-shadow:0 7px 20px #7846ff45
+  background:linear-gradient(135deg,#7654ff,#ad38ff);
+  box-shadow:0 7px 20px #7846ff45
 }
 
 .upgrade-button.maxed{
- background:#29273b;
- color:#77758a
+  background:#29273b;
+  color:#77758a
 }
 
 .hero-card{
- padding:22px;
- border-radius:24px;
- background:
- radial-gradient(circle at top right,#a848ff3d,transparent 45%),
- linear-gradient(145deg,#201936,#151322);
- border:1px solid #975eff33
+  padding:22px;
+  border-radius:24px;
+  background:
+    radial-gradient(circle at top right,#a848ff3d,transparent 45%),
+    linear-gradient(145deg,#201936,#151322);
+  border:1px solid #975eff33
 }
 
-.hero-title{font-size:22px;font-weight:950}
+.hero-title{
+  font-size:22px;
+  font-weight:950
+}
+
 .hero-text{
- color:#aaa7ba;
- font-size:13px;
- line-height:1.5;
- margin-top:7px
+  color:#aaa7ba;
+  font-size:13px;
+  line-height:1.5;
+  margin-top:7px
 }
 
 .ref-code-title{
- margin-top:18px;
- color:#817d91;
- font-size:10px;
- text-transform:uppercase;
- letter-spacing:1.3px
+  margin-top:18px;
+  color:#817d91;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1.3px
 }
 
 .ref-code{
- margin-top:7px;
- padding:15px;
- border-radius:15px;
- background:#0e0d18;
- border:1px solid #ffffff14;
- text-align:center;
- font-size:13px;
- font-weight:750;
- line-height:1.4;
- word-break:break-all;
- user-select:text
+  margin-top:7px;
+  padding:15px;
+  border-radius:15px;
+  background:#0e0d18;
+  border:1px solid #ffffff14;
+  text-align:center;
+  font-size:13px;
+  font-weight:750;
+  line-height:1.4;
+  word-break:break-all;
+  user-select:text
 }
 
-.ref-copy{margin-top:10px}
+.ref-copy{
+  margin-top:10px
+}
 
 .ref-stats{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
- margin-bottom:12px
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px
 }
 
 .ref-stat{
- background:#191827;
- border-radius:18px;
- padding:16px;
- border:1px solid #ffffff0f
+  background:#191827;
+  border-radius:18px;
+  padding:16px;
+  border:1px solid #ffffff0f
 }
 
-.ref-stat-value{font-size:23px;font-weight:950}
-.ref-stat-label{color:#858293;font-size:11px;margin-top:4px}
+.ref-stat-value{
+  font-size:23px;
+  font-weight:950
+}
+
+.ref-stat-label{
+  color:#858293;
+  font-size:11px;
+  margin-top:4px
+}
 
 .ref-item{
- padding:15px;
- border-radius:17px;
- background:#191827;
- border:1px solid #ffffff0f;
- margin-bottom:8px
+  padding:15px;
+  border-radius:17px;
+  background:#191827;
+  border:1px solid #ffffff0f;
+  margin-bottom:8px
 }
 
 .ref-item-top{
- display:flex;
- justify-content:space-between;
- gap:10px
+  display:flex;
+  justify-content:space-between;
+  gap:10px
 }
 
-.ref-name{font-weight:800}
-.ref-earned{color:#a77bff;font-weight:850}
-.ref-small{color:#858293;font-size:11px;margin-top:5px}
+.ref-name{
+  font-weight:800
+}
+
+.ref-earned{
+  color:#a77bff;
+  font-weight:850
+}
+
+.ref-small{
+  color:#858293;
+  font-size:11px;
+  margin-top:5px
+}
 
 .leader-item{
- display:flex;
- align-items:center;
- gap:11px;
- padding:13px;
- margin-bottom:8px;
- border-radius:17px;
- background:#191827;
- border:1px solid #ffffff0f
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:13px;
+  margin-bottom:8px;
+  border-radius:17px;
+  background:#191827;
+  border:1px solid #ffffff0f
 }
 
 .leader-rank{
- width:32px;
- text-align:center;
- font-size:14px;
- font-weight:950;
- color:#888598
+  width:32px;
+  text-align:center;
+  font-size:14px;
+  font-weight:950;
+  color:#888598
 }
 
-.leader-info{flex:1;min-width:0}
+.leader-info{
+  flex:1;
+  min-width:0
+}
+
 .leader-name{
- font-size:13px;
- font-weight:850;
- overflow:hidden;
- text-overflow:ellipsis;
- white-space:nowrap
+  font-size:13px;
+  font-weight:850;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
 }
 
 .leader-sub{
- color:#777487;
- font-size:10px;
- margin-top:3px
+  color:#777487;
+  font-size:10px;
+  margin-top:3px
 }
 
 .leader-value{
- text-align:right;
- font-size:13px;
- font-weight:900
+  text-align:right;
+  font-size:13px;
+  font-weight:900
 }
 
-.loading,.empty{
- padding:30px 10px;
- text-align:center;
- color:#777487
+.loading,
+.empty{
+  padding:30px 10px;
+  text-align:center;
+  color:#777487
 }
-
-/* LANGUAGE / SETTINGS */
 
 .language-overlay,
 .settings-overlay{
- position:fixed;
- inset:0;
- z-index:2000;
- display:none;
- align-items:center;
- justify-content:center;
- padding:22px;
- background:#090812f5;
- backdrop-filter:blur(14px)
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:#090812f5;
+  backdrop-filter:blur(14px)
 }
 
 .language-overlay.show,
 .settings-overlay.show{
- display:flex
+  display:flex
 }
 
 .language-card,
 .settings-card{
- width:min(430px,100%);
- padding:24px;
- border-radius:26px;
- background:linear-gradient(145deg,#211d36,#131121);
- border:1px solid #ffffff14;
- box-shadow:0 25px 80px #00000080
+  width:min(430px,100%);
+  padding:24px;
+  border-radius:26px;
+  background:linear-gradient(145deg,#211d36,#131121);
+  border:1px solid #ffffff14;
+  box-shadow:0 25px 80px #00000080
 }
 
 .language-icon{
- text-align:center;
- font-size:34px;
- margin-bottom:10px
+  text-align:center;
+  font-size:34px;
+  margin-bottom:10px
 }
 
 .language-title{
- text-align:center;
- font-size:23px;
- font-weight:950
+  text-align:center;
+  font-size:23px;
+  font-weight:950
 }
 
 .language-text{
- text-align:center;
- color:#aaa7ba;
- font-size:13px;
- margin:8px 0 20px
+  text-align:center;
+  color:#aaa7ba;
+  font-size:13px;
+  margin:8px 0 20px
 }
 
 .language-options{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
 }
 
 .language-option{
- min-height:58px;
- border:1px solid #ffffff12;
- border-radius:16px;
- background:#191827;
- color:#fff;
- display:flex;
- align-items:center;
- justify-content:center;
- gap:9px;
- font-weight:850;
- cursor:pointer
+  min-height:58px;
+  border:1px solid #ffffff12;
+  border-radius:16px;
+  background:#191827;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  font-weight:850;
+  cursor:pointer
 }
 
-.language-option:hover{background:#29263d}
+.language-option:hover{
+  background:#29263d
+}
 
 .settings-head{
- display:flex;
- align-items:center;
- justify-content:space-between;
- margin-bottom:20px
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px
 }
 
 .settings-title{
- font-size:22px;
- font-weight:950
+  font-size:22px;
+  font-weight:950
 }
 
 .settings-close{
- width:36px;
- height:36px;
- border:0;
- border-radius:12px;
- background:#29263b;
- color:#fff
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:12px;
+  background:#29263b;
+  color:#fff
 }
 
 .settings-label{
- color:#858293;
- font-size:11px;
- text-transform:uppercase;
- letter-spacing:1.2px;
- margin-bottom:9px
+  color:#858293;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  margin-bottom:9px
 }
 
 .toast{
- position:fixed;
- z-index:1000;
- left:50%;
- bottom:calc(92px + env(safe-area-inset-bottom));
- transform:translate(-50%,20px);
- opacity:0;
- pointer-events:none;
- max-width:calc(100vw - 35px);
- padding:12px 16px;
- border-radius:14px;
- background:#29263a;
- border:1px solid #ffffff1a;
- box-shadow:0 15px 40px #00000059;
- font-size:12px;
- font-weight:750;
- text-align:center;
- transition:.2s
+  position:fixed;
+  z-index:1000;
+  left:50%;
+  bottom:calc(92px + env(safe-area-inset-bottom));
+  transform:translate(-50%,20px);
+  opacity:0;
+  pointer-events:none;
+  max-width:calc(100vw - 35px);
+  padding:12px 16px;
+  border-radius:14px;
+  background:#29263a;
+  border:1px solid #ffffff1a;
+  box-shadow:0 15px 40px #00000059;
+  font-size:12px;
+  font-weight:750;
+  text-align:center;
+  transition:.2s
 }
 
 .toast.show{
- opacity:1;
- transform:translate(-50%,0)
+  opacity:1;
+  transform:translate(-50%,0)
 }
 
 .bottom-nav{
- position:fixed;
- z-index:500;
- left:50%;
- bottom:0;
- transform:translateX(-50%);
- width:min(720px,100%);
- padding:8px 10px calc(8px + env(safe-area-inset-bottom));
- background:#0c0b15f0;
- backdrop-filter:blur(18px);
- border-top:1px solid #ffffff0f
+  position:fixed;
+  z-index:500;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:min(720px,100%);
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  background:#0c0b15f0;
+  backdrop-filter:blur(18px);
+  border-top:1px solid #ffffff0f
 }
 
 .nav-inner{
- display:grid;
- grid-template-columns:repeat(5,1fr);
- gap:5px
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px
 }
 
 .nav-button{
- border:0;
- min-height:56px;
- border-radius:16px;
- background:transparent;
- color:#706d80;
- display:flex;
- flex-direction:column;
- align-items:center;
- justify-content:center;
- gap:4px;
- font-size:10px;
- font-weight:750
+  border:0;
+  min-height:56px;
+  border-radius:16px;
+  background:transparent;
+  color:#706d80;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:750
 }
 
 .nav-icon{
- font-size:20px;
- line-height:20px
+  font-size:20px;
+  line-height:20px
 }
 
 .nav-button.active{
- color:#fff;
- background:#211e32
+  color:#fff;
+  background:#211e32
 }
 
 @media(max-width:380px){
- .app{
-  padding-left:12px;
-  padding-right:12px
- }
+  .app{
+    padding-left:12px;
+    padding-right:12px
+  }
 
- .object-name{font-size:23px}
+  .object-name{
+    font-size:23px
+  }
 
- .upgrade-card{padding:12px}
+  .upgrade-card{
+    padding:12px
+  }
 
- .upgrade-button{min-width:68px}
+  .upgrade-button{
+    min-width:68px
+  }
 }
 </style>
 </head>
@@ -600,1390 +742,939 @@ button:disabled{
 
 <div class="app">
 
-<div class="topbar">
-
- <div class="brand">
-
-  <div class="brand-icon">✦</div>
-
-  <div>
-   <div class="brand-title">Sundered Star</div>
-   <div class="brand-subtitle" id="user-name">Исследователь</div>
-  </div>
-
- </div>
-
- <div class="topbar-actions">
-
-  <button
-   class="settings-button"
-   id="settings-button"
-   aria-label="Настройки"
-  >⚙️</button>
-
-  <div class="balance-box">
-
-   <div class="balance-label" id="balance-label">
-    Баланс
-   </div>
-
-   <div class="balance" id="balance">
-    0
-   </div>
-
-  </div>
-
- </div>
-
-</div>
-
-
-<section class="page active" id="page-explore">
-
- <div class="object-title">
-
-  <div class="object-name" id="object-name">
-   Меркурий
-  </div>
-
-  <div class="object-category" id="object-category">
-   Планета
-  </div>
-
- </div>
-
-
- <div class="click-zone" id="click-zone">
-
-  <img
-   class="planet"
-   id="object-image"
-   src="/mercury.png"
-   alt="Космический объект"
-   draggable="false"
-  >
-
- </div>
-
-
- <div class="stat-card">
-
-  <div class="stat-row">
-
-   <div class="stat-label" id="progress-label">
-    🌌 Прогресс
-   </div>
-
-   <div class="stat-value" id="progress-text">
-    0 / 2500
-   </div>
-
-  </div>
-
-  <div class="progress-bar">
-   <div class="progress-fill" id="progress-fill"></div>
-  </div>
-
- </div>
-
-
- <div class="stat-card">
-
-  <div class="stat-row">
-
-   <div class="stat-label" id="stamina-label">
-    ⚡ Стамина
-   </div>
-
-   <div class="stat-value" id="stamina-text">
-    2000 / 2000
-   </div>
-
-  </div>
-
-  <div class="progress-bar">
-   <div
-    class="progress-fill stamina-fill"
-    id="stamina-fill"
-   ></div>
-  </div>
-
- </div>
-
-
- <button
-  class="primary-button"
-  id="prestige-button"
-  disabled
- >
-  Набери прогресс для перелёта
- </button>
-
-</section>
-
-
-<section class="page" id="page-leaderboard">
-
- <div
-  class="section-title"
-  id="leaderboard-title"
- >
-  🏆 Лидерборд · монеты
- </div>
-
- <div id="leaderboard-list">
-  <div class="loading">
-   Загрузка...
-  </div>
- </div>
-
-</section>
-
-
-<section class="page" id="page-bonuses">
-
- <div
-  class="section-title"
-  id="bonuses-title"
- >
-  🎁 Награды
- </div>
-
-
- <div class="daily-card">
-
-  <div class="daily-head">
-
-   <div>
-
-    <div
-     class="daily-title"
-     id="daily-title"
-    >
-     🎁 Ежедневный бонус
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">✦</div>
+      <div>
+        <div class="brand-title">Sundered Star</div>
+        <div class="brand-subtitle" id="user-name">Исследователь</div>
+      </div>
     </div>
 
-    <div
-     class="daily-streak"
-     id="daily-streak"
-    >
-     Серия: 0 дней
+    <div class="topbar-actions">
+      <button
+        class="settings-button"
+        id="settings-button"
+        aria-label="Настройки"
+      >⚙️</button>
+
+      <div class="balance-box">
+        <div class="balance-label" data-i18n="balance">Баланс</div>
+        <div class="balance" id="balance">0</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="page active" id="page-explore">
+
+    <div class="object-title">
+      <div class="object-name" id="object-name">Меркурий</div>
+      <div class="object-category" id="object-category">Планета</div>
     </div>
 
-   </div>
+    <div class="click-zone" id="click-zone">
+      <img
+        class="planet"
+        id="object-image"
+        src="/mercury.png"
+        alt="Космический объект"
+        draggable="false"
+      >
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-row">
+        <div class="stat-label" data-i18n="progress">
+          🌌 Прогресс
+        </div>
+        <div class="stat-value" id="progress-text">
+          0 / 2500
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          id="progress-fill"
+        ></div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-row">
+        <div class="stat-label" data-i18n="stamina">
+          ⚡ Стамина
+        </div>
+
+        <div class="stat-value" id="stamina-text">
+          2000 / 2000
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div
+          class="progress-fill stamina-fill"
+          id="stamina-fill"
+        ></div>
+      </div>
+    </div>
+
+    <button
+      class="primary-button"
+      id="prestige-button"
+      disabled
+    >
+      Набери прогресс для перелёта
+    </button>
+
+  </section>
+
+
+  <section class="page" id="page-leaderboard">
+
+    <div class="section-title" data-i18n="leaderboardTitle">
+      🏆 Лидерборд · монеты
+    </div>
+
+    <div id="leaderboard-list">
+      <div class="loading" data-i18n="loading">
+        Загрузка...
+      </div>
+    </div>
+
+  </section>
+
+
+  <section class="page" id="page-bonuses">
+
+    <div class="section-title" data-i18n="rewards">
+      🎁 Награды
+    </div>
+
+    <div class="daily-card">
 
-   <div
-    class="daily-amount"
-    id="daily-amount"
-   >
-    +250
-   </div>
+      <div class="daily-head">
 
-  </div>
+        <div>
+          <div class="daily-title" data-i18n="dailyTitle">
+            🎁 Ежедневный бонус
+          </div>
+
+          <div
+            class="daily-streak"
+            id="daily-streak"
+          >
+            Серия: 0 дней
+          </div>
+        </div>
+
+        <div
+          class="daily-amount"
+          id="daily-amount"
+        >
+          +250
+        </div>
 
+      </div>
 
-  <button
-   class="primary-button"
-   id="daily-button"
-   style="margin-top:14px"
-  >
-   Забрать
-  </button>
+      <button
+        class="primary-button"
+        id="daily-button"
+        style="margin-top:14px"
+      >
+        Забрать
+      </button>
 
- </div>
+    </div>
 
+    <div class="stat-card">
 
- <div class="stat-card">
+      <div class="stat-row">
 
-  <div class="stat-row">
+        <div class="stat-label" data-i18n="currentBalance">
+          💎 Текущий баланс
+        </div>
 
-   <div
-    class="stat-label"
-    id="bonus-balance-label"
-   >
-    💎 Всего заработано
-   </div>
+        <div
+          class="stat-value"
+          id="bonus-balance"
+        >
+          0
+        </div>
 
-   <div
-    class="stat-value"
-    id="bonus-balance"
-   >
-    0
-   </div>
+      </div>
 
-  </div>
+    </div>
 
- </div>
+  </section>
 
-</section>
 
+  <section class="page" id="page-upgrades">
 
-<section class="page" id="page-upgrades">
+    <div class="section-title" data-i18n="upgrades">
+      ⚙️ Улучшения
+    </div>
 
- <div
-  class="section-title"
-  id="upgrades-title"
- >
-  ⚙️ Улучшения
- </div>
+    <div class="upgrade-card">
 
+      <div class="upgrade-icon">👆</div>
 
- <div class="upgrade-card">
+      <div class="upgrade-info">
 
-  <div class="upgrade-icon">
-   👆
-  </div>
+        <div
+          class="upgrade-name"
+          data-i18n="clickPower"
+        >
+          Сила клика
+        </div>
 
-  <div class="upgrade-info">
+        <div
+          class="upgrade-desc"
+          id="click-upgrade-desc"
+        >
+          Уровень 1 · +1 монета за клик
+        </div>
 
-   <div
-    class="upgrade-name"
-    id="click-upgrade-name"
-   >
-    Сила клика
-   </div>
+      </div>
 
-   <div
-    class="upgrade-desc"
-    id="click-upgrade-desc"
-   >
-    Уровень 1 · +1 монета за клик
-   </div>
+      <button
+        class="upgrade-button"
+        id="click-upgrade-button"
+      >
+        75
+      </button>
 
-  </div>
+    </div>
 
-  <button
-   class="upgrade-button"
-   id="click-upgrade-button"
-  >
-   75
-  </button>
 
- </div>
+    <div class="upgrade-card">
 
+      <div class="upgrade-icon">⚡</div>
 
- <div class="upgrade-card">
+      <div class="upgrade-info">
 
-  <div class="upgrade-icon">
-   ⚡
-  </div>
+        <div
+          class="upgrade-name"
+          data-i18n="staminaCapacity"
+        >
+          Запас стамины
+        </div>
 
-  <div class="upgrade-info">
+        <div
+          class="upgrade-desc"
+          id="stamina-upgrade-desc"
+        >
+          Уровень 1 · макс. 2000
+        </div>
 
-   <div
-    class="upgrade-name"
-    id="stamina-upgrade-name"
-   >
-    Запас стамины
-   </div>
-
-   <div
-    class="upgrade-desc"
-    id="stamina-upgrade-desc"
-   >
-    Уровень 1 · макс. 2000
-   </div>
-
-  </div>
+      </div>
 
-  <button
-   class="upgrade-button"
-   id="stamina-upgrade-button"
-  >
-   150
-  </button>
-
- </div>
+      <button
+        class="upgrade-button"
+        id="stamina-upgrade-button"
+      >
+        150
+      </button>
 
-</section>
-
-
-<section class="page" id="page-referrals">
-
- <div class="hero-card">
-
-  <div
-   class="hero-title"
-   id="referrals-title"
-  >
-   👥 Рефералы
-  </div>
+    </div>
 
-  <div
-   class="hero-text"
-   id="referrals-text"
-  >
-   Приглашай исследователей и получай бонус за каждого нового участника. Дополнительно получай 7% от его заработка каждую неделю.
-  </div>
-
-  <div
-   class="ref-code-title"
-   id="ref-code-title"
-  >
-   Твоя ссылка приглашения
-  </div>
-
-  <div
-   class="ref-code"
-   id="ref-code"
-  >
-   —
-  </div>
-
-  <button
-   class="primary-button ref-copy"
-   id="copy-ref-code"
-  >
-   📋 Скопировать ссылку
-  </button>
-
- </div>
-
-
- <div class="ref-stats">
-
-  <div class="ref-stat">
-
-   <div
-    class="ref-stat-value"
-    id="ref-count"
-   >
-    0
-   </div>
+  </section>
 
-   <div
-    class="ref-stat-label"
-    id="ref-count-label"
-   >
-    Приглашено
-   </div>
-
-  </div>
-
-
-  <div class="ref-stat">
-
-   <div
-    class="ref-stat-value"
-    id="ref-earned"
-   >
-    0
-   </div>
-
-   <div
-    class="ref-stat-label"
-    id="ref-earned-label"
-   >
-    Получено монет
-   </div>
-
-  </div>
-
- </div>
-
-
- <div class="stat-card">
-
-  <div class="stat-row">
-
-   <div
-    class="stat-label"
-    id="ref-bonus-label"
-   >
-    🎁 Бонус за приглашение
-   </div>
-
-   <div
-    class="stat-value"
-    id="ref-bonus"
-   >
-    +1500
-   </div>
-
-  </div>
-
-
-  <div
-   class="stat-row"
-   style="margin-top:12px"
-  >
-
-   <div
-    class="stat-label"
-    id="ref-percent-label"
-   >
-    💎 Доля от заработка
-   </div>
-
-   <div
-    class="stat-value"
-    id="ref-percent"
-   >
-    7%
-   </div>
-
-  </div>
-
-
-  <div
-   class="stat-row"
-   style="margin-top:12px"
-  >
-
-   <div
-    class="stat-label"
-    id="ref-payout-label"
-   >
-    📅 Выплата
-   </div>
-
-   <div
-    class="stat-value"
-    id="ref-payout-value"
-   >
-    раз в 7 дней
-   </div>
-
-  </div>
-
- </div>
-
-
- <div
-  class="section-title"
-  id="my-referrals-title"
- >
-  👤 Твои рефералы
- </div>
-
- <div id="referral-list">
-
-  <div
-   class="empty"
-   id="referral-empty"
-  >
-   Пока никто не приглашён
-  </div>
-
- </div>
-
-</section>
+
+  <section class="page" id="page-referrals">
+
+    <div class="hero-card">
+
+      <div
+        class="hero-title"
+        data-i18n="referrals"
+      >
+        👥 Рефералы
+      </div>
+
+      <div
+        class="hero-text"
+        data-i18n="referralDescription"
+      >
+        Приглашай исследователей и получай бонус за каждого нового участника. Дополнительно получай 7% от его заработка каждую неделю.
+      </div>
+
+      <div
+        class="ref-code-title"
+        data-i18n="referralLink"
+      >
+        Твоя ссылка приглашения
+      </div>
+
+      <div
+        class="ref-code"
+        id="ref-code"
+      >
+        —
+      </div>
+
+      <button
+        class="primary-button ref-copy"
+        id="copy-ref-code"
+        data-i18n="copyLink"
+      >
+        📋 Скопировать ссылку
+      </button>
+
+    </div>
+
+
+    <div class="ref-stats">
+
+      <div class="ref-stat">
+
+        <div
+          class="ref-stat-value"
+          id="ref-count"
+        >
+          0
+        </div>
+
+        <div
+          class="ref-stat-label"
+          data-i18n="invited"
+        >
+          Приглашено
+        </div>
+
+      </div>
+
+
+      <div class="ref-stat">
+
+        <div
+          class="ref-stat-value"
+          id="ref-earned"
+        >
+          0
+        </div>
+
+        <div
+          class="ref-stat-label"
+          data-i18n="receivedCoins"
+        >
+          Получено монет
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-row">
+
+        <div
+          class="stat-label"
+          data-i18n="referralBonus"
+        >
+          🎁 Бонус за приглашение
+        </div>
+
+        <div
+          class="stat-value"
+          id="ref-bonus"
+        >
+          +1500
+        </div>
+
+      </div>
+
+
+      <div
+        class="stat-row"
+        style="margin-top:12px"
+      >
+
+        <div
+          class="stat-label"
+          data-i18n="earnShare"
+        >
+          💎 Доля от заработка
+        </div>
+
+        <div
+          class="stat-value"
+          id="ref-percent"
+        >
+          7%
+        </div>
+
+      </div>
+
+
+      <div
+        class="stat-row"
+        style="margin-top:12px"
+      >
+
+        <div
+          class="stat-label"
+          data-i18n="payout"
+        >
+          📅 Выплата
+        </div>
+
+        <div
+          class="stat-value"
+          data-i18n="onceWeek"
+        >
+          раз в 7 дней
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="section-title"
+      data-i18n="yourReferrals"
+    >
+      👤 Твои рефералы
+    </div>
+
+    <div id="referral-list">
+      <div
+        class="empty"
+        data-i18n="noReferrals"
+      >
+        Пока никто не приглашён
+      </div>
+    </div>
+
+  </section>
 
 </div>
 
 
 <nav class="bottom-nav">
 
- <div class="nav-inner">
+  <div class="nav-inner">
 
-  <button
-   class="nav-button active"
-   data-page="explore"
-  >
-   <span class="nav-icon">🌌</span>
-   <span id="nav-explore">Исследовать</span>
-  </button>
+    <button
+      class="nav-button active"
+      data-page="explore"
+    >
+      <span class="nav-icon">🌌</span>
+      <span data-i18n="explore">Исследовать</span>
+    </button>
 
-  <button
-   class="nav-button"
-   data-page="leaderboard"
-  >
-   <span class="nav-icon">🏆</span>
-   <span id="nav-leaderboard">Лидеры</span>
-  </button>
+    <button
+      class="nav-button"
+      data-page="leaderboard"
+    >
+      <span class="nav-icon">🏆</span>
+      <span data-i18n="leaders">Лидеры</span>
+    </button>
 
-  <button
-   class="nav-button"
-   data-page="bonuses"
-  >
-   <span class="nav-icon">🎁</span>
-   <span id="nav-bonuses">Бонусы</span>
-  </button>
+    <button
+      class="nav-button"
+      data-page="bonuses"
+    >
+      <span class="nav-icon">🎁</span>
+      <span data-i18n="bonuses">Бонусы</span>
+    </button>
 
-  <button
-   class="nav-button"
-   data-page="upgrades"
-  >
-   <span class="nav-icon">⚙️</span>
-   <span id="nav-upgrades">Улучшения</span>
-  </button>
+    <button
+      class="nav-button"
+      data-page="upgrades"
+    >
+      <span class="nav-icon">⚙️</span>
+      <span data-i18n="upgrades">Улучшения</span>
+    </button>
 
-  <button
-   class="nav-button"
-   data-page="referrals"
-  >
-   <span class="nav-icon">👥</span>
-   <span id="nav-referrals">Рефералы</span>
-  </button>
+    <button
+      class="nav-button"
+      data-page="referrals"
+    >
+      <span class="nav-icon">👥</span>
+      <span data-i18n="referrals">Рефералы</span>
+    </button>
 
- </div>
+  </div>
 
 </nav>
 
 
 <div
- class="toast"
- id="toast"
+  class="toast"
+  id="toast"
 >
- Готово
+  Готово
 </div>
 
 
-<!-- FIRST START LANGUAGE -->
-
 <div
- class="language-overlay"
- id="language-overlay"
+  class="language-overlay"
+  id="language-overlay"
 >
 
- <div class="language-card">
+  <div class="language-card">
 
-  <div class="language-icon">
-   ✦
+    <div class="language-icon">
+      ✦
+    </div>
+
+    <div
+      class="language-title"
+      id="language-title"
+    >
+      Добро пожаловать в Sundered Star
+    </div>
+
+    <div
+      class="language-text"
+      id="language-text"
+    >
+      Выберите язык игры
+    </div>
+
+    <div class="language-options">
+
+      <button
+        class="language-option"
+        data-lang="ru"
+      >
+        <span>🇷🇺</span>
+        <span>Русский</span>
+      </button>
+
+      <button
+        class="language-option"
+        data-lang="en"
+      >
+        <span>🇬🇧</span>
+        <span>English</span>
+      </button>
+
+    </div>
+
   </div>
-
-  <div
-   class="language-title"
-   id="language-title"
-  >
-   Добро пожаловать в Sundered Star
-  </div>
-
-  <div
-   class="language-text"
-   id="language-text"
-  >
-   Выберите язык игры
-  </div>
-
-  <div class="language-options">
-
-   <button
-    class="language-option"
-    data-lang="ru"
-   >
-    <span>🇷🇺</span>
-    <span>Русский</span>
-   </button>
-
-   <button
-    class="language-option"
-    data-lang="en"
-   >
-    <span>🇬🇧</span>
-    <span>English</span>
-   </button>
-
-  </div>
-
- </div>
 
 </div>
 
 
-<!-- SETTINGS -->
-
 <div
- class="settings-overlay"
- id="settings-overlay"
+  class="settings-overlay"
+  id="settings-overlay"
 >
 
- <div class="settings-card">
+  <div class="settings-card">
 
-  <div class="settings-head">
+    <div class="settings-head">
 
-   <div
-    class="settings-title"
-    id="settings-title"
-   >
-    Настройки
-   </div>
+      <div
+        class="settings-title"
+        id="settings-title"
+      >
+        Настройки
+      </div>
 
-   <button
-    class="settings-close"
-    id="settings-close"
-   >
-    ✕
-   </button>
+      <button
+        class="settings-close"
+        id="settings-close"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div
+      class="settings-label"
+      id="settings-language-label"
+    >
+      Язык
+    </div>
+
+    <div class="language-options">
+
+      <button
+        class="language-option"
+        data-settings-lang="ru"
+      >
+        <span>🇷🇺</span>
+        <span>Русский</span>
+      </button>
+
+      <button
+        class="language-option"
+        data-settings-lang="en"
+      >
+        <span>🇬🇧</span>
+        <span>English</span>
+      </button>
+
+    </div>
 
   </div>
-
-  <div
-   class="settings-label"
-   id="settings-language-label"
-  >
-   Язык
-  </div>
-
-  <div class="language-options">
-
-   <button
-    class="language-option"
-    data-settings-lang="ru"
-   >
-    <span>🇷🇺</span>
-    <span>Русский</span>
-   </button>
-
-   <button
-    class="language-option"
-    data-settings-lang="en"
-   >
-    <span>🇬🇧</span>
-    <span>English</span>
-   </button>
-
-  </div>
-
- </div>
 
 </div>
 
 
 <script>
 
-const tg=
- window.Telegram&&window.Telegram.WebApp
-  ?window.Telegram.WebApp
-  :null;
-
+const tg =
+  window.Telegram &&
+  window.Telegram.WebApp
+    ? window.Telegram.WebApp
+    : null;
 
 if(tg){
 
- tg.ready();
+  tg.ready();
+  tg.expand();
 
- tg.expand();
-
- try{
-
-  tg.setHeaderColor("#0b0a16");
-  tg.setBackgroundColor("#090812");
-
- }catch(e){}
+  try{
+    tg.setHeaderColor("#0b0a16");
+    tg.setBackgroundColor("#090812");
+  }catch(e){}
 
 }
 
 
-const API="";
-
+const API = "";
 
 function getUserId(){
 
- if(
-  tg&&
-  tg.initDataUnsafe&&
-  tg.initDataUnsafe.user&&
-  tg.initDataUnsafe.user.id
- ){
+  if(
+    tg &&
+    tg.initDataUnsafe &&
+    tg.initDataUnsafe.user &&
+    tg.initDataUnsafe.user.id
+  ){
+    return Number(
+      tg.initDataUnsafe.user.id
+    );
+  }
 
-  return Number(
-   tg.initDataUnsafe.user.id
-  );
+  const p =
+    new URLSearchParams(
+      location.search
+    );
 
- }
+  const id =
+    Number(
+      p.get("user_id")
+    );
 
+  if(
+    Number.isInteger(id) &&
+    id > 0
+  ){
+    return id;
+  }
 
- const p=
-  new URLSearchParams(
-   location.search
-  );
+  let x =
+    Number(
+      localStorage.getItem(
+        "sundered_star_test_user"
+      )
+    );
 
- const id=
-  Number(
-   p.get("user_id")
-  );
+  if(
+    !Number.isInteger(x) ||
+    x <= 0
+  ){
+    x =
+      Math.floor(
+        100000000 +
+        Math.random() * 800000000
+      );
 
- if(
-  Number.isInteger(id)&&
-  id>0
- ){
-  return id;
- }
+    localStorage.setItem(
+      "sundered_star_test_user",
+      String(x)
+    );
+  }
 
-
- let x=
-  Number(
-   localStorage.getItem(
-    "sundered_star_test_user"
-   )
-  );
-
-
- if(
-  !Number.isInteger(x)||
-  x<=0
- ){
-
-  x=
-   Math.floor(
-    100000000+
-    Math.random()*800000000
-   );
-
-  localStorage.setItem(
-   "sundered_star_test_user",
-   String(x)
-  );
-
- }
-
-
- return x;
-
+  return x;
 }
 
 
-const USER_ID=
- getUserId();
+const USER_ID = getUserId();
+const BOT_USERNAME = "SunderedStarBot";
 
-const BOT_USERNAME=
- "SunderedStarBot";
+let state = null;
+let leaderboardData = null;
+let referralData = null;
 
+let pendingTaps = 0;
+let clickTimer = null;
+let clickRequestRunning = false;
 
-let state=null;
-let leaderboardData=null;
-let referralData=null;
+let language = "ru";
 
-let pendingTaps=0;
-let clickTimer=null;
-let clickRequestRunning=false;
 
+const translations = {
 
-/* ============================================================
-   LANGUAGE
-   ============================================================ */
+  ru: {
 
-let language="ru";
+    balance:"Баланс",
+    progress:"🌌 Прогресс",
+    stamina:"⚡ Стамина",
 
+    leaderboardTitle:"🏆 Лидерборд · монеты",
+    loading:"Загрузка...",
 
-const translations={
+    rewards:"🎁 Награды",
+    dailyTitle:"🎁 Ежедневный бонус",
+    currentBalance:"💎 Текущий баланс",
 
- ru:{
+    upgrades:"⚙️ Улучшения",
+    clickPower:"Сила клика",
+    staminaCapacity:"Запас стамины",
 
-  balance:"Баланс",
+    referrals:"👥 Рефералы",
+    referralDescription:
+      "Приглашай исследователей и получай бонус за каждого нового участника. Дополнительно получай 7% от его заработка каждую неделю.",
 
-  planet:"Планета",
-  star:"Звезда",
-  blackhole:"Чёрная дыра",
+    referralLink:"Твоя ссылка приглашения",
+    copyLink:"📋 Скопировать ссылку",
 
-  progress:"🌌 Прогресс",
-  stamina:"⚡ Стамина",
+    invited:"Приглашено",
+    receivedCoins:"Получено монет",
 
-  fly:"Набери прогресс для перелёта",
-  final:"Финальный объект",
+    referralBonus:"🎁 Бонус за приглашение",
+    earnShare:"💎 Доля от заработка",
 
-  series:"Серия",
-  day:"день",
-  days:"дней",
-  days2:"дня",
+    payout:"📅 Выплата",
+    onceWeek:"раз в 7 дней",
 
-  claim:"Забрать",
-  in:"Через",
-  hours:"ч",
+    yourReferrals:"👤 Твои рефералы",
+    noReferrals:"Пока никто не приглашён",
 
-  level:"Уровень",
-  perClick:"монета за клик",
-  max:"макс.",
+    explore:"Исследовать",
+    leaders:"Лидеры",
+    bonuses:"Бонусы",
 
-  copied:"Ссылка скопирована",
-  copiedShort:"Скопировано",
+    claim:"Забрать",
+    in:"через",
+    hours:"ч.",
+    series:"Серия",
 
-  flight:"🚀 Перелёт выполнен",
+    level:"Уровень",
+    perClick:"монета за клик",
+    max:"макс.",
 
-  refActive:"👥 Реферальная связь активирована",
+    final:"Это финальный объект",
+    fly:"Набери прогресс для перелёта",
 
-  welcome:"Добро пожаловать в Sundered Star",
-  chooseLanguage:"Выберите язык игры",
+    flight:"🚀 Перелёт выполнен",
+    copied:"Ссылка скопирована",
+    copiedShort:"Скопировано",
 
-  settings:"Настройки",
-  language:"Язык",
+    refActive:"🎁 Реферал активирован",
 
-  leaderboard:"🏆 Лидерборд · монеты",
-  loadingLeaderboard:"Загрузка лидерборда...",
-  noLeaderboard:"Пока здесь никого нет",
-  unableLeaderboard:"Не удалось загрузить лидерборд",
+    planet:"Планета",
+    star:"Звезда",
+    blackhole:"Чёрная дыра",
 
-  bonuses:"🎁 Награды",
-  dailyBonus:"🎁 Ежедневный бонус",
-  totalEarned:"💎 Всего заработано",
+    days1:"день",
+    days2:"дня",
+    days5:"дней"
 
-  upgrades:"⚙️ Улучшения",
-  clickPower:"Сила клика",
-  staminaStorage:"Запас стамины",
+  },
 
-  referrals:"👥 Рефералы",
+  en: {
 
-  referralsText:
-   "Приглашай исследователей и получай бонус за каждого нового участника. Дополнительно получай 7% от его заработка каждую неделю.",
+    balance:"Balance",
+    progress:"🌌 Progress",
+    stamina:"⚡ Stamina",
 
-  referralLink:"Твоя ссылка приглашения",
-  copyLink:"📋 Скопировать ссылку",
+    leaderboardTitle:"🏆 Leaderboard · coins",
+    loading:"Loading...",
 
-  invited:"Приглашено",
-  coinsReceived:"Получено монет",
+    rewards:"🎁 Rewards",
+    dailyTitle:"🎁 Daily bonus",
+    currentBalance:"💎 Current balance",
 
-  referralBonus:"🎁 Бонус за приглашение",
-  earningShare:"💎 Доля от заработка",
-  payout:"📅 Выплата",
-  every7Days:"раз в 7 дней",
+    upgrades:"⚙️ Upgrades",
+    clickPower:"Click power",
+    staminaCapacity:"Stamina capacity",
 
-  myReferrals:"👤 Твои рефералы",
-  noReferrals:"Пока никто не приглашён",
+    referrals:"👥 Referrals",
+    referralDescription:
+      "Invite researchers and receive a bonus for every new participant. You also receive 7% of their earnings every week.",
 
-  earnedByClicks:"Заработано кликами",
-  payoutNow:"сейчас",
-  payoutIn:"через",
+    referralLink:"Your referral link",
+    copyLink:"📋 Copy link",
 
-  explore:"Исследовать",
-  leaders:"Лидеры",
-  rewards:"Бонусы",
-  upgradesNav:"Улучшения",
-  referralsNav:"Рефералы",
+    invited:"Invited",
+    receivedCoins:"Coins received",
 
-  tapUpgrade:"👆 Сила клика улучшена",
-  staminaUpgrade:"⚡ Запас стамины увеличен",
+    referralBonus:"🎁 Referral bonus",
+    earnShare:"💎 Earnings share",
 
-  coins:"монет",
+    payout:"📅 Payout",
+    onceWeek:"once every 7 days",
 
-  researcher:"Исследователь"
+    yourReferrals:"👤 Your referrals",
+    noReferrals:"Nobody invited yet",
 
- },
+    explore:"Explore",
+    leaders:"Leaders",
+    bonuses:"Bonuses",
 
- en:{
+    claim:"Claim",
+    in:"in",
+    hours:"h.",
+    series:"Streak",
 
-  balance:"Balance",
+    level:"Level",
+    perClick:"coin per click",
+    max:"max.",
 
-  planet:"Planet",
-  star:"Star",
-  blackhole:"Black Hole",
+    final:"Final object",
+    fly:"Reach the required progress",
 
-  progress:"🌌 Progress",
-  stamina:"⚡ Stamina",
+    flight:"🚀 Flight completed",
+    copied:"Link copied",
+    copiedShort:"Copied",
 
-  fly:"Reach the progress required to fly",
-  final:"Final object",
+    refActive:"🎁 Referral activated",
 
-  series:"Streak",
-  day:"day",
-  days:"days",
-  days2:"days",
+    planet:"Planet",
+    star:"Star",
+    blackhole:"Black hole",
 
-  claim:"Claim",
-  in:"In",
-  hours:"h",
+    days1:"day",
+    days2:"days",
+    days5:"days"
 
-  level:"Level",
-  perClick:"coin per click",
-  max:"max.",
-
-  copied:"Link copied",
-  copiedShort:"Copied",
-
-  flight:"🚀 Flight completed",
-
-  refActive:"👥 Referral connection activated",
-
-  welcome:"Welcome to Sundered Star",
-  chooseLanguage:"Choose your game language",
-
-  settings:"Settings",
-  language:"Language",
-
-  leaderboard:"🏆 Leaderboard · coins",
-  loadingLeaderboard:"Loading leaderboard...",
-  noLeaderboard:"No explorers here yet",
-  unableLeaderboard:"Could not load leaderboard",
-
-  bonuses:"🎁 Rewards",
-  dailyBonus:"🎁 Daily bonus",
-  totalEarned:"💎 Total earned",
-
-  upgrades:"⚙️ Upgrades",
-  clickPower:"Click power",
-  staminaStorage:"Stamina capacity",
-
-  referrals:"👥 Referrals",
-
-  referralsText:
-   "Invite explorers and get a bonus for every new participant. You also receive 7% of their click earnings every week.",
-
-  referralLink:"Your invitation link",
-  copyLink:"📋 Copy link",
-
-  invited:"Invited",
-  coinsReceived:"Coins received",
-
-  referralBonus:"🎁 Referral bonus",
-  earningShare:"💎 Earnings share",
-  payout:"📅 Payout",
-  every7Days:"every 7 days",
-
-  myReferrals:"👤 Your referrals",
-  noReferrals:"No one invited yet",
-
-  earnedByClicks:"Earned from clicks",
-  payoutNow:"now",
-  payoutIn:"in",
-
-  explore:"Explore",
-  leaders:"Leaders",
-  rewards:"Rewards",
-  upgradesNav:"Upgrades",
-  referralsNav:"Referrals",
-
-  tapUpgrade:"👆 Click power upgraded",
-  staminaUpgrade:"⚡ Stamina capacity increased",
-
-  coins:"coins",
-
-  researcher:"Explorer"
-
- }
+  }
 
 };
-
-
-/* ============================================================
-   OBJECT TRANSLATIONS
-   ============================================================ */
-
-const objectNames={
-
- ru:[
-  "Меркурий",
-  "Венера",
-  "Марс",
-  "Юпитер",
-  "Сатурн",
-  "Альфа Центавра",
-  "Проксима Центавра",
-  "Сириус",
-  "Бетельгейзе",
-  "Ригель",
-  "Вега",
-  "Белый карлик",
-  "Нейтронная звезда",
-  "Магнетар",
-  "Чёрная дыра",
-  "Сверхмассивная чёрная дыра",
-  "Квазар"
- ],
-
- en:[
-  "Mercury",
-  "Venus",
-  "Mars",
-  "Jupiter",
-  "Saturn",
-  "Alpha Centauri",
-  "Proxima Centauri",
-  "Sirius",
-  "Betelgeuse",
-  "Rigel",
-  "Vega",
-  "White Dwarf",
-  "Neutron Star",
-  "Magnetar",
-  "Black Hole",
-  "Supermassive Black Hole",
-  "Quasar"
- ]
-
-};
-
-
-function getObjectName(index){
-
- const i=
-  Number(index);
-
- const list=
-  objectNames[language]||
-  objectNames.ru;
-
- return(
-  list[i]||
-  objectNames.ru[i]||
-  "Unknown"
- );
-
-}
 
 
 function t(key){
 
- return(
-  translations[language] &&
-  translations[language][key]
- ) ||
- translations.ru[key] ||
- key;
+  return (
+    translations[language] &&
+    translations[language][key]
+  ) ||
+  translations.ru[key] ||
+  key;
 
 }
 
 
 function pluralDays(value){
 
- const n=
-  Number(value||0);
+  const n =
+    Math.abs(
+      Number(value) || 0
+    );
 
+  if(language === "en"){
+    return n === 1
+      ? t("days1")
+      : t("days5");
+  }
 
- if(language==="en"){
+  const mod10 = n % 10;
+  const mod100 = n % 100;
 
-  return n===1
-   ?t("day")
-   :t("days");
+  if(
+    mod10 === 1 &&
+    mod100 !== 11
+  ){
+    return t("days1");
+  }
 
- }
+  if(
+    mod10 >= 2 &&
+    mod10 <= 4 &&
+    (mod100 < 10 || mod100 >= 20)
+  ){
+    return t("days2");
+  }
 
-
- const mod10=
-  n%10;
-
- const mod100=
-  n%100;
-
-
- if(
-  mod10===1&&
-  mod100!==11
- ){
-  return "день";
- }
-
-
- if(
-  mod10>=2&&
-  mod10<=4&&
-  !(mod100>=12&&mod100<=14)
- ){
-  return "дня";
- }
-
-
- return "дней";
-
+  return t("days5");
 }
 
-
-/* ============================================================
-   LANGUAGE UI
-   ============================================================ */
 
 function applyLanguage(){
 
- document.documentElement.lang=
-  language;
-
-
- document.getElementById(
-  "balance-label"
- ).textContent=
-  t("balance");
-
-
- document.getElementById(
-  "progress-label"
- ).textContent=
-  t("progress");
-
-
- document.getElementById(
-  "stamina-label"
- ).textContent=
-  t("stamina");
-
-
- document.getElementById(
-  "leaderboard-title"
- ).textContent=
-  t("leaderboard");
-
-
- document.getElementById(
-  "bonuses-title"
- ).textContent=
-  t("bonuses");
-
-
- document.getElementById(
-  "daily-title"
- ).textContent=
-  t("dailyBonus");
-
-
- document.getElementById(
-  "bonus-balance-label"
- ).textContent=
-  t("totalEarned");
-
-
- document.getElementById(
-  "upgrades-title"
- ).textContent=
-  t("upgrades");
-
-
- document.getElementById(
-  "click-upgrade-name"
- ).textContent=
-  t("clickPower");
-
-
- document.getElementById(
-  "stamina-upgrade-name"
- ).textContent=
-  t("staminaStorage");
-
-
- document.getElementById(
-  "referrals-title"
- ).textContent=
-  t("referrals");
-
-
- document.getElementById(
-  "referrals-text"
- ).textContent=
-  t("referralsText");
-
-
- document.getElementById(
-  "ref-code-title"
- ).textContent=
-  t("referralLink");
-
-
- document.getElementById(
-  "copy-ref-code"
- ).textContent=
-  t("copyLink");
-
-
- document.getElementById(
-  "ref-count-label"
- ).textContent=
-  t("invited");
-
-
- document.getElementById(
-  "ref-earned-label"
- ).textContent=
-  t("coinsReceived");
-
-
- document.getElementById(
-  "ref-bonus-label"
- ).textContent=
-  t("referralBonus");
-
-
- document.getElementById(
-  "ref-percent-label"
- ).textContent=
-  t("earningShare");
-
-
- document.getElementById(
-  "ref-payout-label"
- ).textContent=
-  t("payout");
-
-
- document.getElementById(
-  "ref-payout-value"
- ).textContent=
-  t("every7Days");
-
-
- document.getElementById(
-  "my-referrals-title"
- ).textContent=
-  t("myReferrals");
-
-
- document.getElementById(
-  "referral-empty"
- ).textContent=
-  t("noReferrals");
-
-
- document.getElementById(
-  "nav-explore"
- ).textContent=
-  t("explore");
-
-
- document.getElementById(
-  "nav-leaderboard"
- ).textContent=
-  t("leaders");
-
-
- document.getElementById(
-  "nav-bonuses"
- ).textContent=
-  t("rewards");
-
-
- document.getElementById(
-  "nav-upgrades"
- ).textContent=
-  t("upgradesNav");
-
-
- document.getElementById(
-  "nav-referrals"
- ).textContent=
-  t("referralsNav");
-
-
- document.getElementById(
-  "language-title"
- ).textContent=
-  t("welcome");
-
-
- document.getElementById(
-  "language-text"
- ).textContent=
-  t("chooseLanguage");
-
-
- document.getElementById(
-  "settings-title"
- ).textContent=
-  t("settings");
-
-
- document.getElementById(
-  "settings-language-label"
- ).textContent=
-  t("language");
-
-
- if(state){
-  renderState();
- }
-
-}
-
-
-/* ============================================================
-   SAVE LANGUAGE
-   ============================================================ */
-
-async function saveLanguage(
- newLanguage,
- closeOverlay=true
-){
-
- if(
-  newLanguage!=="ru"&&
-  newLanguage!=="en"
- ){
-  return;
- }
-
-
- language=
-  newLanguage;
-
-
- localStorage.setItem(
-  "sundered_star_language",
-  language
- );
-
-
- applyLanguage();
-
-
- try{
-
-  await api(
-   "/api/language",
-   {
-    method:"POST",
-
-    body:JSON.stringify({
-     user_id:USER_ID,
-     language:language
-    })
-
-   }
-  );
-
- }catch(e){
-
-  console.warn(
-   "Language save failed",
-   e
-  );
-
- }
-
-
- if(closeOverlay){
+  document.documentElement.lang =
+    language;
 
   document
-   .getElementById(
-    "language-overlay"
-   )
-   .classList.remove("show");
+    .querySelectorAll("[data-i18n]")
+    .forEach(el => {
 
+      const key =
+        el.dataset.i18n;
 
-  document
-   .getElementById(
-    "settings-overlay"
-   )
-   .classList.remove("show");
+      if(
+        translations[language] &&
+        translations[language][key]
+      ){
+        el.textContent =
+          translations[language][key];
+      }
 
- }
+    });
+
+  document.getElementById(
+    "language-title"
+  ).textContent =
+    language === "en"
+      ? "Welcome to Sundered Star"
+      : "Добро пожаловать в Sundered Star";
+
+  document.getElementById(
+    "language-text"
+  ).textContent =
+    language === "en"
+      ? "Choose the game language"
+      : "Выберите язык игры";
+
+  document.getElementById(
+    "settings-title"
+  ).textContent =
+    language === "en"
+      ? "Settings"
+      : "Настройки";
+
+  document.getElementById(
+    "settings-language-label"
+  ).textContent =
+    language === "en"
+      ? "Language"
+      : "Язык";
+
+  if(state){
+    renderState();
+  }
 
 }
 
-
-function openSettings(){
-
- document
-  .getElementById(
-   "settings-overlay"
-  )
-  .classList.add("show");
-
-}
-
-
-function closeSettings(){
-
- document
-  .getElementById(
-   "settings-overlay"
-  )
-  .classList.remove("show");
-
-}
-
-
-/* ============================================================
-   COMMON
-   ============================================================ */
 
 function formatNumber(v){
 
- return Number(v||0).toLocaleString(
-  language==="en"
-   ?"en-US"
-   :"ru-RU"
- );
+  return Number(
+    v || 0
+  ).toLocaleString(
+    language === "en"
+      ? "en-US"
+      : "ru-RU"
+  );
 
 }
 
 
 function escapeHtml(v){
 
- return String(v??"")
+  return String(
+    v ?? ""
+  )
   .replaceAll("&","&amp;")
   .replaceAll("<","&lt;")
   .replaceAll(">","&gt;")
@@ -1993,1679 +1684,1606 @@ function escapeHtml(v){
 }
 
 
-function showToast(m){
+function showToast(message){
 
- const toast=
-  document.getElementById(
-   "toast"
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+  toast.textContent =
+    message;
+
+  toast.classList.add("show");
+
+  clearTimeout(
+    showToast.timer
   );
 
- toast.textContent=
-  m;
-
- toast.classList.add(
-  "show"
- );
-
- clearTimeout(
-  showToast.timer
- );
-
- showToast.timer=
-  setTimeout(
-   ()=>toast.classList.remove("show"),
-   1800
-  );
+  showToast.timer =
+    setTimeout(
+      () =>
+        toast.classList.remove("show"),
+      1800
+    );
 
 }
 
 
 async function api(
- path,
- options={}
+  path,
+  options = {}
 ){
 
- const r=
-  await fetch(
-   API+path,
-   {
-    ...options,
+  const response =
+    await fetch(
+      API + path,
+      {
+        ...options,
+        headers:{
+          "Content-Type":
+            "application/json",
+          ...(options.headers || {})
+        }
+      }
+    );
 
-    headers:{
-     "Content-Type":
-      "application/json",
+  let data = null;
 
-     ...(options.headers||{})
-    }
+  try{
+    data =
+      await response.json();
+  }catch(e){}
 
-   }
-  );
+  if(!response.ok){
 
+    throw new Error(
+      data &&
+      data.detail
+        ? data.detail
+        : (
+            language === "en"
+              ? "An error occurred"
+              : "Произошла ошибка"
+          )
+    );
 
- let d=null;
+  }
 
-
- try{
-
-  d=
-   await r.json();
-
- }catch(e){}
-
-
- if(!r.ok){
-
-  throw new Error(
-
-   d&&d.detail
-    ?d.detail
-    :(language==="en"
-      ?"An error occurred"
-      :"Произошла ошибка")
-
-  );
-
- }
-
-
- return d;
+  return data;
 
 }
 
 
 function referralLink(){
 
- return(
-  `https://t.me/${BOT_USERNAME}?startapp=ref_${USER_ID}`
- );
+  return (
+    `https://t.me/${BOT_USERNAME}` +
+    `?startapp=ref_${USER_ID}`
+  );
 
 }
 
 
-/* ============================================================
-   STATE
-   ============================================================ */
-
 function renderState(){
 
- if(!state){
-  return;
- }
+  if(!state)return;
 
-
- document.getElementById(
-  "balance"
- ).textContent=
-  formatNumber(
-   state.balance
-  );
-
-
- document.getElementById(
-  "bonus-balance"
- ).textContent=
-  formatNumber(
-   state.balance
-  );
-
-
- document.getElementById(
-  "user-name"
- ).textContent=
-  state.display_name||
-  t("researcher");
-
-
- document.getElementById(
-  "object-name"
- ).textContent=
-  getObjectName(
-   state.object_index
-  );
-
-
- document.getElementById(
-  "object-category"
- ).textContent=
-
-  state.object_category==="planet"
-   ?t("planet")
-
-   :state.object_category==="star"
-    ?t("star")
-
-    :t("blackhole");
-
-
- const img=
   document.getElementById(
-   "object-image"
-  );
+    "balance"
+  ).textContent =
+    formatNumber(
+      state.balance
+    );
 
-
- if(state.object_image){
-
-  img.src=
-   "/"+state.object_image;
-
- }
-
-
- const threshold=
-  Number(
-   state.object_threshold||0
-  );
-
-
- const progress=
-  Number(
-   state.object_progress||0
-  );
-
-
- document.getElementById(
-  "progress-text"
- ).textContent=
-
-  threshold
-
-   ?`${formatNumber(progress)} / ${formatNumber(threshold)}`
-
-   :`${formatNumber(progress)} · максимум`;
-
-
- document.getElementById(
-  "progress-fill"
- ).style.width=
-
-  threshold
-
-   ?Math.min(
-     100,
-     progress/threshold*100
-    )+"%"
-
-   :"100%";
-
-
- const stamina=
-  Number(
-   state.stamina||0
-  );
-
-
- const max=
-  Number(
-   state.stamina_max||1
-  );
-
-
- document.getElementById(
-  "stamina-text"
- ).textContent=
-  `${formatNumber(stamina)} / ${formatNumber(max)}`;
-
-
- document.getElementById(
-  "stamina-fill"
- ).style.width=
-  Math.min(
-   100,
-   stamina/max*100
-  )+"%";
-
-
- const pb=
   document.getElementById(
-   "prestige-button"
-  );
+    "bonus-balance"
+  ).textContent =
+    formatNumber(
+      state.balance
+    );
 
-
- if(state.can_prestige){
-
-  pb.disabled=false;
-
-  pb.textContent=
-   "🚀 "+
-   (
-    language==="en"
-     ?"Explore next object"
-     :"Исследовать следующий объект"
-   );
-
- }else if(state.is_final_object){
-
-  pb.disabled=true;
-
-  pb.textContent=
-   t("final");
-
- }else{
-
-  pb.disabled=true;
-
-  pb.textContent=
-   t("fly");
-
- }
-
-
- const daily=
-  state.daily_status||{};
-
-
- document.getElementById(
-  "daily-streak"
- ).textContent=
-  `${t("series")}: ${formatNumber(state.daily_streak)} ${pluralDays(state.daily_streak)}`;
-
-
- document.getElementById(
-  "daily-amount"
- ).textContent=
-  "+"+
-  formatNumber(
-   state.daily_next_amount
-  );
-
-
- const db=
   document.getElementById(
-   "daily-button"
+    "user-name"
+  ).textContent =
+    state.display_name ||
+    (
+      language === "en"
+        ? "Researcher"
+        : "Исследователь"
+    );
+
+
+  document.getElementById(
+    "object-name"
+  ).textContent =
+    state.object_name ||
+    (
+      language === "en"
+        ? "Unknown object"
+        : "Неизвестный объект"
+    );
+
+
+  document.getElementById(
+    "object-category"
+  ).textContent =
+    state.object_category === "planet"
+      ? t("planet")
+      : state.object_category === "star"
+        ? t("star")
+        : t("blackhole");
+
+
+  const image =
+    document.getElementById(
+      "object-image"
+    );
+
+  if(state.object_image){
+
+    image.src =
+      "/" +
+      state.object_image;
+
+  }
+
+
+  const threshold =
+    Number(
+      state.object_threshold || 0
+    );
+
+  const progress =
+    Number(
+      state.object_progress || 0
+    );
+
+
+  document.getElementById(
+    "progress-text"
+  ).textContent =
+    threshold
+      ? `${formatNumber(progress)} / ${formatNumber(threshold)}`
+      : `${formatNumber(progress)} · ${language === "en" ? "maximum" : "максимум"}`;
+
+
+  document.getElementById(
+    "progress-fill"
+  ).style.width =
+    threshold
+      ? Math.min(
+          100,
+          progress / threshold * 100
+        ) + "%"
+      : "100%";
+
+
+  const stamina =
+    Number(
+      state.stamina || 0
+    );
+
+  const maxStamina =
+    Number(
+      state.stamina_max || 1
+    );
+
+
+  document.getElementById(
+    "stamina-text"
+  ).textContent =
+    `${formatNumber(stamina)} / ${formatNumber(maxStamina)}`;
+
+
+  document.getElementById(
+    "stamina-fill"
+  ).style.width =
+    Math.min(
+      100,
+      stamina / maxStamina * 100
+    ) + "%";
+
+
+  const prestigeButton =
+    document.getElementById(
+      "prestige-button"
+    );
+
+
+  if(state.can_prestige){
+
+    prestigeButton.disabled =
+      false;
+
+    prestigeButton.textContent =
+      language === "en"
+        ? "🚀 Explore next object"
+        : "🚀 Исследовать следующий объект";
+
+  }else if(
+    state.is_final_object
+  ){
+
+    prestigeButton.disabled =
+      true;
+
+    prestigeButton.textContent =
+      t("final");
+
+  }else{
+
+    prestigeButton.disabled =
+      true;
+
+    prestigeButton.textContent =
+      t("fly");
+
+  }
+
+
+  const daily =
+    state.daily_status || {};
+
+
+  document.getElementById(
+    "daily-streak"
+  ).textContent =
+    `${t("series")}: ` +
+    `${formatNumber(state.daily_streak)} ` +
+    pluralDays(
+      state.daily_streak
+    );
+
+
+  document.getElementById(
+    "daily-amount"
+  ).textContent =
+    "+" +
+    formatNumber(
+      state.daily_next_amount
+    );
+
+
+  const dailyButton =
+    document.getElementById(
+      "daily-button"
+    );
+
+
+  dailyButton.disabled =
+    !daily.can_claim;
+
+
+  dailyButton.textContent =
+    daily.can_claim
+      ? t("claim")
+      : `${t("in")} ${daily.hours_until_next} ${t("hours")}`;
+
+
+  updateUpgrade(
+    "click",
+    state.click_upgrade_cost,
+    "click-upgrade-button"
+  );
+
+  updateUpgrade(
+    "stamina",
+    state.stamina_upgrade_cost,
+    "stamina-upgrade-button"
   );
 
 
- db.disabled=
-  !daily.can_claim;
+  document.getElementById(
+    "click-upgrade-desc"
+  ).textContent =
+    `${t("level")} ${state.click_level} · ` +
+    `+${state.click_power} ${t("perClick")}`;
 
 
- db.textContent=
-
-  daily.can_claim
-
-   ?t("claim")
-
-   :`${t("in")} ${daily.hours_until_next} ${t("hours")}`;
+  document.getElementById(
+    "stamina-upgrade-desc"
+  ).textContent =
+    `${t("level")} ${state.stamina_level} · ` +
+    `${t("max")} ${formatNumber(state.stamina_max)}`;
 
 
- updateUpgrade(
-  "click",
-  state.click_upgrade_cost,
-  "click-upgrade-button"
- );
+  document.getElementById(
+    "ref-code"
+  ).textContent =
+    referralLink();
 
 
- updateUpgrade(
-  "stamina",
-  state.stamina_upgrade_cost,
-  "stamina-upgrade-button"
- );
+  document.getElementById(
+    "ref-count"
+  ).textContent =
+    formatNumber(
+      state.referral_count
+    );
 
 
- document.getElementById(
-  "click-upgrade-desc"
- ).textContent=
-  `${t("level")} ${state.click_level} · +${state.click_power} ${t("perClick")}`;
+  document.getElementById(
+    "ref-earned"
+  ).textContent =
+    formatNumber(
+      state.referral_total_earned
+    );
 
 
- document.getElementById(
-  "stamina-upgrade-desc"
- ).textContent=
-  `${t("level")} ${state.stamina_level} · ${t("max")} ${formatNumber(state.stamina_max)}`;
+  document.getElementById(
+    "ref-bonus"
+  ).textContent =
+    "+" +
+    formatNumber(
+      state.referral_bonus
+    );
 
 
- document.getElementById(
-  "ref-code"
- ).textContent=
-  referralLink();
-
-
- document.getElementById(
-  "ref-count"
- ).textContent=
-  formatNumber(
-   state.referral_count
-  );
-
-
- document.getElementById(
-  "ref-earned"
- ).textContent=
-  formatNumber(
-   state.referral_total_earned
-  );
-
-
- document.getElementById(
-  "ref-bonus"
- ).textContent=
-  "+"+
-  formatNumber(
-   state.referral_bonus
-  );
-
-
- document.getElementById(
-  "ref-percent"
- ).textContent=
-  state.referral_percent+
-  "%";
+  document.getElementById(
+    "ref-percent"
+  ).textContent =
+    state.referral_percent +
+    "%";
 
 }
 
 
 function updateUpgrade(
- type,
- cost,
- id
+  type,
+  cost,
+  id
 ){
 
- const b=
-  document.getElementById(id);
+  const button =
+    document.getElementById(
+      id
+    );
 
-
- b.classList.remove(
-  "can-buy",
-  "maxed"
- );
-
-
- if(cost===-1){
-
-  b.textContent=
-   "MAX";
-
-  b.disabled=
-   true;
-
-  b.classList.add(
-   "maxed"
+  button.classList.remove(
+    "can-buy",
+    "maxed"
   );
 
-  return;
 
- }
+  if(Number(cost) === -1){
+
+    button.textContent =
+      "MAX";
+
+    button.disabled =
+      true;
+
+    button.classList.add(
+      "maxed"
+    );
+
+    return;
+
+  }
 
 
- b.textContent=
-  formatNumber(cost);
+  button.textContent =
+    formatNumber(cost);
+
+  button.disabled =
+    Number(state.balance) <
+    Number(cost);
 
 
- b.disabled=
-  Number(state.balance)<
-  Number(cost);
+  if(!button.disabled){
 
+    button.classList.add(
+      "can-buy"
+    );
 
- if(!b.disabled){
-
-  b.classList.add(
-   "can-buy"
-  );
-
- }
+  }
 
 }
 
-
-/* ============================================================
-   LOAD STATE
-   ============================================================ */
 
 async function loadState(){
 
- try{
+  try{
 
-  state=
-   await api(
-    `/api/state/${USER_ID}`
-   );
+    state =
+      await api(
+        `/api/state/${USER_ID}`
+      );
 
-  renderState();
+    if(
+      state &&
+      (
+        state.language === "ru" ||
+        state.language === "en"
+      )
+    ){
 
- }catch(e){
+      const saved =
+        localStorage.getItem(
+          "sundered_star_language"
+        );
 
-  console.error(e);
+      if(!saved){
+        language =
+          state.language;
+      }
 
-  showToast(
-   e.message
-  );
+    }
 
- }
+    renderState();
+
+  }catch(error){
+
+    console.error(error);
+    showToast(
+      error.message
+    );
+
+  }
 
 }
 
-
-/* ============================================================
-   TELEGRAM PROFILE
-   ============================================================ */
 
 async function syncTelegramProfile(){
 
- if(!tg?.initDataUnsafe?.user){
-  return;
- }
+  if(
+    !tg?.initDataUnsafe?.user
+  ){
+    return;
+  }
 
+  const user =
+    tg.initDataUnsafe.user;
 
- const u=
-  tg.initDataUnsafe.user;
+  try{
 
+    state =
+      await api(
+        "/api/profile",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            user_id:USER_ID,
+            username:
+              user.username || null,
+            first_name:
+              user.first_name || null,
+            last_name:
+              user.last_name || null
+          })
+        }
+      );
 
- try{
+    renderState();
 
-  state=
-   await api(
-    "/api/profile",
-    {
-     method:"POST",
+  }catch(error){
 
-     body:JSON.stringify({
+    console.warn(
+      "Profile sync",
+      error
+    );
 
-      user_id:USER_ID,
-
-      username:
-       u.username||
-       null,
-
-      first_name:
-       u.first_name||
-       null,
-
-      last_name:
-       u.last_name||
-       null
-
-     })
-
-    }
-   );
-
-
-  renderState();
-
- }catch(e){
-
-  console.warn(
-   "Profile sync",
-   e
-  );
-
- }
+  }
 
 }
 
 
-/* ============================================================
-   CLICKS
-   ============================================================ */
+function animateTap(power){
 
-function animateTap(
- power
-){
+  const zone =
+    document.getElementById(
+      "click-zone"
+    );
 
- const z=
-  document.getElementById(
-   "click-zone"
+  const element =
+    document.createElement(
+      "div"
+    );
+
+  element.className =
+    "tap-number";
+
+  element.textContent =
+    "+" + power;
+
+  const rect =
+    zone.getBoundingClientRect();
+
+  element.style.left =
+    (
+      rect.width / 2 -
+      20 +
+      (Math.random() * 80 - 40)
+    ) + "px";
+
+  element.style.top =
+    (
+      rect.height / 2 -
+      20 +
+      (Math.random() * 50 - 25)
+    ) + "px";
+
+  zone.appendChild(
+    element
   );
 
-
- const el=
-  document.createElement(
-   "div"
+  setTimeout(
+    () => element.remove(),
+    700
   );
-
-
- el.className=
-  "tap-number";
-
-
- el.textContent=
-  "+"+
-  power;
-
-
- const r=
-  z.getBoundingClientRect();
-
-
- el.style.left=
-  (
-   r.width/2-
-   20+
-   (Math.random()*80-40)
-  )+"px";
-
-
- el.style.top=
-  (
-   r.height/2-
-   20+
-   (Math.random()*50-25)
-  )+"px";
-
-
- z.appendChild(
-  el
- );
-
-
- setTimeout(
-  ()=>el.remove(),
-  700
- );
 
 }
 
 
 function queueTap(){
 
- if(
-  !state||
-  Number(state.stamina||0)<=0
- ){
-  return;
- }
+  if(
+    !state ||
+    Number(state.stamina || 0) <= 0
+  ){
+    return;
+  }
 
+  const power =
+    Number(
+      state.click_power || 1
+    );
 
- pendingTaps++;
+  pendingTaps++;
 
+  animateTap(
+    power
+  );
 
- if(!clickTimer){
+  if(!clickTimer){
 
-  clickTimer=
-   setTimeout(
-    flushClicks,
-    50
-   );
+    clickTimer =
+      setTimeout(
+        flushClicks,
+        50
+      );
 
- }
+  }
 
 }
 
 
 async function flushClicks(){
 
- clickTimer=
-  null;
+  clickTimer =
+    null;
 
-
- if(
-  pendingTaps<=0||
-  clickRequestRunning
- ){
-  return;
- }
-
-
- const taps=
-  Math.min(
-   pendingTaps,
-   1000
-  );
-
-
- pendingTaps-=
-  taps;
-
-
- clickRequestRunning=
-  true;
-
-
- try{
-
-  const result=
-   await api(
-    "/api/click",
-    {
-     method:"POST",
-
-     body:JSON.stringify({
-
-      user_id:
-       USER_ID,
-
-      taps:
-       taps
-
-     })
-
-    }
-   );
-
-
-  state=
-   result;
-
-
-  const accepted=
-   Number(
-    result?.accepted_taps||0
-   );
-
-
-  const power=
-   Number(
-    result?.click_power||1
-   );
-
-
-  /*
-   Не создаём тысячу DOM-элементов
-   при большой пачке кликов.
-  */
-
-  const visualCount=
-   Math.min(
-    accepted,
-    25
-   );
-
-
-  for(
-   let i=0;
-   i<visualCount;
-   i++
+  if(
+    pendingTaps <= 0 ||
+    clickRequestRunning
   ){
-
-   animateTap(
-    power
-   );
-
+    return;
   }
 
-
-  renderState();
-
-
-  updateLeaderboardSoon();
-
-
- }catch(e){
-
-  pendingTaps+=
-   taps;
-
-
-  showToast(
-   e.message
-  );
-
-
- }finally{
-
-  clickRequestRunning=
-   false;
-
-
-  if(pendingTaps>0){
-
-   clickTimer=
-    setTimeout(
-     flushClicks,
-     50
+  const taps =
+    Math.min(
+      pendingTaps,
+      1000
     );
 
-  }
+  pendingTaps -=
+    taps;
 
- }
+  clickRequestRunning =
+    true;
+
+  try{
+
+    state =
+      await api(
+        "/api/click",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            user_id:USER_ID,
+            taps:taps
+          })
+        }
+      );
+
+    renderState();
+    updateLeaderboardSoon();
+
+  }catch(error){
+
+    pendingTaps +=
+      taps;
+
+    showToast(
+      error.message
+    );
+
+  }finally{
+
+    clickRequestRunning =
+      false;
+
+    if(pendingTaps > 0){
+
+      clickTimer =
+        setTimeout(
+          flushClicks,
+          50
+        );
+
+    }
+
+  }
 
 }
 
 
-const clickZone=
- document.getElementById(
-  "click-zone"
-);
-
-
-clickZone.addEventListener(
- "pointerdown",
- e=>{
-
-  e.preventDefault();
-
-
-  if(
-   Number(
-    state?.stamina||0
-   )<=0
-  ){
-   return;
-  }
-
-
-  clickZone.classList.add(
-   "pressed"
+const clickZone =
+  document.getElementById(
+    "click-zone"
   );
 
 
-  queueTap();
+clickZone.addEventListener(
+  "pointerdown",
+  event => {
 
- },
- {
-  passive:false
- }
+    event.preventDefault();
+
+    if(
+      Number(
+        state?.stamina || 0
+      ) <= 0
+    ){
+      return;
+    }
+
+    clickZone.classList.add(
+      "pressed"
+    );
+
+    queueTap();
+
+  },
+  {
+    passive:false
+  }
 );
 
 
 [
- "pointerup",
- "pointercancel",
- "pointerleave"
+  "pointerup",
+  "pointercancel",
+  "pointerleave"
 ].forEach(
- x=>
-  clickZone.addEventListener(
-   x,
-   ()=>clickZone.classList.remove(
-    "pressed"
-   )
-  )
+  eventName => {
+
+    clickZone.addEventListener(
+      eventName,
+      () =>
+        clickZone.classList.remove(
+          "pressed"
+        )
+    );
+
+  }
 );
 
 
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
+function switchPage(page){
 
-function switchPage(
- page
-){
-
- document
-  .querySelectorAll(
-   ".page"
-  )
-  .forEach(
-   x=>
-    x.classList.toggle(
-     "active",
-     x.id==="page-"+page
-    )
-  );
+  document
+    .querySelectorAll(".page")
+    .forEach(
+      pageElement =>
+        pageElement.classList.toggle(
+          "active",
+          pageElement.id ===
+          "page-" + page
+        )
+    );
 
 
- document
-  .querySelectorAll(
-   ".nav-button"
-  )
-  .forEach(
-   x=>
-    x.classList.toggle(
-     "active",
-     x.dataset.page===page
-    )
-  );
+  document
+    .querySelectorAll(".nav-button")
+    .forEach(
+      button =>
+        button.classList.toggle(
+          "active",
+          button.dataset.page ===
+          page
+        )
+    );
 
 
- if(page==="leaderboard"){
-  loadLeaderboard();
- }
+  if(page === "leaderboard"){
+    loadLeaderboard();
+  }
 
-
- if(page==="referrals"){
-  loadReferrals();
- }
+  if(page === "referrals"){
+    loadReferrals();
+  }
 
 }
 
 
 document
- .querySelectorAll(
-  ".nav-button"
- )
- .forEach(
-  b=>
-   b.addEventListener(
-    "click",
-    ()=>switchPage(
-     b.dataset.page
-    )
-   )
- );
+  .querySelectorAll(".nav-button")
+  .forEach(
+    button =>
+      button.addEventListener(
+        "click",
+        () =>
+          switchPage(
+            button.dataset.page
+          )
+      )
+  );
 
-
-/* ============================================================
-   DAILY
-   ============================================================ */
 
 document
- .getElementById(
-  "daily-button"
- )
- .addEventListener(
-  "click",
-  async()=>{
+  .getElementById(
+    "daily-button"
+  )
+  .addEventListener(
+    "click",
+    async () => {
 
-   try{
+      try{
 
-    const result=
-     await api(
-      "/api/daily/claim",
-      {
-       method:"POST",
+        const result =
+          await api(
+            "/api/daily/claim",
+            {
+              method:"POST",
+              body:JSON.stringify({
+                user_id:USER_ID
+              })
+            }
+          );
 
-       body:JSON.stringify({
-        user_id:
-         USER_ID
-       })
+        state =
+          result;
+
+        renderState();
+
+        showToast(
+          `🎁 +${formatNumber(
+            result.claimed_amount || 0
+          )} ${
+            language === "en"
+              ? "coins"
+              : "монет"
+          }`
+        );
+
+        updateLeaderboardSoon();
+
+      }catch(error){
+
+        showToast(
+          error.message
+        );
 
       }
-     );
-
-
-    const claimedAmount=
-     Number(
-      result?.claimed_amount||0
-     );
-
-
-    state=
-     result;
-
-
-    renderState();
-
-
-    showToast(
-     `🎁 +${formatNumber(claimedAmount)} ${t("coins")}`
-    );
-
-
-    updateLeaderboardSoon();
-
-
-   }catch(e){
-
-    showToast(
-     e.message
-    );
-
-   }
-
-  }
- );
-
-
-/* ============================================================
-   UPGRADES
-   ============================================================ */
-
-async function upgrade(
- path,
- msg
-){
-
- try{
-
-  state=
-   await api(
-    path,
-    {
-     method:"POST",
-
-     body:JSON.stringify({
-      user_id:
-       USER_ID
-     })
 
     }
-   );
-
-
-  renderState();
-
-
-  showToast(
-   msg
   );
 
 
-  updateLeaderboardSoon();
+async function upgrade(
+  path,
+  message
+){
 
+  try{
 
- }catch(e){
+    state =
+      await api(
+        path,
+        {
+          method:"POST",
+          body:JSON.stringify({
+            user_id:USER_ID
+          })
+        }
+      );
 
-  showToast(
-   e.message
-  );
+    renderState();
 
- }
+    showToast(
+      message
+    );
+
+    updateLeaderboardSoon();
+
+  }catch(error){
+
+    showToast(
+      error.message
+    );
+
+  }
 
 }
 
 
 document
- .getElementById(
-  "click-upgrade-button"
- )
- .addEventListener(
-  "click",
-  ()=>upgrade(
-   "/api/upgrade/click",
-   t("tapUpgrade")
+  .getElementById(
+    "click-upgrade-button"
   )
- );
+  .addEventListener(
+    "click",
+    () =>
+      upgrade(
+        "/api/upgrade/click",
+        language === "en"
+          ? "👆 Click power upgraded"
+          : "👆 Сила клика улучшена"
+      )
+  );
 
 
 document
- .getElementById(
-  "stamina-upgrade-button"
- )
- .addEventListener(
-  "click",
-  ()=>upgrade(
-   "/api/upgrade/stamina",
-   t("staminaUpgrade")
+  .getElementById(
+    "stamina-upgrade-button"
   )
- );
+  .addEventListener(
+    "click",
+    () =>
+      upgrade(
+        "/api/upgrade/stamina",
+        language === "en"
+          ? "⚡ Stamina capacity increased"
+          : "⚡ Запас стамины увеличен"
+      )
+  );
 
-
-/* ============================================================
-   PRESTIGE
-   ============================================================ */
 
 document
- .getElementById(
-  "prestige-button"
- )
- .addEventListener(
-  "click",
-  async()=>{
+  .getElementById(
+    "prestige-button"
+  )
+  .addEventListener(
+    "click",
+    async () => {
 
-   if(
-    !state?.can_prestige
-   ){
-    return;
-   }
+      if(
+        !state?.can_prestige
+      ){
+        return;
+      }
 
+      try{
 
-   try{
+        state =
+          await api(
+            "/api/prestige",
+            {
+              method:"POST",
+              body:JSON.stringify({
+                user_id:USER_ID
+              })
+            }
+          );
 
-    state=
-     await api(
-      "/api/prestige",
-      {
-       method:"POST",
+        renderState();
 
-       body:JSON.stringify({
-        user_id:
-         USER_ID
-       })
+        showToast(
+          t("flight")
+        );
+
+        updateLeaderboardSoon();
+
+      }catch(error){
+
+        showToast(
+          error.message
+        );
 
       }
-     );
 
+    }
+  );
 
-    renderState();
-
-
-    showToast(
-     t("flight")
-    );
-
-
-    updateLeaderboardSoon();
-
-
-   }catch(e){
-
-    showToast(
-     e.message
-    );
-
-   }
-
-  }
- );
-
-
-/* ============================================================
-   REFERRALS
-   ============================================================ */
 
 document
- .getElementById(
-  "copy-ref-code"
- )
- .addEventListener(
-  "click",
-  async()=>{
+  .getElementById(
+    "copy-ref-code"
+  )
+  .addEventListener(
+    "click",
+    async () => {
 
-   const link=
-    referralLink();
+      const link =
+        referralLink();
 
+      try{
 
-   try{
+        await navigator.clipboard.writeText(
+          link
+        );
 
-    await navigator.clipboard.writeText(
-     link
-    );
+        showToast(
+          t("copied")
+        );
 
+      }catch(error){
 
-    showToast(
-     t("copied")
-    );
+        const textarea =
+          document.createElement(
+            "textarea"
+          );
 
+        textarea.value =
+          link;
 
-   }catch(e){
+        textarea.style.position =
+          "fixed";
 
-    const ta=
-     document.createElement(
-      "textarea"
-     );
+        textarea.style.opacity =
+          "0";
 
+        document.body.appendChild(
+          textarea
+        );
 
-    ta.value=
-     link;
+        textarea.select();
 
+        document.execCommand(
+          "copy"
+        );
 
-    ta.style.position=
-     "fixed";
+        textarea.remove();
 
-    ta.style.opacity=
-     "0";
+        showToast(
+          t("copiedShort")
+        );
 
+      }
 
-    document.body.appendChild(
-     ta
-    );
-
-
-    ta.select();
-
-
-    document.execCommand(
-     "copy"
-    );
-
-
-    ta.remove();
-
-
-    showToast(
-     t("copiedShort")
-    );
-
-   }
-
-  }
- );
+    }
+  );
 
 
 async function loadReferrals(){
 
- try{
+  try{
 
-  referralData=
-   await api(
-    `/api/referral/${USER_ID}`
-   );
+    referralData =
+      await api(
+        `/api/referral/${USER_ID}`
+      );
 
+    renderReferrals();
 
-  renderReferrals();
+  }catch(error){
 
+    showToast(
+      error.message
+    );
 
- }catch(e){
-
-  showToast(
-   e.message
-  );
-
- }
+  }
 
 }
 
 
 function renderReferrals(){
 
- const c=
-  document.getElementById(
-   "referral-list"
-  );
-
-
- if(
-  !referralData||
-  !referralData.referrals||
-  !referralData.referrals.length
- ){
-
-  c.innerHTML=
-   `<div class="empty">${t("noReferrals")}</div>`;
-
-
-  return;
-
- }
-
-
- c.innerHTML=
-  referralData.referrals
-   .map(
-    r=>
-     `<div class="ref-item">
-
-       <div class="ref-item-top">
-
-        <div class="ref-name">
-         ${escapeHtml(r.name)}
-        </div>
-
-        <div class="ref-earned">
-         +${formatNumber(r.total_paid)}
-        </div>
-
-       </div>
-
-       <div class="ref-small">
-        ${t("earnedByClicks")}: ${formatNumber(r.total_click_earnings)}
-       </div>
-
-       <div class="ref-small">
-        ${t("payout")}: ${
-         r.days_until_payout<=0
-          ?t("payoutNow")
-          :`${t("payoutIn")} ${r.days_until_payout} ${pluralDays(r.days_until_payout)}`
-        }
-       </div>
-
-      </div>`
-   )
-   .join("");
-
-}
-
-
-/* ============================================================
-   REFERRAL START
-   ============================================================ */
-
-async function processReferralStart(){
-
- let p=
-  tg?.initDataUnsafe?.start_param||
-  "";
-
-
- if(!p){
-
-  const q=
-   new URLSearchParams(
-    location.search
-   );
-
-
-  p=
-   q.get("startapp")||
-   q.get("start")||
-   "";
-
- }
-
-
- if(!p){
-  return;
- }
-
-
- p=
-  String(p)
-   .trim()
-   .replace(
-    /^ref_/,
-    ""
-   );
-
-
- const ref=
-  Number(p);
-
-
- if(
-  !Number.isInteger(ref)||
-  ref<=0||
-  ref===USER_ID
- ){
-  return;
- }
-
-
- try{
-
-  const r=
-   await api(
-    "/api/referral/register",
-    {
-     method:"POST",
-
-     body:JSON.stringify({
-      user_id:
-       USER_ID,
-
-      referrer_id:
-       ref
-     })
-
-    }
-   );
+  const container =
+    document.getElementById(
+      "referral-list"
+    );
 
 
   if(
-   r&&
-   !r.already_registered
+    !referralData?.referrals?.length
   ){
 
-   state=
-    r.state;
+    container.innerHTML =
+      `<div class="empty">${t(
+        "noReferrals"
+      )}</div>`;
 
-
-   renderState();
-
-
-   showToast(
-    t("refActive")
-   );
+    return;
 
   }
 
 
- }catch(e){
+  container.innerHTML =
+    referralData.referrals
+      .map(
+        referral => {
 
-  console.warn(
-   "Referral",
-   e
-  );
+          const payoutText =
+            referral.days_until_payout <= 0
+              ? (
+                  language === "en"
+                    ? "now"
+                    : "сейчас"
+                )
+              : (
+                  language === "en"
+                    ? `in ${referral.days_until_payout} days`
+                    : `через ${referral.days_until_payout} дн.`
+                );
 
- }
+          return `
+            <div class="ref-item">
+
+              <div class="ref-item-top">
+
+                <div class="ref-name">
+                  ${escapeHtml(
+                    referral.name
+                  )}
+                </div>
+
+                <div class="ref-earned">
+                  +${formatNumber(
+                    referral.total_paid
+                  )}
+                </div>
+
+              </div>
+
+              <div class="ref-small">
+                ${
+                  language === "en"
+                    ? "Earned from clicks:"
+                    : "Заработано кликами:"
+                }
+                ${formatNumber(
+                  referral.total_click_earnings
+                )}
+              </div>
+
+              <div class="ref-small">
+                ${
+                  language === "en"
+                    ? "Next payout:"
+                    : "Следующая выплата:"
+                }
+                ${payoutText}
+              </div>
+
+            </div>
+          `;
+
+        }
+      )
+      .join("");
 
 }
 
 
-/* ============================================================
-   LEADERBOARD
-   ============================================================ */
+async function processReferralStart(){
+
+  let parameter =
+    tg?.initDataUnsafe?.start_param ||
+    "";
+
+  if(!parameter){
+
+    const query =
+      new URLSearchParams(
+        location.search
+      );
+
+    parameter =
+      query.get("startapp") ||
+      query.get("start") ||
+      "";
+
+  }
+
+
+  if(!parameter){
+    return;
+  }
+
+
+  parameter =
+    String(
+      parameter
+    )
+    .trim()
+    .replace(
+      /^ref_/,
+      ""
+    );
+
+
+  const referrerId =
+    Number(
+      parameter
+    );
+
+
+  if(
+    !Number.isInteger(
+      referrerId
+    ) ||
+    referrerId <= 0 ||
+    referrerId === USER_ID
+  ){
+    return;
+  }
+
+
+  try{
+
+    const result =
+      await api(
+        "/api/referral/register",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            user_id:USER_ID,
+            referrer_id:referrerId
+          })
+        }
+      );
+
+
+    if(
+      result &&
+      !result.already_registered
+    ){
+
+      state =
+        result.state;
+
+      renderState();
+
+      showToast(
+        t("refActive")
+      );
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Referral",
+      error
+    );
+
+  }
+
+}
+
 
 async function loadLeaderboard(){
 
- const c=
-  document.getElementById(
-   "leaderboard-list"
-  );
+  const container =
+    document.getElementById(
+      "leaderboard-list"
+    );
+
+  container.innerHTML =
+    `<div class="loading">${
+      language === "en"
+        ? "Loading leaderboard..."
+        : "Загрузка лидерборда..."
+    }</div>`;
 
 
- c.innerHTML=
-  `<div class="loading">${t("loadingLeaderboard")}</div>`;
+  try{
 
+    leaderboardData =
+      await api(
+        "/api/leaderboard?limit=50"
+      );
 
- try{
+    renderLeaderboard();
 
-  leaderboardData=
-   await api(
-    "/api/leaderboard?limit=50"
-   );
+  }catch(error){
 
+    container.innerHTML =
+      `<div class="empty">${
+        language === "en"
+          ? "Could not load leaderboard"
+          : "Не удалось загрузить лидерборд"
+      }</div>`;
 
-  renderLeaderboard();
-
-
- }catch(e){
-
-  c.innerHTML=
-   `<div class="empty">${t("unableLeaderboard")}</div>`;
-
- }
+  }
 
 }
 
 
 function renderLeaderboard(){
 
- const c=
-  document.getElementById(
-   "leaderboard-list"
-  );
+  const container =
+    document.getElementById(
+      "leaderboard-list"
+    );
+
+  const rows =
+    leaderboardData?.balance ||
+    [];
 
 
- const rows=
-  leaderboardData?.balance||
-  [];
+  if(!rows.length){
+
+    container.innerHTML =
+      `<div class="empty">${
+        language === "en"
+          ? "Nobody here yet"
+          : "Пока здесь никого нет"
+      }</div>`;
+
+    return;
+
+  }
 
 
- if(!rows.length){
+  container.innerHTML =
+    rows
+      .map(
+        row => `
 
-  c.innerHTML=
-   `<div class="empty">${t("noLeaderboard")}</div>`;
+          <div class="leader-item">
 
+            <div class="leader-rank">
+              #${row.rank}
+            </div>
 
-  return;
+            <div class="leader-info">
 
- }
+              <div class="leader-name">
+                ${escapeHtml(
+                  row.name
+                )}
+              </div>
 
+              <div class="leader-sub">
+                ${escapeHtml(
+                  row.object_name || ""
+                )}
+              </div>
 
- c.innerHTML=
-  rows
-   .map(
-    r=>
-     `<div class="leader-item">
+            </div>
 
-       <div class="leader-rank">
-        #${r.rank}
-       </div>
+            <div class="leader-value">
+              ${formatNumber(
+                row.balance
+              )} 🪙
+            </div>
 
-       <div class="leader-info">
+          </div>
 
-        <div class="leader-name">
-         ${escapeHtml(r.name)}
-        </div>
-
-        <div class="leader-sub">
-         ${escapeHtml(
-          getObjectName(
-           r.object_index
-          )
-         )}
-        </div>
-
-       </div>
-
-       <div class="leader-value">
-        ${formatNumber(r.balance)} 🪙
-       </div>
-
-      </div>`
-   )
-   .join("");
+        `
+      )
+      .join("");
 
 }
 
 
-let leaderRefreshTimer=
- null;
+let leaderRefreshTimer =
+  null;
 
 
 function updateLeaderboardSoon(){
 
- clearTimeout(
-  leaderRefreshTimer
- );
-
-
- leaderRefreshTimer=
-  setTimeout(
-   async()=>{
-
-    try{
-
-     leaderboardData=
-      await api(
-       "/api/leaderboard?limit=50"
-      );
-
-
-     if(
-      document
-       .getElementById(
-        "page-leaderboard"
-       )
-       .classList
-       .contains(
-        "active"
-       )
-     ){
-
-      renderLeaderboard();
-
-     }
-
-    }catch(e){}
-
-   },
-   250
+  clearTimeout(
+    leaderRefreshTimer
   );
+
+
+  leaderRefreshTimer =
+    setTimeout(
+      async () => {
+
+        try{
+
+          leaderboardData =
+            await api(
+              "/api/leaderboard?limit=50"
+            );
+
+          if(
+            document
+              .getElementById(
+                "page-leaderboard"
+              )
+              .classList
+              .contains("active")
+          ){
+
+            renderLeaderboard();
+
+          }
+
+        }catch(error){}
+
+      },
+      250
+    );
 
 }
 
 
-/* ============================================================
-   SETTINGS
-   ============================================================ */
+function openSettings(){
 
-document
- .getElementById(
-  "settings-button"
- )
- .addEventListener(
-  "click",
-  openSettings
- );
-
-
-document
- .getElementById(
-  "settings-close"
- )
- .addEventListener(
-  "click",
-  closeSettings
- );
-
-
-document
- .getElementById(
-  "settings-overlay"
- )
- .addEventListener(
-  "click",
-  e=>{
-
-   if(
-    e.target.id===
-    "settings-overlay"
-   ){
-
-    closeSettings();
-
-   }
-
-  }
- );
-
-
-document
- .querySelectorAll(
-  "[data-lang]"
- )
- .forEach(
-  b=>
-   b.addEventListener(
-    "click",
-    ()=>saveLanguage(
-     b.dataset.lang,
-     true
+  document
+    .getElementById(
+      "settings-overlay"
     )
-   )
- );
-
-
-document
- .querySelectorAll(
-  "[data-settings-lang]"
- )
- .forEach(
-  b=>
-   b.addEventListener(
-    "click",
-    ()=>saveLanguage(
-     b.dataset.settingsLang,
-     true
-    )
-   )
- );
-
-
-/* ============================================================
-   LANGUAGE INIT
-   ============================================================ */
-
-async function initLanguage(){
-
- let serverLanguage=
-  null;
-
-
- try{
-
-  const r=
-   await api(
-    `/api/settings/language/${USER_ID}`
-   );
-
-
-  serverLanguage=
-   r.language;
-
-
- }catch(e){
-
-  console.warn(
-   "Language API unavailable",
-   e
-  );
-
- }
-
-
- /*
-  ВАЖНО:
-
-  main.py создаёт нового пользователя
-  с language="ru".
-
-  Поэтому serverLanguage === "ru"
-  не означает, что пользователь уже
-  реально выбирал язык.
-
-  Для первого входа используем наличие
-  локального маркера как признак того,
-  что выбор уже был сделан.
- */
-
- const localLanguage=
-  localStorage.getItem(
-   "sundered_star_language"
-  );
-
-
- const hasLocalLanguage=
-  localLanguage==="ru"||
-  localLanguage==="en";
-
-
- if(hasLocalLanguage){
-
-  /*
-   Если сервер уже содержит корректный
-   язык — он является источником истины.
-   Иначе используем локальный.
-  */
-
-  language=
-   (
-    serverLanguage==="ru"||
-    serverLanguage==="en"
-   )
-    ?serverLanguage
-    :localLanguage;
-
-
-  applyLanguage();
-
-
-  return;
-
- }
-
-
- /*
-  Первый вход на этом устройстве.
-  Показываем выбор языка.
- */
-
- language=
-  (
-   serverLanguage==="ru"||
-   serverLanguage==="en"
-  )
-   ?serverLanguage
-   :"ru";
-
-
- applyLanguage();
-
-
- document
-  .getElementById(
-   "language-overlay"
-  )
-  .classList.add(
-   "show"
-  );
+    .classList
+    .add("show");
 
 }
 
 
-/* ============================================================
-   PERIODIC STATE
-   ============================================================ */
+function closeSettings(){
 
-setInterval(
- async()=>{
+  document
+    .getElementById(
+      "settings-overlay"
+    )
+    .classList
+    .remove("show");
 
-  /*
-   Пока есть неотправленные клики,
-   не перетираем локальное состояние
-   очередным GET /state.
-  */
+}
+
+
+async function saveLanguage(
+  selectedLanguage,
+  closeAfter
+){
 
   if(
-   pendingTaps||
-   clickRequestRunning
+    selectedLanguage !== "ru" &&
+    selectedLanguage !== "en"
   ){
-   return;
+    return;
   }
 
 
   try{
 
-   state=
-    await api(
-     `/api/state/${USER_ID}`
+    state =
+      await api(
+        "/api/language",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            user_id:USER_ID,
+            language:selectedLanguage
+          })
+        }
+      );
+
+    language =
+      selectedLanguage;
+
+    localStorage.setItem(
+      "sundered_star_language",
+      selectedLanguage
+    );
+
+    applyLanguage();
+
+
+    document
+      .getElementById(
+        "language-overlay"
+      )
+      .classList
+      .remove("show");
+
+
+    if(closeAfter){
+
+      document
+        .getElementById(
+          "settings-overlay"
+        )
+        .classList
+        .remove("show");
+
+    }
+
+    showToast(
+      language === "en"
+        ? "Language saved"
+        : "Язык сохранён"
+    );
+
+  }catch(error){
+
+    showToast(
+      error.message
+    );
+
+  }
+
+}
+
+
+async function initLanguage(){
+
+  const localLanguage =
+    localStorage.getItem(
+      "sundered_star_language"
     );
 
 
-   renderState();
+  /*
+   * Если пользователь уже выбирал язык
+   * на этом устройстве — больше не показываем
+   * стартовый экран.
+   */
+  if(
+    localLanguage === "ru" ||
+    localLanguage === "en"
+  ){
+
+    language =
+      localLanguage;
+
+    applyLanguage();
+
+    return;
+
+  }
 
 
-  }catch(e){}
+  /*
+   * Backend хранит язык пользователя.
+   * Это используется как первоначальное
+   * значение, но сам экран выбора показываем
+   * только если локально выбор ещё не сохранён.
+   */
+  if(
+    state &&
+    (
+      state.language === "ru" ||
+      state.language === "en"
+    )
+  ){
 
- },
- 3000
+    language =
+      state.language;
+
+  }else{
+
+    language =
+      "ru";
+
+  }
+
+
+  applyLanguage();
+
+
+  document
+    .getElementById(
+      "language-overlay"
+    )
+    .classList
+    .add("show");
+
+}
+
+
+document
+  .getElementById(
+    "settings-button"
+  )
+  .addEventListener(
+    "click",
+    openSettings
+  );
+
+
+document
+  .getElementById(
+    "settings-close"
+  )
+  .addEventListener(
+    "click",
+    closeSettings
+  );
+
+
+document
+  .getElementById(
+    "settings-overlay"
+  )
+  .addEventListener(
+    "click",
+    event => {
+
+      if(
+        event.target.id ===
+        "settings-overlay"
+      ){
+
+        closeSettings();
+
+      }
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    "[data-lang]"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () =>
+          saveLanguage(
+            button.dataset.lang,
+            false
+          )
+      );
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    "[data-settings-lang]"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () =>
+          saveLanguage(
+            button.dataset.settingsLang,
+            true
+          )
+      );
+
+    }
+  );
+
+
+setInterval(
+  async () => {
+
+    if(
+      pendingTaps ||
+      clickRequestRunning
+    ){
+      return;
+    }
+
+    try{
+
+      state =
+        await api(
+          `/api/state/${USER_ID}`
+        );
+
+      renderState();
+
+    }catch(error){}
+
+  },
+  3000
 );
 
 
-/* ============================================================
-   START
-   ============================================================ */
-
 async function init(){
 
- await loadState();
+  await loadState();
 
- await syncTelegramProfile();
+  await syncTelegramProfile();
 
- await initLanguage();
+  await initLanguage();
 
- await processReferralStart();
+  await processReferralStart();
 
 }
 
